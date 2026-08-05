@@ -65,7 +65,7 @@ services:
       - key: ADMIN_PASSWORD_HASH
         sync: false
       - key: CORS_ORIGINS
-        # https://pifix-web.onrender.com,https://pifix-c5u9.pinet.com
+        # https://pifix-web.onrender.com,https://REPLACE-ME.pinet.com
         sync: false
       - key: ENABLE_INTERNAL_CRON
         value: "true"
@@ -90,7 +90,7 @@ services:
       # The address pioneers actually arrive from, used for referral links and
       # the "open in Pi Browser" screen.
       - key: VITE_APP_URL
-        sync: false # https://pifix-c5u9.pinet.com
+        sync: false # read it from Develop -> PiNet Settings -> "Current PiNet subdomain"
     routes:
       # SPA fallback — every client route must serve index.html.
       - type: rewrite

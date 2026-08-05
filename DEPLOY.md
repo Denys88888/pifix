@@ -78,7 +78,7 @@ JWT_SECRET=<64 random chars>
 JWT_EXPIRES_IN=30d
 ADMIN_JWT_EXPIRES_IN=12h
 
-CORS_ORIGINS=https://pifix-web.onrender.com,https://pifix-c5u9.pinet.com
+CORS_ORIGINS=https://pifix-web.onrender.com,https://REPLACE-ME.pinet.com
 CRON_SECRET=<32 random chars>
 ENABLE_INTERNAL_CRON=true
 LAZY_SWEEP_INTERVAL_SECONDS=300
@@ -127,7 +127,9 @@ Render → **New → Static Site** → same repo.
 ```
 VITE_API_URL=https://pifix-api.onrender.com/api
 VITE_PI_SANDBOX=true
-VITE_APP_URL=https://pifix-web.onrender.com
+# The pinet subdomain from step 5.7 — NOT the Render URL, or referral links
+# hand users an address they cannot open in Pi Browser.
+VITE_APP_URL=https://REPLACE-ME.pinet.com
 ```
 
 ### Redirects / Rewrites (required)
@@ -152,8 +154,15 @@ Then go back to the API service and make sure the static site's URL is in
 
 ## 5. Finish the app in the Pi Developer Portal
 
-The app is already registered on **Testnet** with slug `pifix-c5u9`, so pioneers
-will reach it at **https://pifix-c5u9.pinet.com**.
+The app is already registered on **Testnet** with slug `pifix-c5u9`.
+
+> **The slug is not the address.** PiNet assigns its own subdomain and appends
+> digits to it, so the public address is *not* `pifix-c5u9.pinet.com`. (For the
+> sibling Taxi Pro app the slug and the subdomain differ completely.) Every
+> `*.pinet.com` host answers HTTP 200 with the same generic PiNet page, so you
+> cannot discover it by guessing and curling — the only source of truth is
+> **Develop → My Apps → PiFix (Testnet) → PiNet Settings → "Current PiNet
+> subdomain"**. Read it there and put it into `VITE_APP_URL`.
 
 Do these in order — several of them are impossible before the site is live, so
 Render (steps 2 and 4) has to come first.
@@ -166,7 +175,7 @@ Render (steps 2 and 4) has to come first.
 | 4 | **API Key** | copy it into the Render API service as `PI_API_KEY` |
 | 5 | **Pi Sign-In** | request the scopes `username`, `payments`, `wallet_address`. `payments` is what exposes the wallet address used for payouts |
 | 6 | **Checklist → validation key** | put the generated `validation-key.txt` into `frontend/public/`, commit, redeploy — it then answers at `https://pifix-web.onrender.com/validation-key.txt` |
-| 7 | **PiNet Settings** | confirm the slug; add `https://pifix-c5u9.pinet.com` to `CORS_ORIGINS` on the API |
+| 7 | **PiNet Settings** | read "Current PiNet subdomain" — that is the real public address. Put it into `VITE_APP_URL` on the static site and add it to `CORS_ORIGINS` on the API |
 
 > Never paste the wallet seed into a chat, an issue, or a commit. It goes
 > straight from the portal into Render's environment variables and nowhere else.
