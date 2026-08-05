@@ -164,8 +164,23 @@ The app is already registered on **Testnet** with slug `pifix-c5u9`.
 > **Develop → My Apps → PiFix (Testnet) → PiNet Settings → "Current PiNet
 > subdomain"**. Read it there and put it into `VITE_APP_URL`.
 
-Do these in order — several of them are impossible before the site is live, so
-Render (steps 2 and 4) has to come first.
+Do these in order. **Nothing in the portal can be saved before the site is
+live** — verified by walking the screens in an emulator on 2026-08-05:
+
+- **Configuration** refuses to submit without *both* "Your App's URL" and "Your
+  App's development URL" (`Frontend URL is required` / `Development URL is
+  required`). So even the description cannot be changed first — Render has to
+  come before any portal edit.
+- **PiNet Settings** shows *"You must validate your domain ownership first
+  before creating PiNet subdomain"*, and the subdomain does not exist yet. It is
+  created only after the App URL is verified, and **PiNet appends 4 random
+  digits** to whatever you type — that is why the address is unpredictable.
+
+Field limits, so nothing gets truncated on paste: **App Name 80**,
+**Subtitle 30**, **Description 140** characters.
+
+Existing values that are already correct: App Network `Pi Testnet`,
+Testnet App Visibility `Public`, App Hosting `Self Hosted`.
 
 | # | Portal screen | What to enter |
 |---|---|---|
@@ -180,20 +195,21 @@ Render (steps 2 and 4) has to come first.
 > Never paste the wallet seed into a chat, an issue, or a commit. It goes
 > straight from the portal into Render's environment variables and nowhere else.
 
-### Ready-made description
+### Ready-made text, already trimmed to the field limits
 
-English (portal field):
+**Subtitle** (24/30):
 
-> Hire verified handymen and pay in Pi. Plumbers, electricians, mechanics,
-> builders, movers, cleaners, furniture assembly, appliance repair and on-site
-> IT — near you. Your Pi is held in escrow until you confirm the work is done.
+> Hire a master, pay in Pi
 
-Russian:
+**Description** (135/140):
 
-> Нанимайте проверенных мастеров и платите в Pi. Сантехники, электрики,
-> механики, строители, грузчики, уборка, сборка мебели, ремонт техники и
-> IT на выезде — рядом с вами. Ваши Pi заморожены в escrow, пока вы не
-> подтвердите, что работа выполнена.
+> Hire verified handymen and pay in Pi. Plumbers, electricians, movers, cleaners
+> and more. Your Pi stays in escrow until the job is done.
+
+Russian variant of the description, if you prefer it (133/140):
+
+> Нанимайте мастеров и платите в Pi. Сантехники, электрики, грузчики, уборка и
+> другое. Ваши Pi в escrow, пока вы не подтвердите работу.
 
 ---
 
