@@ -1,0 +1,53 @@
+.wrap {
+  background: var(--accent-soft);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border: 2px solid rgba(76, 175, 80, 0.28);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: pifix-spin 0.8s linear infinite;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a5d6a7;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.step {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stepOn {
+  background: var(--accent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}

@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+dist/
+build/
+*.tsbuildinfo
+
+# environment — NEVER commit these, they hold the Pi API key and wallet seed
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+logs/
+
+# database dumps
+*.sql
+*.sql.gz
+
+# editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# prisma
+backend/prisma/*.db
+backend/prisma/migrations/dev.db*

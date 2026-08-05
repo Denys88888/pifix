@@ -1,0 +1,56 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  line-height: 1;
+}
+
+.starOn,
+.starOff {
+  padding: 0;
+  background: none;
+  border: none;
+  line-height: 1;
+}
+
+.starOn {
+  color: #ffc107;
+}
+
+.starOff {
+  color: rgba(255, 255, 255, 0.18);
+}
+
+.sm .starOn,
+.sm .starOff {
+  font-size: 13px;
+}
+
+.md .starOn,
+.md .starOff {
+  font-size: 17px;
+}
+
+/* Interactive size: each star has to be a real tap target. */
+.lg .starOn,
+.lg .starOff {
+  font-size: 34px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value {
+  margin-inline-start: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.count {
+  color: var(--text-dim);
+  font-weight: 500;
+}

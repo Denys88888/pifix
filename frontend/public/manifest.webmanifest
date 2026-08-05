@@ -1,0 +1,21 @@
+{
+  "name": "PiFix — hire a master, pay in Pi",
+  "short_name": "PiFix",
+  "description": "Find and hire plumbers, electricians, movers, cleaners and more inside Pi Network.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "lang": "en",
+  "dir": "auto",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

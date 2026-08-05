@@ -1,0 +1,34 @@
+.full select,
+.compact select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
+    linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: right 12px center, right 7px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-inline-end: 26px;
+}
+
+.compact select {
+  min-height: 36px;
+  width: auto;
+  padding: 0 26px 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.full select {
+  min-height: 44px;
+  width: 100%;
+}
+
+:global([dir='rtl']) .compact select,
+:global([dir='rtl']) .full select {
+  background-position: left 12px center, left 7px center;
+  padding-inline-end: 10px;
+  padding-inline-start: 26px;
+}

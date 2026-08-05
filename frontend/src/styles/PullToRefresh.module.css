@@ -1,0 +1,22 @@
+.indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.18s ease;
+  color: var(--text-dim);
+}
+
+.text {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: pifix-spin 0.8s linear infinite;
+}

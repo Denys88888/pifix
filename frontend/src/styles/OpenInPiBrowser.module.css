@@ -1,0 +1,66 @@
+.wrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 16px;
+}
+
+.lang {
+  align-self: flex-end;
+}
+
+.card {
+  width: 100%;
+  max-width: var(--content-max);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.icon {
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 4px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 34px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.steps {
+  text-align: start;
+  margin: 4px 0;
+  padding-inline-start: 22px;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.url {
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px;
+  font-size: 13px;
+  word-break: break-all;
+  color: var(--accent);
+}
+
+.footnote {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 4px 0 0;
+}

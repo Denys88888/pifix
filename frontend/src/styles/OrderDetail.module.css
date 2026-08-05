@@ -1,0 +1,71 @@
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.category {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-dim);
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 17px;
+}
+
+.description {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.response {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px;
+}
+
+.responseName {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.verified {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #08130a;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.responseMessage {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

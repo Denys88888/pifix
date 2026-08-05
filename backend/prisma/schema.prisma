@@ -1,0 +1,447 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  PiFix — Prisma schema
+//  Money is ALWAYS Decimal(15,7) (Pi has 7 decimals). Never Float.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ────────────────────────────────────────────────────────────────────
+
+enum OrderStatus {
+  OPEN // published, waiting for responses
+  IN_PROGRESS // master selected, escrow funded
+  AWAITING_CONFIRMATION // master marked as done, waiting for client
+  COMPLETED // escrow released
+  CANCELLED
+  DISPUTED
+}
+
+enum EscrowStatus {
+  NONE
+  FUNDED
+  RELEASED
+  REFUNDED
+}
+
+enum ResponseStatus {
+  ACTIVE
+  SELECTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PaymentType {
+  CONNECT // master pays to respond to an order
+  ESCROW // client funds an order
+  BOOST // master boosts profile
+  SUBSCRIPTION // PRO subscription
+  PAYOUT // App→User: escrow release to master
+  WITHDRAWAL // App→User: balance withdrawal
+  REFERRAL_BONUS // App→User: referral payout
+  REFUND // App→User: connect / escrow refund
+}
+
+enum PaymentStatus {
+  PENDING // created client-side, waiting for server approval
+  APPROVED // approved by the server on Pi API
+  COMPLETED // completed & verified on Pi API
+  CANCELLED
+  ERROR
+}
+
+enum PaymentDirection {
+  U2A // user → app
+  A2U // app → user
+}
+
+enum TransactionType {
+  CONNECT_SPENT
+  ESCROW_FUNDED
+  ESCROW_RELEASED
+  ESCROW_REFUNDED
+  CONNECT_REFUNDED
+  JOB_EARNING
+  REFERRAL_BONUS
+  WITHDRAWAL
+  BOOST
+  SUBSCRIPTION
+  ADMIN_ADJUSTMENT
+}
+
+enum WithdrawalStatus {
+  REQUESTED
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum ReviewRole {
+  CLIENT_TO_MASTER
+  MASTER_TO_CLIENT
+}
+
+// ── Core models ──────────────────────────────────────────────────────────────
+
+model User {
+  id            String  @id @default(uuid())
+  piUid         String  @unique
+  username      String  @unique
+  walletAddress String?
+  language      String  @default("en")
+
+  isMaster    Boolean @default(false)
+  isBlocked   Boolean @default(false)
+  isDeleted   Boolean @default(false)
+  kycVerified Boolean @default(false)
+
+  ratingAvg   Decimal @default(0) @db.Decimal(3, 2)
+  ratingCount Int     @default(0)
+
+  /// Withdrawable balance (earnings + bonuses − withdrawn), in Pi.
+  balancePi     Decimal @default(0) @db.Decimal(15, 7)
+  /// Lifetime earnings, in Pi.
+  totalEarnedPi Decimal @default(0) @db.Decimal(15, 7)
+
+  referrerId        String?
+  referrer          User?   @relation("Referrals", fields: [referrerId], references: [id], onDelete: SetNull)
+  referrals         User[]  @relation("Referrals")
+  /// Guards against paying the referral bonus twice for the same user.
+  referralBonusPaid Boolean @default(false)
+
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  masterProfile   MasterProfile?
+  clientOrders    Order[]             @relation("ClientOrders")
+  masterOrders    Order[]             @relation("MasterOrders")
+  responses       Response[]
+  payments        Payment[]
+  transactions    Transaction[]
+  withdrawals     WithdrawalRequest[]
+  reviewsAuthored Review[]            @relation("ReviewAuthor")
+  reviewsReceived Review[]            @relation("ReviewTarget")
+
+  @@index([referrerId])
+  @@index([isMaster, isBlocked])
+  @@map("users")
+}
+
+model Category {
+  id        String  @id @default(uuid())
+  /// i18n key on the frontend: categories.<slug>
+  slug      String  @unique
+  icon      String  @default("🛠️")
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  orders          Order[]
+  masterCategories MasterCategory[]
+
+  @@map("categories")
+}
+
+model MasterProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName String
+  avatarUrl   String?
+  bio         String  @db.VarChar(1000)
+
+  /// Home point used to match nearby orders.
+  lat      Float?
+  lng      Float?
+  address  String? @db.VarChar(300)
+  radiusKm Int     @default(20)
+
+  portfolio    String[] @default([])
+  certificates String[] @default([])
+
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  /// Uploaded ID document + selfie-with-document URLs (admin-only visibility).
+  verificationDocs   String[]           @default([])
+  verificationNote   String?            @db.VarChar(500)
+  verifiedAt         DateTime?
+
+  completedJobs Int       @default(0)
+  boostedUntil  DateTime?
+  proUntil      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories MasterCategory[]
+
+  @@index([verificationStatus])
+  @@index([lat, lng])
+  @@map("master_profiles")
+}
+
+model MasterCategory {
+  masterProfileId String
+  categoryId      String
+  masterProfile   MasterProfile @relation(fields: [masterProfileId], references: [id], onDelete: Cascade)
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([masterProfileId, categoryId])
+  @@index([categoryId])
+  @@map("master_categories")
+}
+
+model Order {
+  id       String @id @default(uuid())
+  /// Short human-readable id used in payment memos: "PiFix job #A7K3QD".
+  publicId String @unique
+
+  clientId   String
+  client     User     @relation("ClientOrders", fields: [clientId], references: [id], onDelete: Restrict)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  title       String @db.VarChar(120)
+  description String @db.VarChar(1000)
+  budgetPi    Decimal @db.Decimal(15, 7)
+
+  address String @db.VarChar(300)
+  lat     Float
+  lng     Float
+
+  isUrgent Boolean  @default(false)
+  photos   String[] @default([])
+
+  status OrderStatus @default(OPEN)
+
+  masterId           String?
+  master             User?     @relation("MasterOrders", fields: [masterId], references: [id], onDelete: SetNull)
+  selectedResponseId String?   @unique
+
+  // ── escrow bookkeeping (all Pi amounts) ──
+  escrowStatus    EscrowStatus @default(NONE)
+  escrowAmountPi  Decimal      @default(0) @db.Decimal(15, 7) // held for the master
+  clientFeePi     Decimal      @default(0) @db.Decimal(15, 7) // platform commission
+  expressFeePi    Decimal      @default(0) @db.Decimal(15, 7)
+  totalPaidPi     Decimal      @default(0) @db.Decimal(15, 7) // what the client actually paid
+  masterFeePi     Decimal      @default(0) @db.Decimal(15, 7) // optional split taken from the master
+  masterPayoutPi  Decimal      @default(0) @db.Decimal(15, 7) // escrowAmountPi − masterFeePi
+  escrowPaymentId String?
+  /// Deadline for the client to confirm; after it the escrow auto-releases.
+  autoReleaseAt   DateTime?
+
+  completedAt DateTime? // master pressed "done"
+  confirmedAt DateTime? // client confirmed / auto-released
+  cancelledAt DateTime?
+
+  disputeReason String? @db.VarChar(500)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  responses    Response[]
+  reviews      Review[]
+  payments     Payment[]
+  transactions Transaction[]
+
+  @@index([status, categoryId])
+  @@index([status, createdAt])
+  @@index([lat, lng])
+  @@index([clientId, status])
+  @@index([masterId, status])
+  @@index([escrowStatus, autoReleaseAt])
+  @@map("orders")
+}
+
+model Response {
+  id       String @id @default(uuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  masterId String
+  master   User   @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  pricePi Decimal @db.Decimal(15, 7)
+  message String  @db.VarChar(500)
+
+  status ResponseStatus @default(ACTIVE)
+
+  /// Pi payment identifier of the paid connect.
+  connectPaymentId String?
+  connectPricePi   Decimal @default(0) @db.Decimal(15, 7)
+  connectRefunded  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, masterId])
+  @@index([masterId, status])
+  @@index([orderId, status])
+  @@map("responses")
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  /// Payment identifier issued by the Pi Platform API.
+  piPaymentId String  @unique
+  txid        String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      PaymentType
+  direction PaymentDirection @default(U2A)
+  status    PaymentStatus    @default(PENDING)
+
+  amountPi Decimal @db.Decimal(15, 7)
+  memo     String  @db.VarChar(200)
+
+  orderId    String?
+  order      Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  responseId String?
+
+  metadata  Json?
+  errorText String? @db.VarChar(500)
+
+  approvedAt  DateTime?
+  completedAt DateTime?
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([type, status])
+  @@index([orderId])
+  @@map("payments")
+}
+
+model Transaction {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type TransactionType
+  /// Positive = credited to the user's balance, negative = debited.
+  amountPi    Decimal @db.Decimal(15, 7)
+  balanceAfter Decimal @default(0) @db.Decimal(15, 7)
+  description String  @db.VarChar(300)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@map("transactions")
+}
+
+model WithdrawalRequest {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amountPi      Decimal          @db.Decimal(15, 7)
+  walletAddress String
+  status        WithdrawalStatus @default(REQUESTED)
+
+  txid        String?
+  piPaymentId String?
+  adminNote   String? @db.VarChar(500)
+
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@map("withdrawal_requests")
+}
+
+model Review {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetId String
+  target   User   @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  role   ReviewRole
+  rating Int
+  text   String     @default("") @db.VarChar(500)
+
+  isHidden  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([orderId, authorId])
+  @@index([targetId, isHidden, createdAt])
+  @@map("reviews")
+}
+
+model PlatformSettings {
+  id Int @id @default(1)
+
+  connectPricePi          Decimal @default(0.5) @map("connect_price_pi") @db.Decimal(15, 7)
+  clientFeePercent        Decimal @default(10.0) @map("client_fee_percent") @db.Decimal(5, 2)
+  /// Optional cut taken from the master's payout (0 = master receives the full budget).
+  masterFeePercent        Decimal @default(0.0) @map("master_fee_percent") @db.Decimal(5, 2)
+  proSubscriptionPricePi  Decimal @default(10.0) @map("pro_subscription_price_pi") @db.Decimal(15, 7)
+  expressFeePi            Decimal @default(3.0) @map("express_fee_pi") @db.Decimal(15, 7)
+  profileBoostPricePi     Decimal @default(5.0) @map("profile_boost_price_pi") @db.Decimal(15, 7)
+  escrowTimeoutDays       Int     @default(7) @map("escrow_timeout_days")
+  referralBonusDirectPi   Decimal @default(1.0) @map("referral_bonus_direct_pi") @db.Decimal(15, 7)
+  referralBonusIndirectPi Decimal @default(0.5) @map("referral_bonus_indirect_pi") @db.Decimal(15, 7)
+  minBudgetPi             Decimal @default(1.0) @map("min_budget_pi") @db.Decimal(15, 7)
+  maxOpenOrdersPerClient  Int     @default(5) @map("max_open_orders_per_client")
+  maxActiveResponsesPerMaster Int @default(10) @map("max_active_responses_per_master")
+  connectRefundWindowMinutes  Int @default(60) @map("connect_refund_window_minutes")
+
+  /// Withdrawals below this are rejected.
+  minWithdrawalPi     Decimal @default(5.0) @map("min_withdrawal_pi") @db.Decimal(15, 7)
+  /// Balance at which a withdrawal is paid out without admin approval (0 = always manual).
+  autoWithdrawalPi    Decimal @default(0) @map("auto_withdrawal_pi") @db.Decimal(15, 7)
+  /// Pi→USD rate used by the admin dashboard only. Never used for on-chain math.
+  piUsdRate           Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
+  maintenanceMode     Boolean @default(false) @map("maintenance_mode")
+
+  updatedAt DateTime @updatedAt
+
+  @@map("platform_settings")
+}
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  actor     String
+  action    String
+  targetId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("admin_logs")
+}
+
+/// Bookkeeping for the lazy escrow sweep so concurrent requests do not
+/// hammer the database on every single API call.
+model SystemState {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("system_state")
+}

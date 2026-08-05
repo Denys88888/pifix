@@ -1,0 +1,109 @@
+# Render Blueprint for PiFix.
+#
+#   Render Dashboard → New → Blueprint → point at this repository.
+# Everything except the secrets marked `sync: false` is created automatically;
+# Render will prompt for those on the first deploy.
+
+databases:
+  - name: pifix-db
+    databaseName: pifix
+    user: pifix
+    plan: free # upgrade to `starter` for daily backups
+    postgresMajorVersion: "16"
+
+services:
+  # ── API ────────────────────────────────────────────────────────────────────
+  - type: web
+    name: pifix-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    # `start` runs `prisma migrate deploy` before booting, so schema changes ship
+    # with the code and never need a manual step.
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pifix-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: PI_API_KEY
+        sync: false
+      - key: PI_SANDBOX
+        value: "true"
+      - key: REQUIRE_KYC
+        value: "false"
+      - key: PI_WALLET_PRIVATE_SEED
+        sync: false
+      - key: PI_HORIZON_URL
+        value: https://api.testnet.minepi.com
+      - key: PI_NETWORK_PASSPHRASE
+        value: Pi Testnet
+      - key: PAYOUTS_ENABLED
+        value: "true"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_FOLDER
+        value: pifix
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ENABLE_INTERNAL_CRON
+        value: "true"
+      - key: LAZY_SWEEP_INTERVAL_SECONDS
+        value: "300"
+      - key: LOG_LEVEL
+        value: info
+
+  # ── SPA ────────────────────────────────────────────────────────────────────
+  - type: web
+    name: pifix-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        sync: false # https://pifix-api.onrender.com/api
+      - key: VITE_PI_SANDBOX
+        value: "true"
+      - key: VITE_APP_URL
+        sync: false # https://pifix-web.onrender.com
+    routes:
+      # SPA fallback — every client route must serve index.html.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      # The worker itself must never be cached, or a deploy can never roll out.
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
