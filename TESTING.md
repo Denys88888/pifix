@@ -1,5 +1,27 @@
 # PiFix — release checklist
 
+## Automated first: the money paths
+
+```bash
+cd backend && set -a && . ./.env && set +a && npm run test:money
+```
+
+41 assertions covering escrow release, double-confirm protection, auto-release,
+dispute freezing, admin refunds, reviews and rating recomputation, withdrawal
+guards, GDPR erasure and ledger integrity. It refuses to run with
+`NODE_ENV=production`.
+
+Pi payments cannot be simulated, so the payment-gated transitions are seeded
+into the database in exactly the state a verified payment produces, and
+everything downstream runs through the real HTTP API. That means the suite
+covers what happens *after* money arrives — it does not replace items 8, 9, 12
+and 17 below, which still need a real device.
+
+Last full run: **41 passed, 0 failed** (2026-08-05, local).
+
+---
+
+
 Run the whole list before every deploy that touches money. Items marked **Pi
 Browser** cannot be verified in desktop Chrome — the SDK simply is not there.
 
@@ -143,3 +165,10 @@ WHERE "escrowStatus" = 'FUNDED' AND "autoReleaseAt" < now();
 
 The second query must return **zero rows**. Any row means the ledger and the
 balance drifted apart, and payouts should be paused until it is explained.
+
+One caveat learned the hard way: the query also flags rows that were inserted by
+hand. Seeding a user with a `balancePi` but no matching `transactions` row
+produces a false alarm that looks exactly like real drift. Every balance written
+by the application goes through `postTransaction`, which writes both in one
+database transaction — so if this query fires, first confirm the affected rows
+were not hand-seeded.

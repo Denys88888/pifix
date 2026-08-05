@@ -16,6 +16,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "test:money": "tsx scripts/e2eMoney.ts",
     "hash-admin-password": "tsx scripts/hashPassword.ts"
   },
   "prisma": {
