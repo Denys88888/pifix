@@ -78,7 +78,7 @@ JWT_SECRET=<64 random chars>
 JWT_EXPIRES_IN=30d
 ADMIN_JWT_EXPIRES_IN=12h
 
-CORS_ORIGINS=https://pifix-web.onrender.com,https://<your-app>.pinet.com
+CORS_ORIGINS=https://pifix-web.onrender.com,https://pifix-c5u9.pinet.com
 CRON_SECRET=<32 random chars>
 ENABLE_INTERNAL_CRON=true
 LAZY_SWEEP_INTERVAL_SECONDS=300
@@ -140,20 +140,51 @@ Render → the static site → **Redirects/Rewrites**:
 
 Without this, a hard refresh on `/orders/123` returns 404.
 
+Render serves real files before applying rewrites, so once
+`frontend/public/validation-key.txt` exists it is returned as-is. If that URL
+ever answers with HTML instead, the file is missing from the build — the rewrite
+is swallowing it, and Pi's validation will fail.
+
 Then go back to the API service and make sure the static site's URL is in
 `CORS_ORIGINS`.
 
 ---
 
-## 5. Register the app in the Pi Developer Portal
+## 5. Finish the app in the Pi Developer Portal
 
-1. Pi Developer Portal → your app.
-2. **App URL**: `https://pifix-web.onrender.com`
-3. Request scopes: `username`, `payments`, `wallet_address`.
-4. Copy the generated `validation-key.txt` content and serve it — put the file
-   in `frontend/public/` so it is available at
-   `https://pifix-web.onrender.com/validation-key.txt`, then redeploy.
-5. Note your `*.pinet.com` address and add it to `CORS_ORIGINS`.
+The app is already registered on **Testnet** with slug `pifix-c5u9`, so pioneers
+will reach it at **https://pifix-c5u9.pinet.com**.
+
+Do these in order — several of them are impossible before the site is live, so
+Render (steps 2 and 4) has to come first.
+
+| # | Portal screen | What to enter |
+|---|---|---|
+| 1 | **Configuration → App URL** | `https://pifix-web.onrender.com` (the Render static site, not the pinet address) |
+| 2 | **Configuration → Description** | see the ready-made text below — `Ttt` is still a placeholder |
+| 3 | **Wallet → Connected App Wallet** | create the app wallet. Its private seed becomes `PI_WALLET_PRIVATE_SEED`. **Without it escrow release and withdrawals cannot run** — the admin dashboard will keep showing "Payouts not configured" |
+| 4 | **API Key** | copy it into the Render API service as `PI_API_KEY` |
+| 5 | **Pi Sign-In** | request the scopes `username`, `payments`, `wallet_address`. `payments` is what exposes the wallet address used for payouts |
+| 6 | **Checklist → validation key** | put the generated `validation-key.txt` into `frontend/public/`, commit, redeploy — it then answers at `https://pifix-web.onrender.com/validation-key.txt` |
+| 7 | **PiNet Settings** | confirm the slug; add `https://pifix-c5u9.pinet.com` to `CORS_ORIGINS` on the API |
+
+> Never paste the wallet seed into a chat, an issue, or a commit. It goes
+> straight from the portal into Render's environment variables and nowhere else.
+
+### Ready-made description
+
+English (portal field):
+
+> Hire verified handymen and pay in Pi. Plumbers, electricians, mechanics,
+> builders, movers, cleaners, furniture assembly, appliance repair and on-site
+> IT — near you. Your Pi is held in escrow until you confirm the work is done.
+
+Russian:
+
+> Нанимайте проверенных мастеров и платите в Pi. Сантехники, электрики,
+> механики, строители, грузчики, уборка, сборка мебели, ремонт техники и
+> IT на выезде — рядом с вами. Ваши Pi заморожены в escrow, пока вы не
+> подтвердите, что работа выполнена.
 
 ---
 
