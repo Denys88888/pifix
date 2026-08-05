@@ -156,41 +156,72 @@ Then go back to the API service and make sure the static site's URL is in
 
 The app is already registered on **Testnet** with slug `pifix-c5u9`.
 
-> **The slug is not the address.** PiNet assigns its own subdomain and appends
-> digits to it, so the public address is *not* `pifix-c5u9.pinet.com`. (For the
-> sibling Taxi Pro app the slug and the subdomain differ completely.) Every
-> `*.pinet.com` host answers HTTP 200 with the same generic PiNet page, so you
-> cannot discover it by guessing and curling — the only source of truth is
-> **Develop → My Apps → PiFix (Testnet) → PiNet Settings → "Current PiNet
-> subdomain"**. Read it there and put it into `VITE_APP_URL`.
+> **The slug is not the address, and the address does not exist yet.** The PiNet
+> subdomain is created at checklist step 9, and PiNet appends 4 random digits to
+> whatever name you choose — so it is neither `pifix-c5u9.pinet.com` nor
+> anything else you can predict. (For the sibling Taxi Pro app the slug and the
+> subdomain differ completely.) Nor can you probe for it: every `*.pinet.com`
+> host, including a nonsense one, answers HTTP 200 with the same generic PiNet
+> page. Read the real value from **PiNet Settings → "Current PiNet subdomain"**
+> once step 9 is done, then put it into `VITE_APP_URL`.
 
-Do these in order. **Nothing in the portal can be saved before the site is
-live** — verified by walking the screens in an emulator on 2026-08-05:
+### Already done — the app sits at 3 of 10
 
-- **Configuration** refuses to submit without *both* "Your App's URL" and "Your
-  App's development URL" (`Frontend URL is required` / `Development URL is
-  required`). So even the description cannot be changed first — Render has to
-  come before any portal edit.
-- **PiNet Settings** shows *"You must validate your domain ownership first
-  before creating PiNet subdomain"*, and the subdomain does not exist yet. It is
-  created only after the App URL is verified, and **PiNet appends 4 random
-  digits** to whatever you type — that is why the address is unpredictable.
+Walked in an emulator on 2026-08-05. **Configuration saves fine before the site
+is live**: both "Your App's URL" and "Your App's development URL" are required
+fields, but they only have to be *filled*, not reachable — ownership is verified
+much later, at checklist step 8. Currently stored:
 
-Field limits, so nothing gets truncated on paste: **App Name 80**,
-**Subtitle 30**, **Description 140** characters.
+| Field | Value |
+|---|---|
+| App URL | `https://pifix-web.onrender.com` |
+| Development URL | `http://localhost:5180` |
+| Subtitle | Hire a master, pay in Pi |
+| Description | Hire verified handymen and pay in Pi. … |
+| Network / Visibility / Hosting | Pi Testnet / Public / Self Hosted |
 
-Existing values that are already correct: App Network `Pi Testnet`,
-Testnet App Visibility `Public`, App Hosting `Self Hosted`.
+> If your Render static site ends up with a different name, change the App URL
+> to match before doing step 8 — the validation fetches `validation-key.txt`
+> from exactly this host.
 
-| # | Portal screen | What to enter |
-|---|---|---|
-| 1 | **Configuration → App URL** | `https://pifix-web.onrender.com` (the Render static site, not the pinet address) |
-| 2 | **Configuration → Description** | see the ready-made text below — `Ttt` is still a placeholder |
-| 3 | **Wallet → Connected App Wallet** | create the app wallet. Its private seed becomes `PI_WALLET_PRIVATE_SEED`. **Without it escrow release and withdrawals cannot run** — the admin dashboard will keep showing "Payouts not configured" |
-| 4 | **API Key** | copy it into the Render API service as `PI_API_KEY` |
-| 5 | **Pi Sign-In** | request the scopes `username`, `payments`, `wallet_address`. `payments` is what exposes the wallet address used for payouts |
-| 6 | **Checklist → validation key** | put the generated `validation-key.txt` into `frontend/public/`, commit, redeploy — it then answers at `https://pifix-web.onrender.com/validation-key.txt` |
-| 7 | **PiNet Settings** | read "Current PiNet subdomain" — that is the real public address. Put it into `VITE_APP_URL` on the static site and add it to `CORS_ORIGINS` on the API |
+Field limits, so nothing is truncated on paste: **App Name 80**,
+**Subtitle 30**, **Description 140**.
+
+One practical gotcha: the portal's WebView drops fast input. Typing a 30-character
+URL in one go landed only `htt`. Paste, or type in short bursts.
+
+### The remaining 7 steps, in the portal's own order
+
+| # | Step | State | Needs |
+|---|---|---|---|
+| 1 | Create App | ✅ done | — |
+| 2 | Configure Hosting | next | a real host — Render |
+| 3 | Connect App Wallet | 🔒 locked | step 2 first; generates the seed for `PI_WALLET_PRIVATE_SEED` |
+| 4 | Code Your App | 🔒 locked | step 2 first |
+| 5 | Configure Development URL | done as part of Configuration | — |
+| 6 | Run Development App in the Sandbox | 🔒 locked | `sandbox: true` in the frontend + a code from the Pi app's Utilities page |
+| 7 | Deploy App to Production Environment | 🔒 locked | the live Render URL |
+| 8 | Validate Domain Ownership | 🔒 locked | `validation-key.txt` served from the App URL |
+| 9 | Add a PiNet subdomain | 🔒 locked | step 8 first. **PiNet appends 4 random digits**, so the address is not the slug and cannot be guessed |
+| 10 | Process transactions | 🔒 locked | everything above |
+
+Steps 3 and 4 sit behind a padlock until hosting is configured, so **Render is
+genuinely the gate** — just not for the reason first assumed.
+
+### What to do after Render is live
+
+1. **Connect App Wallet** — unlocks once hosting is set. Its private seed becomes
+   `PI_WALLET_PRIVATE_SEED`. Without it escrow release and withdrawals cannot
+   run and the admin dashboard keeps showing "Payouts not configured".
+2. **API Key** — copy into the Render API service as `PI_API_KEY`.
+3. **Pi Sign-In** — request the scopes `username`, `payments`, `wallet_address`.
+   `payments` is what exposes the wallet address used for payouts.
+4. **Validate Domain Ownership** — the portal hands you a key; put it in
+   `frontend/public/validation-key.txt`, commit, redeploy. It then answers at
+   `https://<your-static-site>/validation-key.txt`.
+5. **Add a PiNet subdomain** — only now does the public address exist. Read it
+   back, then set `VITE_APP_URL` on the static site and add it to `CORS_ORIGINS`
+   on the API.
 
 > Never paste the wallet seed into a chat, an issue, or a commit. It goes
 > straight from the portal into Render's environment variables and nowhere else.
