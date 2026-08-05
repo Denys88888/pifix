@@ -1,23 +1,51 @@
 # PiFix — release checklist
 
-## Automated first: the money paths
+## Automated first
+
+Two suites, 86 assertions. Both refuse to run with `NODE_ENV=production`.
+
+### The money paths — 41 assertions
 
 ```bash
 cd backend && set -a && . ./.env && set +a && npm run test:money
 ```
 
-41 assertions covering escrow release, double-confirm protection, auto-release,
-dispute freezing, admin refunds, reviews and rating recomputation, withdrawal
-guards, GDPR erasure and ledger integrity. It refuses to run with
-`NODE_ENV=production`.
+Escrow release, double-confirm protection, auto-release, dispute freezing the
+timer, admin refunds, reviews and rating recomputation, withdrawal guards, GDPR
+erasure, ledger integrity. Payment-gated transitions are seeded into exactly the
+state a verified payment produces; everything downstream runs through the real
+HTTP API.
 
-Pi payments cannot be simulated, so the payment-gated transitions are seeded
-into the database in exactly the state a verified payment produces, and
-everything downstream runs through the real HTTP API. That means the suite
-covers what happens *after* money arrives — it does not replace items 8, 9, 12
-and 17 below, which still need a real device.
+### Payment verification, adversarially — 45 assertions
 
-Last full run: **41 passed, 0 failed** (2026-08-05, local).
+```bash
+# terminal 1
+cd backend && set -a && . ./.env && set +a && npm run fake-pi
+# terminal 2
+cd backend && set -a && . ./.env && set +a \
+  && PORT=3010 PI_API_BASE_URL=http://localhost:4010 ENABLE_INTERNAL_CRON=false npm run dev
+# terminal 3
+cd backend && set -a && . ./.env && set +a && npm run test:payments
+```
+
+`scripts/fakePiApi.ts` speaks the Pi Platform protocol, so the backend runs its
+genuine approve → chain → complete → grant pipeline while the test crafts
+payments the real SDK would never produce. What it proves:
+
+- an underpaid connect is refused **and never approved on the Pi API**
+- you cannot approve a payment belonging to another user
+- malformed or hostile metadata is refused
+- a cancelled payment grants nothing
+- **approval alone grants nothing** — the response only appears after completion
+- replaying a completed payment is idempotent: no second response, no second grant
+- an escrow that skips the commission is refused and the order stays `OPEN`
+- completion is refused while the chain has not verified the transaction
+- the honest escrow books 38.5 / 3.85 / 42.35 Pi exactly
+
+Last full run: **41 + 45 = 86 passed, 0 failed** (2026-08-05, local).
+
+Neither suite replaces items 8, 9, 12 and 17 below: only a real device proves
+the Pi SDK callbacks behave in Pi Browser.
 
 ---
 
