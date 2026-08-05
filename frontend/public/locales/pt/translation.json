@@ -16,7 +16,8 @@
     "pullToRefresh": "Puxe para atualizar",
     "releaseToRefresh": "Solte para atualizar",
     "privacy": "Política de privacidade",
-    "maintenance": "O PiFix está em manutenção. Algumas ações estão temporariamente indisponíveis."
+    "maintenance": "O PiFix está em manutenção. Algumas ações estão temporariamente indisponíveis.",
+    "truncated": "Mostrando os {{shown}} mais próximos. Reduza o raio para refinar a busca."
   },
   "nav": {
     "label": "Navegação principal",

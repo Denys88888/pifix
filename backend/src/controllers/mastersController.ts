@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma';
 import { logger } from '../lib/logger';
 import { badRequest, conflict, notFound } from '../lib/errors';
 import { money } from '../lib/money';
-import { masterProfileDTO, paginate, reviewDTO, transactionDTO } from '../lib/serializers';
+import { GEO_CANDIDATE_CAP, masterProfileDTO, paginate, reviewDTO, transactionDTO } from '../lib/serializers';
 import { boundingBox, haversineKm, roundDistance } from '../services/geolocation';
 
 export const profileSchema = z.object({
@@ -159,7 +159,7 @@ export async function searchMasters(req: Request, res: Response): Promise<void> 
       where,
       include: profileInclude,
       orderBy,
-      take: 500,
+      take: GEO_CANDIDATE_CAP,
     });
 
     const within = candidates
@@ -181,7 +181,7 @@ export async function searchMasters(req: Request, res: Response): Promise<void> 
       .slice(start, start + q.limit)
       .map((entry) => masterProfileDTO(entry.profile, { distanceKm: entry.distanceKm }));
 
-    res.json(paginate(items, q.page, q.limit, total));
+    res.json(paginate(items, q.page, q.limit, total, candidates.length === GEO_CANDIDATE_CAP));
     return;
   }
 

@@ -16,7 +16,8 @@
     "pullToRefresh": "Pociągnij, aby odświeżyć",
     "releaseToRefresh": "Puść, aby odświeżyć",
     "privacy": "Polityka prywatności",
-    "maintenance": "PiFix jest w trakcie prac serwisowych. Część funkcji jest chwilowo niedostępna."
+    "maintenance": "PiFix jest w trakcie prac serwisowych. Część funkcji jest chwilowo niedostępna.",
+    "truncated": "Pokazano {{shown}} najbliższych. Zmniejsz promień, aby zawęzić wyszukiwanie."
   },
   "nav": {
     "label": "Nawigacja główna",

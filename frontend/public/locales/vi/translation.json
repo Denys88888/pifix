@@ -16,7 +16,8 @@
     "pullToRefresh": "Kéo để làm mới",
     "releaseToRefresh": "Thả để làm mới",
     "privacy": "Chính sách bảo mật",
-    "maintenance": "PiFix đang bảo trì. Một số thao tác tạm thời không dùng được."
+    "maintenance": "PiFix đang bảo trì. Một số thao tác tạm thời không dùng được.",
+    "truncated": "Đang hiển thị {{shown}} kết quả gần nhất. Thu nhỏ bán kính để tìm chính xác hơn."
   },
   "nav": {
     "label": "Điều hướng chính",

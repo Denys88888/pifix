@@ -16,7 +16,8 @@
     "pullToRefresh": "Tarik untuk menyegarkan",
     "releaseToRefresh": "Lepas untuk menyegarkan",
     "privacy": "Kebijakan privasi",
-    "maintenance": "PiFix sedang dalam pemeliharaan. Beberapa fitur sementara tidak tersedia."
+    "maintenance": "PiFix sedang dalam pemeliharaan. Beberapa fitur sementara tidak tersedia.",
+    "truncated": "Menampilkan {{shown}} terdekat. Perkecil radius untuk mempersempit pencarian."
   },
   "nav": {
     "label": "Navigasi utama",

@@ -229,6 +229,23 @@ async function main() {
 
   console.log('\n═══ 3. Failed payout must not eat the balance ═══');
 
+  // Precondition, asserted rather than assumed: with payouts disabled the
+  // controller refuses before it debits, so the rollback is never exercised and
+  // every assertion below would pass for the wrong reason.
+  const dash = await fetch(`${API}/admin/dashboard`, {
+    headers: { Authorization: `Basic ${Buffer.from(ADMIN_BASIC).toString('base64')}` },
+  }).then((r) => r.json() as Promise<{ system?: { payoutsConfigured?: boolean } }>);
+  check('payouts are enabled, so the rollback path is actually reachable',
+    dash.system?.payoutsConfigured === true,
+    'start the backend with PAYOUTS_ENABLED=true and an unsignable PI_WALLET_PRIVATE_SEED');
+  if (dash.system?.payoutsConfigured !== true) {
+    console.log('\n  ⚠️  Skipping the rollback assertions — they would pass vacuously.');
+    console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);
+    failures.forEach((f) => console.log('  - ' + f));
+    process.exitCode = 1;
+    return;
+  }
+
   const balBefore = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
   check('carol has a balance to withdraw', balBefore.greaterThan(5), balBefore.toString());
 

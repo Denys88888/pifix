@@ -19,6 +19,7 @@
     "test:money": "tsx scripts/e2eMoney.ts",
     "test:payments": "tsx scripts/e2ePayments.ts",
     "test:extras": "tsx scripts/e2eBonuses.ts",
+    "test:security": "tsx scripts/e2eSecurity.ts",
     "fake-pi": "tsx scripts/fakePiApi.ts",
     "hash-admin-password": "tsx scripts/hashPassword.ts"
   },

@@ -6,7 +6,7 @@ import { logger } from '../lib/logger';
 import { badRequest, conflict, forbidden, notFound } from '../lib/errors';
 import { money, toPi } from '../lib/money';
 import { publicId } from '../lib/ids';
-import { orderDTO, paginate } from '../lib/serializers';
+import { GEO_CANDIDATE_CAP, orderDTO, paginate } from '../lib/serializers';
 import { getSettings } from '../services/settings';
 import { computeOrderCharges, releaseEscrow } from '../services/escrow';
 import { refundConnect } from '../services/paymentVerification';
@@ -137,7 +137,7 @@ export async function listOrders(req: Request, res: Response): Promise<void> {
       where,
       include: { category: true, client: true, master: true, _count: { select: { responses: true } } },
       orderBy,
-      take: 500,
+      take: GEO_CANDIDATE_CAP,
     });
 
     const within = candidates
@@ -160,7 +160,7 @@ export async function listOrders(req: Request, res: Response): Promise<void> {
         }),
       );
 
-    res.json(paginate(items, q.page, q.limit, total));
+    res.json(paginate(items, q.page, q.limit, total, candidates.length === GEO_CANDIDATE_CAP));
     return;
   }
 

@@ -16,7 +16,8 @@
     "pullToRefresh": "Pull to refresh",
     "releaseToRefresh": "Release to refresh",
     "privacy": "Privacy policy",
-    "maintenance": "PiFix is under maintenance. Some actions are temporarily unavailable."
+    "maintenance": "PiFix is under maintenance. Some actions are temporarily unavailable.",
+    "truncated": "Showing the {{shown}} nearest matches. Reduce the radius to narrow the search."
   },
   "nav": {
     "label": "Main navigation",

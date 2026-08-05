@@ -190,6 +190,12 @@ export interface Paginated<T> {
   limit: number;
   total: number;
   hasMore: boolean;
+  /**
+   * Distance searches rank a bounded candidate set in memory. When the cap is
+   * hit this is true and `total` is a floor, not the real count — the list is
+   * showing the nearest matches, not all of them.
+   */
+  truncated?: boolean;
 }
 
 export interface Quote {

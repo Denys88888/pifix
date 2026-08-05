@@ -171,8 +171,34 @@ export interface Paginated<T> {
   limit: number;
   total: number;
   hasMore: boolean;
+  /**
+   * Set when a distance search hit the candidate cap, so `total` is a floor
+   * rather than the true count. Surfaced instead of silently truncating.
+   */
+  truncated?: boolean;
 }
 
-export function paginate<T>(items: T[], page: number, limit: number, total: number): Paginated<T> {
-  return { items, page, limit, total, hasMore: page * limit < total };
+export function paginate<T>(
+  items: T[],
+  page: number,
+  limit: number,
+  total: number,
+  truncated = false,
+): Paginated<T> {
+  return {
+    items,
+    page,
+    limit,
+    total,
+    hasMore: page * limit < total,
+    ...(truncated ? { truncated: true } : {}),
+  };
 }
+
+/**
+ * Distance ranking cannot be pushed into Prisma without raw SQL, so a bounded
+ * candidate set is pulled from the bounding box and ranked in memory. Past this
+ * many matches inside the box the tail is invisible — the response says so
+ * rather than pretending the count is complete.
+ */
+export const GEO_CANDIDATE_CAP = 500;

@@ -2,7 +2,7 @@
 
 ## Automated first
 
-Three suites, 110 assertions. All refuse to run with `NODE_ENV=production`.
+Four suites, 128 assertions. All refuse to run with `NODE_ENV=production`.
 
 ### The money paths — 42 assertions
 
@@ -42,7 +42,20 @@ payments the real SDK would never produce. What it proves:
 - completion is refused while the chain has not verified the transaction
 - the honest escrow books 38.5 / 3.85 / 42.35 Pi exactly
 
-### Referrals, boost, and the failed-payout path — 23 assertions
+### Security controls — 17 assertions
+
+```bash
+cd backend && set -a && . ./.env && set +a && npm run test:security
+```
+
+Everything the checklist below asserts about defences, actually exercised: a PDF
+renamed to `.jpg` is caught by the magic-byte check before Cloudinary is
+touched, oversized and wrong-type files are refused, the 5-orders-per-hour cap
+fires and is **per user, not per IP** (carrier NAT would otherwise punish a whole
+city), reads keep working while writes are limited, admin login is brute-force
+braked, and hostile input is rejected rather than truncated.
+
+### Referrals, boost, and the failed-payout path — 24 assertions
 
 ```bash
 # same three terminals, but the backend needs a wallet that cannot sign:
@@ -61,7 +74,12 @@ second, so a failure that did not roll back would silently destroy earnings.
 The suite forces that failure with an unsignable wallet seed and asserts the
 balance comes back and the request reopens for a retry.
 
-Last full run: **42 + 45 + 23 = 110 passed, 0 failed** (2026-08-05, local).
+It first asserts that payouts are actually enabled. Without that guard the whole
+section passes vacuously: with payouts disabled the controller refuses before it
+debits, so there is nothing to roll back and every assertion goes green for the
+wrong reason.
+
+Last full run: **42 + 45 + 24 + 17 = 128 passed, 0 failed** (2026-08-06, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.

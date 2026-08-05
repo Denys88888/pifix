@@ -25,6 +25,8 @@ export default function MastersList(): JSX.Element {
   const [items, setItems] = useState<MasterProfile[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [truncated, setTruncated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,6 +49,8 @@ export default function MastersList(): JSX.Element {
         const result = await mastersApi.search({ ...filters, page: nextPage });
         setItems((current) => (append ? [...current, ...result.items] : result.items));
         setHasMore(result.hasMore);
+        setTotal(result.total);
+        setTruncated(Boolean(result.truncated));
         setPage(result.page);
       } catch (caught) {
         setError(caught instanceof ApiError ? caught.message : t('errors.generic'));
@@ -144,6 +148,10 @@ export default function MastersList(): JSX.Element {
         </div>
 
         {error ? <div className="alert alert--error">{error}</div> : null}
+
+        {truncated ? (
+          <div className="alert alert--warn">{t('common.truncated', { shown: total })}</div>
+        ) : null}
 
         {view === 'map' ? (
           <LeafletMap
