@@ -340,6 +340,15 @@ model Transaction {
   balanceAfter Decimal @default(0) @db.Decimal(15, 7)
   description String  @db.VarChar(300)
 
+  /// True  — this row moved `users.balancePi` (earnings, bonuses, withdrawals).
+  /// False — the user paid from their Pi wallet, so the row is history only
+  ///         (connect fees, escrow funding, boost, subscription).
+  ///
+  /// Without this flag the two kinds are indistinguishable and the audit query
+  /// `balance == SUM(amountPi)` reports drift on every wallet payment. Only
+  /// rows with affectsBalance = true belong in that sum.
+  affectsBalance Boolean @default(true)
+
   orderId String?
   order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
 

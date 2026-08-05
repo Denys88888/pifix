@@ -123,6 +123,8 @@ export async function fundEscrow(params: {
       data: { status: ResponseStatus.REJECTED },
     });
 
+    // History only: the client paid from their Pi wallet, so the internal
+    // balance is untouched and this row must stay out of the audit sum.
     await tx.transaction.create({
       data: {
         userId: params.clientId,
@@ -134,6 +136,7 @@ export async function fundEscrow(params: {
         })).balancePi,
         description: `Escrow funded for job #${order.publicId}`,
         orderId: order.id,
+        affectsBalance: false,
       },
     });
 

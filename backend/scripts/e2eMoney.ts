@@ -325,13 +325,23 @@ async function main() {
 
   console.log('\n═══ 8. Ledger integrity ═══');
 
+  // Only balance-moving rows belong in this sum: wallet payments (connect,
+  // escrow funding, boost, subscription) are history with affectsBalance=false.
   const drift: Array<{ username: string; balance: string; ledger: string }> = await prisma.$queryRaw`
     SELECT u.username, u."balancePi"::text AS balance, COALESCE(SUM(t."amountPi"), 0)::text AS ledger
-    FROM users u LEFT JOIN transactions t ON t."userId" = u.id
+    FROM users u LEFT JOIN transactions t ON t."userId" = u.id AND t."affectsBalance"
     GROUP BY u.id, u.username, u."balancePi"
     HAVING u."balancePi" <> COALESCE(SUM(t."amountPi"), 0)
   `;
-  check('every balance equals the sum of its transactions', drift.length === 0, JSON.stringify(drift).slice(0, 300));
+  check('every balance equals the sum of its balance-moving transactions',
+    drift.length === 0, JSON.stringify(drift).slice(0, 300));
+
+  const walletRows: Array<{ n: bigint }> = await prisma.$queryRaw`
+    SELECT COUNT(*) AS n FROM transactions
+    WHERE "affectsBalance" = false AND "type" NOT IN ('CONNECT_SPENT','ESCROW_FUNDED','BOOST','SUBSCRIPTION')
+  `;
+  check('only wallet-paid kinds are excluded from the audit sum',
+    Number(walletRows[0]?.n ?? 0) === 0, String(walletRows[0]?.n));
 
   const stuck: Array<{ publicId: string }> = await prisma.$queryRaw`
     SELECT "publicId" FROM orders

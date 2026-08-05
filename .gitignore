@@ -18,9 +18,12 @@ build/
 npm-debug.log*
 logs/
 
-# database dumps
-*.sql
+# database dumps — scoped deliberately. A blanket *.sql also swallows every
+# Prisma migration, which leaves `prisma migrate deploy` with nothing to apply
+# and the production database empty.
 *.sql.gz
+/dumps/
+pifix-*.sql
 
 # editors / OS
 .DS_Store

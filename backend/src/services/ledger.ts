@@ -9,6 +9,11 @@ type Tx = Prisma.TransactionClient;
  * Every balance movement goes through here so `users.balancePi` and the
  * `transactions` audit trail can never drift apart. Amounts are signed:
  * positive credits the user, negative debits.
+ *
+ * Rows written here always carry `affectsBalance = true` (the column default).
+ * Payments made from the user's Pi wallet — connect fees, escrow funding,
+ * boost, subscription — are recorded elsewhere with `affectsBalance = false`,
+ * because they never touch `balancePi` and would otherwise break the audit sum.
  */
 export async function postTransaction(
   tx: Tx,

@@ -304,6 +304,8 @@ async function executeIntent(
             balanceAfter: user.balancePi,
             description: 'Connect fee',
             orderId: intent.orderId,
+            // Paid from the Pi wallet — history only, not a balance movement.
+            affectsBalance: false,
           },
         });
         await tx.payment.update({ where: { piPaymentId }, data: { responseId: created.id } });
@@ -333,6 +335,7 @@ async function executeIntent(
           amountPi: amount.negated(),
           balanceAfter: user.balancePi,
           description: 'Profile boost (7 days)',
+          affectsBalance: false,
         },
       });
       return { boostedUntil: until.toISOString() };
@@ -350,6 +353,7 @@ async function executeIntent(
           amountPi: amount.negated(),
           balanceAfter: user.balancePi,
           description: `PRO subscription (30 days, ${money(settings.proSubscriptionPricePi)} Pi)`,
+          affectsBalance: false,
         },
       });
       return { proUntil: until.toISOString() };

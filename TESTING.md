@@ -2,9 +2,9 @@
 
 ## Automated first
 
-Two suites, 86 assertions. Both refuse to run with `NODE_ENV=production`.
+Three suites, 110 assertions. All refuse to run with `NODE_ENV=production`.
 
-### The money paths — 41 assertions
+### The money paths — 42 assertions
 
 ```bash
 cd backend && set -a && . ./.env && set +a && npm run test:money
@@ -42,10 +42,29 @@ payments the real SDK would never produce. What it proves:
 - completion is refused while the chain has not verified the transaction
 - the honest escrow books 38.5 / 3.85 / 42.35 Pi exactly
 
-Last full run: **41 + 45 = 86 passed, 0 failed** (2026-08-05, local).
+### Referrals, boost, and the failed-payout path — 23 assertions
 
-Neither suite replaces items 8, 9, 12 and 17 below: only a real device proves
-the Pi SDK callbacks behave in Pi Browser.
+```bash
+# same three terminals, but the backend needs a wallet that cannot sign:
+PORT=3010 PI_API_BASE_URL=http://localhost:4010 ENABLE_INTERNAL_CRON=false \
+PAYOUTS_ENABLED=true PI_WALLET_PRIVATE_SEED=SBOGUS... PI_HORIZON_URL=http://localhost:4999 \
+npm run dev
+# then
+npm run test:extras
+```
+
+Two-level referral bonuses (including the once-only guard, self-referral and
+unknown referrers), boost and subscription purchases with the renewal extending
+rather than resetting, and the one that matters most: **an on-chain payout that
+fails must restore the balance**. The withdrawal debits first and transfers
+second, so a failure that did not roll back would silently destroy earnings.
+The suite forces that failure with an unsignable wallet seed and asserts the
+balance comes back and the request reopens for a retry.
+
+Last full run: **42 + 45 + 23 = 110 passed, 0 failed** (2026-08-05, local).
+
+No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
+SDK callbacks behave in Pi Browser.
 
 ---
 
@@ -181,9 +200,15 @@ curl -s -X POST -H "X-Cron-Secret: YOUR_CRON_SECRET" $API/api/cron/auto-release 
 SELECT sum("escrowAmountPi") FROM orders WHERE "escrowStatus" = 'FUNDED';
 SELECT sum("balancePi")      FROM users;
 
--- ledger integrity: balance must equal the sum of that user's transactions
+-- Ledger integrity: the balance must equal the sum of that user's
+-- balance-moving transactions. The `affectsBalance` filter is not optional —
+-- connect fees, escrow funding, boost and subscription are paid from the Pi
+-- wallet, are stored for history with affectsBalance = false, and never touch
+-- balancePi. Omit the filter and this query reports drift for every user who
+-- has ever paid for anything.
 SELECT u.username, u."balancePi", COALESCE(sum(t."amountPi"), 0) AS ledger
-FROM users u LEFT JOIN transactions t ON t."userId" = u.id
+FROM users u
+LEFT JOIN transactions t ON t."userId" = u.id AND t."affectsBalance"
 GROUP BY u.id HAVING u."balancePi" <> COALESCE(sum(t."amountPi"), 0);
 
 -- escrows past their deadline that the sweep has not settled
