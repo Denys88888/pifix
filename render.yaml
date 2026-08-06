@@ -35,10 +35,17 @@ services:
         value: production
       - key: PORT
         value: "3000"
+      # NOT wired via fromDatabase on purpose. pifix-api is pinned to Frankfurt
+      # and pifix-db landed in Oregon on first deploy (Render's free Postgres
+      # does not offer Frankfurt); Render's private network — and therefore the
+      # Internal Database URL that `fromDatabase: connectionString` resolves
+      # to — only works between services in the SAME region. Using it here
+      # deploys clean and then fails at boot with P1001 "Can't reach database
+      # server". Set this by hand in the dashboard to the database's EXTERNAL
+      # connection string (Connect → External on the pifix-db page) — sync:
+      # false means later blueprint syncs will never overwrite it.
       - key: DATABASE_URL
-        fromDatabase:
-          name: pifix-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: CRON_SECRET
