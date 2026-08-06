@@ -19,7 +19,12 @@ services:
     plan: free
     region: frankfurt
     rootDir: backend
-    buildCommand: npm ci && npm run build
+    # --include=dev is required: NODE_ENV=production is already set for the
+    # build step on Render, and plain `npm ci` silently skips devDependencies
+    # under that flag — which is exactly where typescript and the prisma CLI
+    # live. Without this, `tsc` falls back to some unpinned resolution and
+    # build fails on a config option that works fine with the pinned version.
+    buildCommand: npm ci --include=dev && npm run build
     # `start` runs `prisma migrate deploy` before booting, so schema changes ship
     # with the code and never need a manual step.
     startCommand: npm start
@@ -79,7 +84,9 @@ services:
     name: pifix-web
     runtime: static
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    # Same reasoning as pifix-api: vite and typescript are devDependencies and
+    # must not be skipped under Render's build-time NODE_ENV=production.
+    buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: dist
     autoDeploy: true
     envVars:
