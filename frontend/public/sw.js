@@ -9,7 +9,12 @@
  *   • EVERYTHING under /api → never touched by the worker
  */
 
-const VERSION = 'pifix-v1';
+/* Bump this on every locale change. `activate` deletes every cache whose name
+ * does not start with VERSION, so bumping is what evicts stale translation
+ * bundles. Locales are stale-while-revalidate, which means a newly added key
+ * renders as its raw id ("auth.piNoResponse") on the first load after a deploy
+ * and only comes good on the next one — seen for real in Pi Browser. */
+const VERSION = 'pifix-v2';
 const STATIC_CACHE = `${VERSION}-static`;
 const SHELL_CACHE = `${VERSION}-shell`;
 const SHELL_URL = '/index.html';
