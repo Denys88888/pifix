@@ -51,6 +51,13 @@ declare global {
 let initialised = false;
 let incompleteHandler: ((payment: IncompletePayment) => void) | null = null;
 
+/**
+ * How long to wait for the Pi native bridge to answer authenticate() before
+ * concluding there is no bridge. Sized for a human reading a consent screen,
+ * not for a network round-trip.
+ */
+const AUTH_BRIDGE_TIMEOUT_MS = 60_000;
+
 export function isPiBrowser(): boolean {
   return typeof window !== 'undefined' && typeof window.Pi !== 'undefined';
 }
@@ -90,9 +97,26 @@ export async function authenticate(
 ): Promise<PiAuthResult> {
   if (!isPiBrowser()) throw new PiUnavailableError();
 
-  return window.Pi!.authenticate(scopes, (payment) => {
-    incompleteHandler?.(payment);
-  });
+  // isPiBrowser() only proves the SDK script loaded, and index.html loads it
+  // from sdk.minepi.com in every browser — so outside Pi Browser we get here
+  // with a window.Pi that has no native bridge behind it, and authenticate()
+  // then never settles: it does not resolve, it does not reject, and the sign-in
+  // button sits on its spinner forever with nothing logged. Verified in desktop
+  // Chrome against the deployed app.
+  //
+  // The timeout is the only thing that turns that dead end into a message. It is
+  // deliberately generous: inside real Pi Browser this call hands off to the Pi
+  // host app for consent (observed navigating away to Mine when the pioneer has
+  // no session), so it must never fire on a pioneer who is simply reading the
+  // consent screen.
+  return Promise.race([
+    window.Pi!.authenticate(scopes, (payment) => {
+      incompleteHandler?.(payment);
+    }),
+    new Promise<never>((_resolve, reject) =>
+      setTimeout(() => reject(new PiUnavailableError()), AUTH_BRIDGE_TIMEOUT_MS),
+    ),
+  ]);
 }
 
 /**

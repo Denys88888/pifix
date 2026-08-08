@@ -11,7 +11,13 @@ import i18n from 'i18next';
 import { ApiError, getAuthToken, setAuthToken, setUnauthorizedHandler } from '../api/client';
 import { authApi, paymentsApi } from '../api/endpoints';
 import type { SelfUser } from '../api/types';
-import { authenticate, initPi, isPiBrowser, type IncompletePayment } from '../lib/piSdk';
+import {
+  authenticate,
+  initPi,
+  isPiBrowser,
+  PiUnavailableError,
+  type IncompletePayment,
+} from '../lib/piSdk';
 
 export type AuthStatus = 'booting' | 'no_pi' | 'signed_out' | 'signing_in' | 'signed_in' | 'error';
 
@@ -86,7 +92,12 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
             ? caught.message
             : 'Authentication failed';
       setError(message);
-      setStatus(isPiBrowser() ? 'signed_out' : 'no_pi');
+      // PiUnavailableError means the SDK object exists but nothing is behind it,
+      // so isPiBrowser() cannot be trusted to tell these apart — this is the one
+      // signal that actually distinguishes "not in Pi Browser" from "sign-in
+      // failed", and it is what makes the OpenInPiBrowser screen reachable.
+      const noBridge = caught instanceof PiUnavailableError || !isPiBrowser();
+      setStatus(noBridge ? 'no_pi' : 'signed_out');
     } finally {
       signingIn.current = false;
     }
