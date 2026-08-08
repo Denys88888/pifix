@@ -12,6 +12,10 @@ export interface SettingsContextValue {
 
 export const SettingsContext = createContext<SettingsContextValue | null>(null);
 
+const BOOT_ATTEMPTS = 3;
+/** Waits before attempts 2 and 3. Short, because the boot timeout is already long. */
+const RETRY_DELAYS_MS = [1_000, 3_000];
+
 /**
  * Prices and limits live in the database and can change at any moment from the
  * admin panel, so they are fetched at boot and re-fetched whenever the app
@@ -27,18 +31,41 @@ export function SettingsProvider({ children }: { children: ReactNode }): JSX.Ele
   const reload = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const [nextSettings, nextCategories] = await Promise.all([
+
+    let lastError: unknown = null;
+
+    // A cold free-tier instance can miss even the extended boot timeout, and
+    // there is no other trigger until the tab is backgrounded and refocused —
+    // so a single miss used to leave the app sitting there with no categories
+    // and no prices. Retry a couple of times before giving up.
+    for (let attempt = 0; attempt < BOOT_ATTEMPTS; attempt += 1) {
+      if (attempt > 0) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      }
+
+      // allSettled, not all: these are independent endpoints, and letting a
+      // failing one discard a successful one is how a slow /settings used to
+      // blank out the category grid too.
+      const [settingsResult, categoriesResult] = await Promise.allSettled([
         referenceApi.settings(),
         referenceApi.categories(),
       ]);
-      setSettings(nextSettings);
-      setCategories(nextCategories);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not load platform settings');
-    } finally {
-      setLoading(false);
+
+      if (settingsResult.status === 'fulfilled') setSettings(settingsResult.value);
+      else lastError = settingsResult.reason;
+
+      if (categoriesResult.status === 'fulfilled') setCategories(categoriesResult.value);
+      else lastError = categoriesResult.reason;
+
+      if (settingsResult.status === 'fulfilled' && categoriesResult.status === 'fulfilled') {
+        setError(null);
+        setLoading(false);
+        return;
+      }
     }
+
+    setError(lastError instanceof Error ? lastError.message : 'Could not load platform settings');
+    setLoading(false);
   }, []);
 
   useEffect(() => {

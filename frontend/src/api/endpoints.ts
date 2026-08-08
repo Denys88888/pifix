@@ -44,13 +44,26 @@ export const authApi = {
 
 // ── Reference data ───────────────────────────────────────────────────────────
 
+/**
+ * These two run at boot, which on a free Render instance is exactly when the
+ * API may be spinning back up. Render's own warning is "can delay requests by
+ * 50 seconds or more", well past the 30 s default, so they get their own
+ * longer budget — otherwise the very first visit after an idle period loads an
+ * app with no prices and no categories.
+ */
+const BOOT_TIMEOUT_MS = 90_000;
+
 export const referenceApi = {
   async settings() {
-    const { data } = await api.get<{ settings: PlatformSettings }>('/settings');
+    const { data } = await api.get<{ settings: PlatformSettings }>('/settings', {
+      timeout: BOOT_TIMEOUT_MS,
+    });
     return data.settings;
   },
   async categories() {
-    const { data } = await api.get<{ categories: Category[] }>('/categories');
+    const { data } = await api.get<{ categories: Category[] }>('/categories', {
+      timeout: BOOT_TIMEOUT_MS,
+    });
     return data.categories;
   },
 };
