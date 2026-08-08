@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Увійти через Pi",
     "signInRequired": "Потрібен вхід",
-    "signInRequiredHint": "Увійдіть через акаунт Pi, щоб продовжити."
+    "signInRequiredHint": "Увійдіть через акаунт Pi, щоб продовжити.",
+    "piNoResponse": "Pi не відповів. Переконайтеся, що ви увійшли в застосунок Pi, і спробуйте ще раз."
   },
   "piBrowser": {
     "title": "Відкрийте у Pi Browser",

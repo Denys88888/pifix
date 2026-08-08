@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "تسجيل الدخول عبر Pi",
     "signInRequired": "تسجيل الدخول مطلوب",
-    "signInRequiredHint": "سجّل الدخول بحساب Pi للمتابعة."
+    "signInRequiredHint": "سجّل الدخول بحساب Pi للمتابعة.",
+    "piNoResponse": "لم يستجب Pi. تأكد من تسجيل الدخول إلى تطبيق Pi ثم حاول مرة أخرى."
   },
   "piBrowser": {
     "title": "افتح التطبيق في Pi Browser",

@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Zaloguj przez Pi",
     "signInRequired": "Wymagane logowanie",
-    "signInRequiredHint": "Zaloguj się kontem Pi, aby kontynuować."
+    "signInRequiredHint": "Zaloguj się kontem Pi, aby kontynuować.",
+    "piNoResponse": "Pi nie odpowiedziało. Upewnij się, że jesteś zalogowany w aplikacji Pi, i spróbuj ponownie."
   },
   "piBrowser": {
     "title": "Otwórz w Pi Browser",

@@ -15,6 +15,7 @@ import {
   authenticate,
   initPi,
   isPiBrowser,
+  PiBridgeTimeoutError,
   PiUnavailableError,
   type IncompletePayment,
 } from '../lib/piSdk';
@@ -91,13 +92,18 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
           : caught instanceof Error
             ? caught.message
             : 'Authentication failed';
-      setError(message);
-      // PiUnavailableError means the SDK object exists but nothing is behind it,
-      // so isPiBrowser() cannot be trusted to tell these apart — this is the one
-      // signal that actually distinguishes "not in Pi Browser" from "sign-in
-      // failed", and it is what makes the OpenInPiBrowser screen reachable.
-      const noBridge = caught instanceof PiUnavailableError || !isPiBrowser();
-      setStatus(noBridge ? 'no_pi' : 'signed_out');
+      // A bridge timeout is NOT proof the pioneer is outside Pi Browser — the
+      // same hang happens inside it when they have no Pi session. So it keeps
+      // them on the app with an honest message and a working retry, instead of
+      // replacing the whole UI with "open in Pi Browser", which is what an
+      // earlier version did and which was wrong for exactly that case.
+      if (caught instanceof PiBridgeTimeoutError) {
+        setError(i18n.t('auth.piNoResponse'));
+        setStatus('signed_out');
+      } else {
+        setError(message);
+        setStatus(caught instanceof PiUnavailableError || !isPiBrowser() ? 'no_pi' : 'signed_out');
+      }
     } finally {
       signingIn.current = false;
     }

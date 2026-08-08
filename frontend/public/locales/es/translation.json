@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Entrar con Pi",
     "signInRequired": "Necesitas iniciar sesión",
-    "signInRequiredHint": "Inicia sesión con tu cuenta de Pi para continuar."
+    "signInRequiredHint": "Inicia sesión con tu cuenta de Pi para continuar.",
+    "piNoResponse": "Pi no respondió. Asegúrate de haber iniciado sesión en la app de Pi e inténtalo de nuevo."
   },
   "piBrowser": {
     "title": "Ábrelo en Pi Browser",

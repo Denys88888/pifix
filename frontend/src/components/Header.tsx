@@ -8,7 +8,7 @@ const ROOT_PATHS = ['/', '/orders', '/masters', '/profile', '/dashboard'];
 
 export function Header(): JSX.Element {
   const { t } = useTranslation();
-  const { user, status, signIn } = useAuth();
+  const { user, status, signIn, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,6 +52,15 @@ export function Header(): JSX.Element {
           )}
         </div>
       </div>
+
+      {/* The sign-in button lives here and nothing else rendered its failures,
+          so a rejected authenticate() used to leave the button silently back at
+          rest with no explanation anywhere on screen. */}
+      {error && status !== 'signed_in' ? (
+        <p className={styles.signInError} role="alert">
+          {error}
+        </p>
+      ) : null}
     </header>
   );
 }

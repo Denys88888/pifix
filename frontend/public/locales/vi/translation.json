@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Đăng nhập bằng Pi",
     "signInRequired": "Cần đăng nhập",
-    "signInRequiredHint": "Đăng nhập bằng tài khoản Pi để tiếp tục."
+    "signInRequiredHint": "Đăng nhập bằng tài khoản Pi để tiếp tục.",
+    "piNoResponse": "Pi không phản hồi. Hãy đảm bảo bạn đã đăng nhập ứng dụng Pi rồi thử lại."
   },
   "piBrowser": {
     "title": "Hãy mở trong Pi Browser",

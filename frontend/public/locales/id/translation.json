@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Masuk dengan Pi",
     "signInRequired": "Perlu masuk",
-    "signInRequiredHint": "Masuk dengan akun Pi Anda untuk melanjutkan."
+    "signInRequiredHint": "Masuk dengan akun Pi Anda untuk melanjutkan.",
+    "piNoResponse": "Pi tidak merespons. Pastikan Anda sudah masuk ke aplikasi Pi, lalu coba lagi."
   },
   "piBrowser": {
     "title": "Buka di Pi Browser",

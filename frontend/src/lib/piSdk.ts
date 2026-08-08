@@ -89,6 +89,21 @@ export class PiUnavailableError extends Error {
 }
 
 /**
+ * The bridge did not answer in time. Deliberately distinct from
+ * PiUnavailableError: a timeout does NOT prove the pioneer is outside Pi
+ * Browser. Observed on the emulator inside the genuine Pi Browser, on an
+ * account with no Pi session — authenticate() hung there exactly as it does in
+ * desktop Chrome. Treating the two as the same thing tells a pioneer who is
+ * already in Pi Browser to go and open Pi Browser.
+ */
+export class PiBridgeTimeoutError extends Error {
+  constructor() {
+    super('Pi did not respond in time');
+    this.name = 'PiBridgeTimeoutError';
+  }
+}
+
+/**
  * `payments` is required: it is the scope that lets the app create payments and
  * that exposes the wallet address used for payouts.
  */
@@ -104,17 +119,16 @@ export async function authenticate(
   // button sits on its spinner forever with nothing logged. Verified in desktop
   // Chrome against the deployed app.
   //
-  // The timeout is the only thing that turns that dead end into a message. It is
-  // deliberately generous: inside real Pi Browser this call hands off to the Pi
-  // host app for consent (observed navigating away to Mine when the pioneer has
-  // no session), so it must never fire on a pioneer who is simply reading the
-  // consent screen.
+  // The timeout is the only thing that turns that dead end into a message. What
+  // it must NOT do is claim to know why: the same hang happens inside the real
+  // Pi Browser when the pioneer has no Pi session, so it reports "Pi did not
+  // respond" rather than "you are not in Pi Browser".
   return Promise.race([
     window.Pi!.authenticate(scopes, (payment) => {
       incompleteHandler?.(payment);
     }),
     new Promise<never>((_resolve, reject) =>
-      setTimeout(() => reject(new PiUnavailableError()), AUTH_BRIDGE_TIMEOUT_MS),
+      setTimeout(() => reject(new PiBridgeTimeoutError()), AUTH_BRIDGE_TIMEOUT_MS),
     ),
   ]);
 }

@@ -28,7 +28,8 @@
   "auth": {
     "signIn": "Pi से साइन इन करें",
     "signInRequired": "साइन इन ज़रूरी है",
-    "signInRequiredHint": "जारी रखने के लिए अपने Pi खाते से साइन इन करें।"
+    "signInRequiredHint": "जारी रखने के लिए अपने Pi खाते से साइन इन करें।",
+    "piNoResponse": "Pi ने जवाब नहीं दिया। सुनिश्चित करें कि आप Pi ऐप में साइन इन हैं, फिर दोबारा कोशिश करें।"
   },
   "piBrowser": {
     "title": "Pi Browser में खोलें",
