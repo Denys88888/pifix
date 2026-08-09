@@ -136,3 +136,10 @@ services:
       - path: /sw.js
         name: Cache-Control
         value: no-cache
+      # Render does not know the .webmanifest extension and serves it as
+      # binary/octet-stream. Combined with the nosniff above that is asking for
+      # a browser to drop the manifest, and with it the icon and the
+      # "Add to Home Screen" name.
+      - path: /manifest.webmanifest
+        name: Content-Type
+        value: application/manifest+json
