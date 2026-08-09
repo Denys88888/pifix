@@ -12,6 +12,10 @@
     <meta name="description" content="PiFix — find and hire plumbers, electricians, movers and more, paid in Pi." />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Pi Browser is an Android WebView and iOS Safari ignores SVG icons for
+         "Add to Home Screen", so the raster icon is not optional here. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>PiFix</title>
     <!-- The Pi SDK must load before the app so Pi.init can run on mount. -->
