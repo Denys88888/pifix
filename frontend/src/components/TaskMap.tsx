@@ -52,14 +52,21 @@ export function TaskMap({
   const center = centerProp ?? geo.coords;
   const effectiveFilter = lock ?? filter;
 
+  // Depend on the coordinates, never on the object holding them. A caller
+  // passing center={{ lat, lng }} inline creates a new object every render,
+  // and with the object in the dependency list that is a fetch loop: load
+  // changes identity → the effect reruns → setState → render → repeat.
+  const centerLat = center?.lat ?? null;
+  const centerLng = center?.lng ?? null;
+
   const load = useCallback(async () => {
-    if (!center) return;
+    if (centerLat === null || centerLng === null) return;
     setLoading(true);
     setError(null);
     try {
       const result = await mapApi.nearby({
-        lat: center.lat,
-        lng: center.lng,
+        lat: centerLat,
+        lng: centerLng,
         radius: radiusMeters,
         type: effectiveFilter,
         category,
@@ -70,7 +77,7 @@ export function TaskMap({
     } finally {
       setLoading(false);
     }
-  }, [center?.lat, center?.lng, radiusMeters, effectiveFilter, category, t, center]);
+  }, [centerLat, centerLng, radiusMeters, effectiveFilter, category, t]);
 
   useEffect(() => {
     void load();
@@ -80,7 +87,7 @@ export function TaskMap({
   // pin until something re-reads it, so the map refreshes on a slow timer.
   // Paused while the tab is hidden so a backgrounded phone is not polling.
   useEffect(() => {
-    if (!center) return undefined;
+    if (centerLat === null || centerLng === null) return undefined;
     const tick = () => {
       if (document.visibilityState === 'visible') void load();
     };
@@ -90,7 +97,7 @@ export function TaskMap({
       window.clearInterval(timer);
       document.removeEventListener('visibilitychange', tick);
     };
-  }, [load, center]);
+  }, [load, centerLat, centerLng]);
 
   const markers = useMemo<MapMarker[]>(() => {
     if (!data) return [];

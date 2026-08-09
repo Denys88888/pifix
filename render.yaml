@@ -111,6 +111,12 @@ services:
       # the "open in Pi Browser" screen.
       - key: VITE_APP_URL
         sync: false # read it from Develop -> PiNet Settings -> "Current PiNet subdomain"
+      # Copy the grey box from Develop -> checklist -> "Validate Domain
+      # Ownership". The build writes it to /validation-key.txt, which is what
+      # the portal fetches. Until this is set that URL 404s and the check
+      # cannot pass — which also blocks the PiNet subdomain behind it.
+      - key: VITE_PI_VALIDATION_KEY
+        sync: false
     routes:
       # SPA fallback — every client route must serve index.html.
       - type: rewrite

@@ -5,7 +5,10 @@
  * never touches `window.Pi` directly and always gets typed, promise-based APIs.
  */
 
-export type PiScope = 'username' | 'payments' | 'wallet_address' | 'roles';
+// Exactly the three scopes the Pi SDK reference documents. 'roles' used to be
+// listed here and is not in the docs — leaving it in the type advertised a
+// scope that may simply be rejected at the consent screen.
+export type PiScope = 'username' | 'payments' | 'wallet_address';
 
 export interface PiAuthResult {
   accessToken: string;
