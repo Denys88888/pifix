@@ -5,6 +5,7 @@ import type {
   Category,
   MasterProfile,
   MasterStats,
+  NearbyResult,
   Order,
   OrderResponse,
   Paginated,
@@ -185,6 +186,13 @@ export const mastersApi = {
   },
   async myProfile() {
     const { data } = await api.get<{ profile: MasterProfile | null }>('/masters/me/profile');
+    return data.profile;
+  },
+  /** The "I am taking work" switch that puts the master's pin on the map. */
+  async setAvailability(isAvailable: boolean) {
+    const { data } = await api.put<{ profile: MasterProfile }>('/masters/me/availability', {
+      isAvailable,
+    });
     return data.profile;
   },
   async saveProfile(payload: {
@@ -388,5 +396,24 @@ export const adminApiClient = {
   async rejectWithdrawal(id: string, note?: string) {
     const { data } = await adminApi.post<{ withdrawal: Withdrawal }>(`/admin/withdrawals/${id}/reject`, { note });
     return data.withdrawal;
+  },
+};
+
+// ── Map ──────────────────────────────────────────────────────────────────────
+
+export interface NearbyQuery {
+  lat: number;
+  lng: number;
+  /** METRES, matching what a map viewport gives you. */
+  radius?: number;
+  type?: 'tasks' | 'workers' | 'all';
+  category?: string;
+  limit?: number;
+}
+
+export const mapApi = {
+  async nearby(query: NearbyQuery) {
+    const { data } = await api.get<NearbyResult>('/nearby', { params: query });
+    return data;
   },
 };

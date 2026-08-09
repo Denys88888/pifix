@@ -10,12 +10,14 @@ import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { ImageUploader } from '../components/ImageUploader';
 import { PullToRefresh } from '../components/PullToRefresh';
+import { TaskMap } from '../components/TaskMap';
+import { AvailabilityToggle } from '../components/AvailabilityToggle';
 import { useAuth } from '../hooks/useAuth';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import { formatDate, shortWallet } from '../lib/format';
 import styles from '../styles/Pages.module.css';
 
-type Tab = 'jobs' | 'responses' | 'money';
+type Tab = 'jobs' | 'map' | 'responses' | 'money';
 
 export default function MasterDashboard(): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -176,8 +178,10 @@ export default function MasterDashboard(): JSX.Element {
           </div>
         ) : null}
 
+        <AvailabilityToggle />
+
         <div className={styles.tabs}>
-          {(['jobs', 'responses', 'money'] as Tab[]).map((item) => (
+          {(['jobs', 'map', 'responses', 'money'] as Tab[]).map((item) => (
             <button
               key={item}
               className={tab === item ? `${styles.tab} ${styles.tabActive}` : styles.tab}
@@ -199,6 +203,8 @@ export default function MasterDashboard(): JSX.Element {
             </div>
           )
         ) : null}
+
+        {tab === 'map' ? <TaskMap lock="tasks" height={380} /> : null}
 
         {tab === 'responses' ? (
           responses.length === 0 ? (

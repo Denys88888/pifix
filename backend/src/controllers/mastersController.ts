@@ -36,7 +36,7 @@ export const searchMastersSchema = z.object({
 });
 
 const profileInclude = {
-  user: { select: { id: true, username: true, ratingAvg: true, ratingCount: true } },
+  user: { select: { id: true, username: true, ratingAvg: true, ratingCount: true, lastSeenAt: true } },
   categories: { include: { category: true } },
 } as const;
 
@@ -105,6 +105,38 @@ export async function getMyProfile(req: Request, res: Response): Promise<void> {
     include: profileInclude,
   });
   res.json({ profile: profile ? masterProfileDTO(profile) : null });
+}
+
+const availabilitySchema = z.object({ isAvailable: z.boolean() });
+
+/**
+ * The master's "I am taking work" switch, which is what puts their green pin on
+ * the map. Deliberately separate from upsertProfile: that one is a full-form
+ * PUT, and a master toggling availability from the dashboard must not have to
+ * round-trip their whole bio and category list to do it.
+ */
+export async function setAvailability(req: Request, res: Response): Promise<void> {
+  const { isAvailable } = availabilitySchema.parse(req.body);
+
+  const existing = await prisma.masterProfile.findUnique({
+    where: { userId: req.user!.id },
+    select: { id: true, lat: true, lng: true },
+  });
+  if (!existing) throw notFound('profile_not_found', 'Create a master profile first');
+
+  // Going available without a home point would mean a pin at (null, null) —
+  // the map query filters those out, so the master would silently never appear.
+  if (isAvailable && (existing.lat === null || existing.lng === null)) {
+    throw badRequest('location_required', 'Set your work location before going available');
+  }
+
+  const profile = await prisma.masterProfile.update({
+    where: { id: existing.id },
+    data: { isAvailable },
+    include: profileInclude,
+  });
+
+  res.json({ profile: masterProfileDTO(profile) });
 }
 
 export async function getMasterByUsername(req: Request, res: Response): Promise<void> {

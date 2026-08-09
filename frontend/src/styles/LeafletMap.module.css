@@ -78,3 +78,152 @@
 .pinAccent span {
   color: #08130a;
 }
+
+/* ── Pin tones ─────────────────────────────────────────────────────────────
+   Red = an open job, green = a master available for work. Colour alone is not
+   the only signal: tasks carry their price and masters their rating, so the
+   two are still distinguishable without colour vision. */
+.pinTask {
+  border-color: #ff5a5f;
+  background: #2a1418;
+}
+
+.pinTask span {
+  color: #ff8a8d;
+}
+
+.pinWorker {
+  border-color: #4caf50;
+  background: #12281a;
+}
+
+.pinWorker span {
+  color: #7fdc86;
+}
+
+/* Online right now. The ring is a separate ::after so it can pulse without
+   dragging the rotated pin body into the animation. */
+.pinLive::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50% 50% 50% 0;
+  border: 2px solid rgba(76, 175, 80, 0.7);
+  animation: pinPulse 1.8s ease-out infinite;
+}
+
+.pinLive {
+  position: relative;
+}
+
+@keyframes pinPulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+/* Respect the OS "reduce motion" switch — a pulsing ring per pin is exactly
+   the kind of thing that setting exists for. */
+@media (prefers-reduced-motion: reduce) {
+  .pinLive::after {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* ── Popups ────────────────────────────────────────────────────────────────
+   Leaflet's own popup chrome is white and hardcoded, so it is restyled to the
+   app's dark surface in LeafletMap's :global block below. */
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.popupTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.popupLine {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.popupAction {
+  margin-top: 6px;
+  display: block;
+  text-align: center;
+  background: var(--accent);
+  color: #08130a;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+/* Leaflet ships its popup chrome as a white bubble with a white tip, hardcoded
+   in its own stylesheet. These are its class names, not ours, so they need
+   :global or CSS Modules would hash them and the override would never apply. */
+.wrap :global(.leaflet-popup-content-wrapper) {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+.wrap :global(.leaflet-popup-content) {
+  margin: 10px 12px;
+}
+
+.wrap :global(.leaflet-popup-tip) {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.wrap :global(.leaflet-popup-close-button) {
+  color: var(--text-dim);
+}
+
+/* Zoom buttons and the attribution strip are light by default too. */
+.wrap :global(.leaflet-bar a) {
+  background: var(--card);
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+
+.wrap :global(.leaflet-bar a:hover) {
+  background: var(--surface-2, #1c2748);
+}
+
+.wrap :global(.leaflet-control-attribution) {
+  background: rgba(16, 16, 28, 0.8);
+  color: var(--text-dim);
+}
+
+.wrap :global(.leaflet-control-attribution a) {
+  color: var(--text-dim);
+}
+
+/* Leaflet styles every anchor inside the map with `.leaflet-container a`,
+   which is specificity (0,1,1) and beats a bare module class (0,1,0) — the
+   popup button came out link-blue on green. Combining its global class with
+   ours wins without resorting to !important. */
+.wrap :global(.leaflet-container) a.popupAction {
+  color: #08130a;
+  text-decoration: none;
+}
+
+.wrap :global(.leaflet-container) a.popupAction:hover {
+  color: #08130a;
+}

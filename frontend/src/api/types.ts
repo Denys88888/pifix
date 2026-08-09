@@ -38,6 +38,10 @@ export interface MasterProfile {
   completedJobs: number;
   isBoosted: boolean;
   isPro: boolean;
+  /** The master's own "taking work now" switch. */
+  isAvailable: boolean;
+  /** Derived server-side from lastSeenAt — never sent by the client. */
+  isOnline: boolean;
   boostedUntil: string | null;
   proUntil: string | null;
   ratingAvg: number;
@@ -248,4 +252,47 @@ export interface AdminSettings extends PlatformSettings {
   autoWithdrawalPi: string;
   piUsdRate: string;
   updatedAt: string;
+}
+
+// ── Map: /api/nearby ─────────────────────────────────────────────────────────
+
+export interface NearbyTask {
+  kind: 'task';
+  id: string;
+  title: string;
+  lat: number;
+  lng: number;
+  distanceKm: number;
+  budgetPi: string;
+  isUrgent: boolean;
+  category: string | null;
+  categoryIcon: string | null;
+  createdAt: string;
+}
+
+export interface NearbyWorker {
+  kind: 'worker';
+  id: string;
+  username: string | null;
+  displayName: string;
+  avatarUrl: string | null;
+  lat: number;
+  lng: number;
+  distanceKm: number;
+  ratingAvg: number;
+  ratingCount: number;
+  completedJobs: number;
+  isOnline: boolean;
+  isBoosted: boolean;
+  categories: string[];
+}
+
+export interface NearbyResult {
+  center: { lat: number; lng: number };
+  radiusMeters: number;
+  onlineWindowMs: number;
+  tasks: NearbyTask[];
+  workers: NearbyWorker[];
+  /** True when either list hit the server candidate cap; counts are a floor. */
+  truncated: boolean;
 }

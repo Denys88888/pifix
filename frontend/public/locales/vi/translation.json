@@ -53,7 +53,8 @@
     "howItWorks": "Cách hoạt động",
     "step1": "Đăng công việc kèm ngân sách và địa chỉ.",
     "step2": "Chọn thợ và thanh toán — ngân sách cộng phí dịch vụ {{fee}}% được giữ trong ký quỹ.",
-    "step3": "Xác nhận hoàn thành, thợ nhận tiền. Không xác nhận trong {{days}} ngày = tự động thanh toán."
+    "step3": "Xác nhận hoàn thành, thợ nhận tiền. Không xác nhận trong {{days}} ngày = tự động thanh toán.",
+    "nearby": "Gần bạn"
   },
   "categories": {
     "plumbing": "Nước",
@@ -230,7 +231,8 @@
     "noTransactions": "Chưa có giao dịch.",
     "amount": "Số tiền (π)",
     "withdrawNote": "Pi sẽ được gửi tới địa chỉ ví liên kết với tài khoản Pi của bạn.",
-    "requestWithdrawal": "Yêu cầu rút tiền"
+    "requestWithdrawal": "Yêu cầu rút tiền",
+    "tab_map": "Bản đồ"
   },
   "verification": {
     "UNVERIFIED": "Hồ sơ chưa được xác minh. Bạn chưa thể gửi chào giá.",
@@ -292,7 +294,22 @@
   "map": {
     "loading": "Đang tải bản đồ…",
     "unavailable": "Không tải được bản đồ. Bạn vẫn có thể nhập địa chỉ thủ công.",
-    "tapHint": "Chạm vào bản đồ để đặt điểm"
+    "tapHint": "Chạm vào bản đồ để đặt điểm",
+    "filter": {
+      "all": "Tất cả",
+      "tasks": "Chỉ công việc",
+      "workers": "Chỉ thợ"
+    },
+    "filterLabel": "Hiển thị gì trên bản đồ",
+    "needLocation": "Cho phép định vị để xem những gì ở gần bạn.",
+    "distanceAway": "cách {{km}} km",
+    "jobsDone": "Đã làm {{n}} việc",
+    "respond": "Nhận việc",
+    "viewMaster": "Xem hồ sơ",
+    "legendTasks": "Công việc: {{n}}",
+    "legendWorkers": "Thợ: {{n}}",
+    "empty": "Chưa có gì trong bán kính này.",
+    "truncated": "Chỉ hiển thị những mục gần nhất — phóng to bản đồ để xem phần còn lại."
   },
   "upload": {
     "add": "Thêm ({{current}}/{{max}})",
@@ -374,5 +391,14 @@
     "contactTitle": "Liên hệ",
     "contactBody": "Với mọi yêu cầu về quyền riêng tư, hãy liên hệ chủ sở hữu ứng dụng qua trang PiFix trên Pi Developer Portal.",
     "manageData": "Quản lý dữ liệu của tôi"
+  },
+  "availability": {
+    "on": "Đang nhận việc",
+    "off": "Không nhận việc",
+    "hint": "Khi bật, ghim của bạn hiện trên bản đồ cho khách ở gần.",
+    "needLocation": "Hãy đặt nơi làm việc trước — không có nó thì ghim không biết đặt ở đâu.",
+    "setLocation": "Đặt vị trí",
+    "goOnline": "Bắt đầu nhận việc",
+    "goOffline": "Tạm dừng"
   }
 }

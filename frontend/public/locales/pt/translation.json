@@ -53,7 +53,8 @@
     "howItWorks": "Como funciona",
     "step1": "Publique um serviço com seu orçamento e endereço.",
     "step2": "Escolha um profissional e pague — o orçamento mais {{fee}}% de taxa ficam em custódia.",
-    "step3": "Confirme o serviço e o profissional recebe. Sem confirmação em {{days}} dias = pagamento automático."
+    "step3": "Confirme o serviço e o profissional recebe. Sem confirmação em {{days}} dias = pagamento automático.",
+    "nearby": "Perto de si"
   },
   "categories": {
     "plumbing": "Encanamento",
@@ -230,7 +231,8 @@
     "noTransactions": "Nenhuma transação ainda.",
     "amount": "Valor (π)",
     "withdrawNote": "Os Pi vão para o endereço de carteira vinculado à sua conta Pi.",
-    "requestWithdrawal": "Solicitar saque"
+    "requestWithdrawal": "Solicitar saque",
+    "tab_map": "Mapa"
   },
   "verification": {
     "UNVERIFIED": "Seu perfil não está verificado. Você ainda não pode enviar propostas.",
@@ -292,7 +294,22 @@
   "map": {
     "loading": "Carregando o mapa…",
     "unavailable": "Não foi possível carregar o mapa. Você pode digitar o endereço manualmente.",
-    "tapHint": "Toque no mapa para marcar o ponto"
+    "tapHint": "Toque no mapa para marcar o ponto",
+    "filter": {
+      "all": "Tudo",
+      "tasks": "Só trabalhos",
+      "workers": "Só profissionais"
+    },
+    "filterLabel": "O que mostrar no mapa",
+    "needLocation": "Permita a localização para ver o que há por perto.",
+    "distanceAway": "a {{km}} km",
+    "jobsDone": "{{n}} trabalhos feitos",
+    "respond": "Candidatar-me",
+    "viewMaster": "Ver perfil",
+    "legendTasks": "Trabalhos: {{n}}",
+    "legendWorkers": "Profissionais: {{n}}",
+    "empty": "Ainda não há nada neste raio.",
+    "truncated": "A mostrar apenas os mais próximos — aproxime o mapa para ver os restantes."
   },
   "upload": {
     "add": "Adicionar ({{current}}/{{max}})",
@@ -374,5 +391,14 @@
     "contactTitle": "Contato",
     "contactBody": "Para pedidos de privacidade, entre em contato com o responsável pelo aplicativo pela ficha do PiFix no Pi Developer Portal.",
     "manageData": "Gerenciar meus dados"
+  },
+  "availability": {
+    "on": "A aceitar trabalhos",
+    "off": "Sem aceitar trabalhos",
+    "hint": "Enquanto ativo, o seu marcador aparece no mapa para clientes próximos.",
+    "needLocation": "Defina primeiro o seu local de trabalho — sem ele o marcador não tem onde ficar.",
+    "setLocation": "Definir local",
+    "goOnline": "Começar a aceitar",
+    "goOffline": "Parar por agora"
   }
 }

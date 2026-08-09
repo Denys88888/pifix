@@ -53,7 +53,8 @@
     "howItWorks": "How it works",
     "step1": "Post a job with your budget and address.",
     "step2": "Pick a master and pay — the budget plus a {{fee}}% fee is held in escrow.",
-    "step3": "Confirm the work and the master gets paid. No confirmation in {{days}} days = automatic payout."
+    "step3": "Confirm the work and the master gets paid. No confirmation in {{days}} days = automatic payout.",
+    "nearby": "Nearby"
   },
   "categories": {
     "plumbing": "Plumbing",
@@ -230,7 +231,8 @@
     "noTransactions": "No transactions yet.",
     "amount": "Amount (π)",
     "withdrawNote": "The Pi is sent to the wallet address linked to your Pi account.",
-    "requestWithdrawal": "Request a withdrawal"
+    "requestWithdrawal": "Request a withdrawal",
+    "tab_map": "Map"
   },
   "verification": {
     "UNVERIFIED": "Your profile is not verified. You cannot respond to jobs yet.",
@@ -292,7 +294,22 @@
   "map": {
     "loading": "Loading the map…",
     "unavailable": "The map could not be loaded. You can still enter the address manually.",
-    "tapHint": "Tap the map to place the point"
+    "tapHint": "Tap the map to place the point",
+    "filter": {
+      "all": "All",
+      "tasks": "Jobs only",
+      "workers": "Masters only"
+    },
+    "filterLabel": "What to show on the map",
+    "needLocation": "Allow location to see what is nearby.",
+    "distanceAway": "{{km}} km away",
+    "jobsDone": "{{n}} jobs done",
+    "respond": "Respond",
+    "viewMaster": "View profile",
+    "legendTasks": "{{n}} jobs",
+    "legendWorkers": "{{n}} masters",
+    "empty": "Nothing within this radius yet.",
+    "truncated": "Showing the closest ones only — zoom in for the rest."
   },
   "upload": {
     "add": "Add ({{current}}/{{max}})",
@@ -374,5 +391,14 @@
     "contactTitle": "Contact",
     "contactBody": "For any privacy request, contact the app owner through the Pi Developer Portal listing for PiFix.",
     "manageData": "Manage my data"
+  },
+  "availability": {
+    "on": "Taking work",
+    "off": "Not taking work",
+    "hint": "When on, your pin shows on the map for clients nearby.",
+    "needLocation": "Set your work location first — without it your pin has nowhere to go.",
+    "setLocation": "Set location",
+    "goOnline": "Start taking work",
+    "goOffline": "Stop for now"
   }
 }

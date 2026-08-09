@@ -6,6 +6,7 @@ import { uploadLimiter, writeLimiter } from '../middleware/rateLimit';
 import { upload } from '../middleware/upload';
 import { categoryDTO } from '../lib/serializers';
 import { getSettings, publicSettings } from '../services/settings';
+import * as nearby from '../controllers/nearbyController';
 import * as reviews from '../controllers/reviewsController';
 import * as uploads from '../controllers/uploadsController';
 import * as withdrawals from '../controllers/withdrawalsController';
@@ -59,3 +60,8 @@ withdrawalsRouter.use(requireAuth);
 withdrawalsRouter.post('/', writeLimiter, asyncHandler(withdrawals.requestWithdrawal));
 withdrawalsRouter.get('/mine', asyncHandler(withdrawals.myWithdrawals));
 withdrawalsRouter.delete('/:id', asyncHandler(withdrawals.cancelWithdrawal));
+
+// ── Map: open orders + available masters in one viewport ─────────────────────
+export const nearbyRouter = Router();
+
+nearbyRouter.get('/', asyncHandler(nearby.listNearby));

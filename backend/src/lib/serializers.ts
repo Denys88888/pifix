@@ -14,6 +14,18 @@ type WithClient = { client?: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratin
 type WithMaster = { master?: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratingCount'> | null };
 type WithCounts = { _count?: { responses?: number } };
 
+/**
+ * How long after their last authenticated request a master still counts as
+ * online. Long enough to survive a tunnel or a screen lock, short enough that
+ * the green dot on the map means something.
+ */
+export const ONLINE_WINDOW_MS = 5 * 60 * 1000;
+
+export function isRecentlySeen(lastSeenAt: Date | null | undefined): boolean {
+  if (!lastSeenAt) return false;
+  return Date.now() - lastSeenAt.getTime() < ONLINE_WINDOW_MS;
+}
+
 export function publicUser(user: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratingCount'> | null | undefined) {
   if (!user) return null;
   return {
@@ -45,7 +57,9 @@ export function selfUser(user: User & { masterProfile?: MasterProfile | null }) 
 
 export function masterProfileDTO(
   profile: MasterProfile & {
-    user?: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratingCount'> | null;
+    user?: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratingCount'> & {
+      lastSeenAt?: Date | null;
+    } | null;
     categories?: Array<{ category: Category }>;
   },
   extra: { distanceKm?: number } = {},
@@ -68,6 +82,10 @@ export function masterProfileDTO(
     completedJobs: profile.completedJobs,
     isBoosted: Boolean(profile.boostedUntil && profile.boostedUntil > new Date()),
     isPro: Boolean(profile.proUntil && profile.proUntil > new Date()),
+    isAvailable: profile.isAvailable,
+    // Derived from User.lastSeenAt, never stored as a flag: a client that
+    // crashes cannot leave its owner showing as online forever.
+    isOnline: isRecentlySeen(profile.user?.lastSeenAt),
     boostedUntil: profile.boostedUntil?.toISOString() ?? null,
     proUntil: profile.proUntil?.toISOString() ?? null,
     ratingAvg: profile.user ? Number(profile.user.ratingAvg) : 0,

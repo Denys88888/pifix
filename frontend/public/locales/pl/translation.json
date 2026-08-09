@@ -53,7 +53,8 @@
     "howItWorks": "Jak to działa",
     "step1": "Dodaj zlecenie z budżetem i adresem.",
     "step2": "Wybierz fachowca i zapłać — budżet plus prowizja {{fee}}% trafia do escrow.",
-    "step3": "Potwierdź wykonanie, a fachowiec otrzyma zapłatę. Brak potwierdzenia przez {{days}} dni = wypłata automatyczna."
+    "step3": "Potwierdź wykonanie, a fachowiec otrzyma zapłatę. Brak potwierdzenia przez {{days}} dni = wypłata automatyczna.",
+    "nearby": "W pobliżu"
   },
   "categories": {
     "plumbing": "Hydraulika",
@@ -230,7 +231,8 @@
     "noTransactions": "Brak operacji.",
     "amount": "Kwota (π)",
     "withdrawNote": "Pi trafią na adres portfela powiązany z Twoim kontem Pi.",
-    "requestWithdrawal": "Zgłoś wypłatę"
+    "requestWithdrawal": "Zgłoś wypłatę",
+    "tab_map": "Mapa"
   },
   "verification": {
     "UNVERIFIED": "Profil niezweryfikowany. Nie możesz jeszcze zgłaszać się do zleceń.",
@@ -292,7 +294,22 @@
   "map": {
     "loading": "Ładowanie mapy…",
     "unavailable": "Nie udało się załadować mapy. Adres możesz wpisać ręcznie.",
-    "tapHint": "Dotknij mapy, aby ustawić punkt"
+    "tapHint": "Dotknij mapy, aby ustawić punkt",
+    "filter": {
+      "all": "Wszystko",
+      "tasks": "Tylko zlecenia",
+      "workers": "Tylko fachowcy"
+    },
+    "filterLabel": "Co pokazać na mapie",
+    "needLocation": "Zezwól na lokalizację, aby zobaczyć, co jest w pobliżu.",
+    "distanceAway": "{{km}} km od Ciebie",
+    "jobsDone": "Wykonane zlecenia: {{n}}",
+    "respond": "Zgłoś się",
+    "viewMaster": "Zobacz profil",
+    "legendTasks": "Zlecenia: {{n}}",
+    "legendWorkers": "Fachowcy: {{n}}",
+    "empty": "W tym promieniu nic jeszcze nie ma.",
+    "truncated": "Pokazano tylko najbliższe — przybliż mapę, aby zobaczyć resztę."
   },
   "upload": {
     "add": "Dodaj ({{current}}/{{max}})",
@@ -374,5 +391,14 @@
     "contactTitle": "Kontakt",
     "contactBody": "W sprawach prywatności skontaktuj się z właścicielem aplikacji przez wizytówkę PiFix w Pi Developer Portal.",
     "manageData": "Zarządzaj moimi danymi"
+  },
+  "availability": {
+    "on": "Przyjmuję zlecenia",
+    "off": "Nie przyjmuję zleceń",
+    "hint": "Gdy włączone, Twoja pinezka jest widoczna dla klientów w pobliżu.",
+    "needLocation": "Najpierw ustaw miejsce pracy — bez niego pinezka nie ma gdzie stanąć.",
+    "setLocation": "Ustaw miejsce",
+    "goOnline": "Zacznij przyjmować",
+    "goOffline": "Na razie przerwij"
   }
 }

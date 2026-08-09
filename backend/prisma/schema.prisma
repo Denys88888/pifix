@@ -183,6 +183,13 @@ model MasterProfile {
   boostedUntil  DateTime?
   proUntil      DateTime?
 
+  /// Master's own switch: "I am taking work right now". Independent of being
+  /// verified — an unverified master can flip it, they just cannot respond yet.
+  /// Presence ("online") is NOT stored here: it is derived from User.lastSeenAt,
+  /// which requireAuth already touches on every authenticated request, so a
+  /// crashed client cannot leave someone pinned online forever.
+  isAvailable Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -190,6 +197,7 @@ model MasterProfile {
 
   @@index([verificationStatus])
   @@index([lat, lng])
+  @@index([isAvailable])
   @@map("master_profiles")
 }
 

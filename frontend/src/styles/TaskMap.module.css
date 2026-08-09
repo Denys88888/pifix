@@ -1,0 +1,92 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/*
+ * Full-bleed: the map is the screen. Height comes from the flex parent rather
+ * than a fixed pixel value, because 100vh is wrong in Pi Browser — its address
+ * bar is part of the viewport and vh does not account for it, so a 100vh map
+ * ends up scrolled under the bottom navigation.
+ */
+.full {
+  flex: 1;
+  min-height: 0;
+}
+
+.full > :global(.leaflet-container),
+.full > div:nth-child(2) {
+  flex: 1;
+  min-height: 0;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+}
+
+.filter {
+  flex: 1;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filterActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(76, 175, 80, 0.12);
+}
+
+.prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+  padding: 24px 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotTask {
+  background: #ff5a5f;
+}
+
+.dotWorker {
+  background: #4caf50;
+}
+
+.empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: center;
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ordersApi, type OrderFilters } from '../api/endpoints';
 import type { Order } from '../api/types';
 import { OrderCard } from '../components/OrderCard';
@@ -17,6 +18,7 @@ const PAGE_SIZE = 20;
 
 export default function OrdersList(): JSX.Element {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { categories } = usePlatformSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const geo = useGeolocation();
@@ -112,6 +114,16 @@ export default function OrdersList(): JSX.Element {
       lng: order.lng,
       label: order.budgetPi.split('.')[0],
       accent: order.isUrgent,
+      tone: 'task' as const,
+      popup: {
+        title: order.title,
+        lines: [
+          `${order.budgetPi} π`,
+          ...(order.distanceKm !== undefined ? [t('map.distanceAway', { km: order.distanceKm })] : []),
+          ...(order.isUrgent ? [t('order.urgent')] : []),
+        ],
+        action: { label: t('map.respond'), href: `/orders/${order.id}` },
+      },
     }));
 
   return (
@@ -258,6 +270,7 @@ export default function OrdersList(): JSX.Element {
 
         {view === 'map' ? (
           <LeafletMap
+            onNavigate={(href) => navigate(href)}
             center={geo.coords ?? (items[0] ? { lat: items[0].lat, lng: items[0].lng } : null)}
             markers={markers}
             radiusKm={geo.coords ? radiusKm : undefined}

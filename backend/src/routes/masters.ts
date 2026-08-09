@@ -12,6 +12,7 @@ mastersRouter.get('/', optionalAuth, asyncHandler(masters.searchMasters));
 // Static paths first — "me" must not be swallowed by /:username.
 mastersRouter.get('/me/profile', requireAuth, asyncHandler(masters.getMyProfile));
 mastersRouter.put('/me/profile', requireAuth, writeLimiter, asyncHandler(masters.upsertProfile));
+mastersRouter.put('/me/availability', requireAuth, writeLimiter, asyncHandler(masters.setAvailability));
 mastersRouter.get('/me/stats', requireAuth, asyncHandler(masters.myStats));
 mastersRouter.get('/me/transactions', requireAuth, asyncHandler(masters.myTransactions));
 mastersRouter.get('/me/responses', requireAuth, asyncHandler(responses.myResponses));

@@ -9,6 +9,7 @@ import { adminRouter } from './admin';
 import { cronRouter } from './cron';
 import {
   categoriesRouter,
+  nearbyRouter,
   reviewsRouter,
   settingsRouter,
   uploadsRouter,
@@ -41,6 +42,7 @@ apiRouter.use('/categories', categoriesRouter);
 apiRouter.use('/orders', ordersRouter);
 apiRouter.use('/responses', responsesRouter);
 apiRouter.use('/masters', mastersRouter);
+apiRouter.use('/nearby', nearbyRouter);
 apiRouter.use('/payments', paymentsRouter);
 apiRouter.use('/reviews', reviewsRouter);
 apiRouter.use('/uploads', uploadsRouter);

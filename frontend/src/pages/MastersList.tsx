@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { mastersApi, type MasterFilters } from '../api/endpoints';
 import type { MasterProfile } from '../api/types';
 import { MasterCard } from '../components/MasterCard';
@@ -14,6 +15,7 @@ import styles from '../styles/Pages.module.css';
 
 export default function MastersList(): JSX.Element {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { categories } = usePlatformSettings();
   const geo = useGeolocation();
 
@@ -74,6 +76,21 @@ export default function MastersList(): JSX.Element {
       lng: master.lng as number,
       label: String(master.ratingAvg.toFixed(1)),
       accent: master.isBoosted,
+      tone: 'worker' as const,
+      live: master.isOnline,
+      popup: {
+        title: master.displayName,
+        lines: [
+          master.ratingCount > 0
+            ? `★ ${master.ratingAvg.toFixed(1)} (${master.ratingCount})`
+            : t('master.noReviews'),
+          t('map.jobsDone', { n: master.completedJobs }),
+          ...(master.distanceKm !== undefined ? [t('map.distanceAway', { km: master.distanceKm })] : []),
+        ],
+        action: master.username
+          ? { label: t('map.viewMaster'), href: `/masters/${master.username}` }
+          : undefined,
+      },
     }));
 
   return (
@@ -155,6 +172,7 @@ export default function MastersList(): JSX.Element {
 
         {view === 'map' ? (
           <LeafletMap
+            onNavigate={(href) => navigate(href)}
             center={geo.coords}
             markers={markers}
             radiusKm={geo.coords ? radiusKm : undefined}

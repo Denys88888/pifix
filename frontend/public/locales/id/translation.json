@@ -53,7 +53,8 @@
     "howItWorks": "Cara kerjanya",
     "step1": "Pasang pekerjaan dengan anggaran dan alamat Anda.",
     "step2": "Pilih tukang dan bayar — anggaran plus biaya layanan {{fee}}% ditahan di escrow.",
-    "step3": "Konfirmasi pekerjaan dan tukang dibayar. Tanpa konfirmasi dalam {{days}} hari = pembayaran otomatis."
+    "step3": "Konfirmasi pekerjaan dan tukang dibayar. Tanpa konfirmasi dalam {{days}} hari = pembayaran otomatis.",
+    "nearby": "Di dekat Anda"
   },
   "categories": {
     "plumbing": "Ledeng",
@@ -230,7 +231,8 @@
     "noTransactions": "Belum ada transaksi.",
     "amount": "Jumlah (π)",
     "withdrawNote": "Pi dikirim ke alamat dompet yang terhubung dengan akun Pi Anda.",
-    "requestWithdrawal": "Ajukan penarikan"
+    "requestWithdrawal": "Ajukan penarikan",
+    "tab_map": "Peta"
   },
   "verification": {
     "UNVERIFIED": "Profil Anda belum terverifikasi. Anda belum bisa mengirim penawaran.",
@@ -292,7 +294,22 @@
   "map": {
     "loading": "Memuat peta…",
     "unavailable": "Peta gagal dimuat. Anda tetap bisa mengisi alamat secara manual.",
-    "tapHint": "Ketuk peta untuk menempatkan titik"
+    "tapHint": "Ketuk peta untuk menempatkan titik",
+    "filter": {
+      "all": "Semua",
+      "tasks": "Hanya pekerjaan",
+      "workers": "Hanya tukang"
+    },
+    "filterLabel": "Yang ditampilkan di peta",
+    "needLocation": "Izinkan lokasi untuk melihat yang ada di dekat Anda.",
+    "distanceAway": "{{km}} km dari Anda",
+    "jobsDone": "{{n}} pekerjaan selesai",
+    "respond": "Ajukan diri",
+    "viewMaster": "Lihat profil",
+    "legendTasks": "Pekerjaan: {{n}}",
+    "legendWorkers": "Tukang: {{n}}",
+    "empty": "Belum ada apa pun dalam radius ini.",
+    "truncated": "Hanya yang terdekat yang ditampilkan — perbesar peta untuk melihat sisanya."
   },
   "upload": {
     "add": "Tambah ({{current}}/{{max}})",
@@ -374,5 +391,14 @@
     "contactTitle": "Kontak",
     "contactBody": "Untuk permintaan terkait privasi, hubungi pemilik aplikasi melalui halaman PiFix di Pi Developer Portal.",
     "manageData": "Kelola data saya"
+  },
+  "availability": {
+    "on": "Menerima pekerjaan",
+    "off": "Tidak menerima pekerjaan",
+    "hint": "Saat aktif, penanda Anda terlihat di peta oleh klien terdekat.",
+    "needLocation": "Tentukan lokasi kerja dulu — tanpa itu penanda Anda tidak punya tempat.",
+    "setLocation": "Tentukan lokasi",
+    "goOnline": "Mulai menerima",
+    "goOffline": "Berhenti dulu"
   }
 }

@@ -5,6 +5,7 @@ import { ordersApi } from '../api/endpoints';
 import type { Order } from '../api/types';
 import { OrderCard } from '../components/OrderCard';
 import { SkeletonList } from '../components/SkeletonCard';
+import { TaskMap } from '../components/TaskMap';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import { useAuth } from '../hooks/useAuth';
 import styles from '../styles/Pages.module.css';
@@ -74,6 +75,12 @@ export default function Home(): JSX.Element {
           </Link>
         ))}
       </div>
+
+      <div className={styles.sectionTitle}>
+        <h2>{t('home.nearby')}</h2>
+      </div>
+
+      <TaskMap height={320} />
 
       <div className={styles.sectionTitle}>
         <h2>{t('home.latestJobs')}</h2>
