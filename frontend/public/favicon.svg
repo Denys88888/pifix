@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PiFix">
+  <!-- Same geometry as scripts/makeIcons.py, at 1/16 scale. Change both. -->
   <rect width="64" height="64" rx="14" fill="#1a1a2e"/>
-  <path d="M16 22h32" stroke="#4caf50" stroke-width="5" stroke-linecap="round"/>
-  <path d="M25 22v22" stroke="#4caf50" stroke-width="5" stroke-linecap="round"/>
-  <path d="M39 22v18a4 4 0 0 0 4 4h3" stroke="#4caf50" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-45 32 32)" fill="none" stroke="#4caf50">
+    <!-- Ring with a 62° jaw at the top. -->
+    <path d="M35.7984 17.8659A7.375 7.375 0 1 1 28.2016 17.8659" stroke-width="4.75"/>
+    <!-- Handle. Its top cap hides inside the ring's stroke. -->
+    <rect x="29.625" y="29.1875" width="4.75" height="20.375" rx="2.375" fill="#4caf50" stroke="none"/>
+  </g>
 </svg>
