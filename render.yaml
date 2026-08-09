@@ -99,8 +99,14 @@ services:
     envVars:
       - key: VITE_API_URL
         sync: false # https://pifix-api.onrender.com/api
+      # false, not true. `sandbox` is the SDK's mode for developing OUTSIDE Pi
+      # Browser, and it is unrelated to the app being on Testnet — that is the
+      # portal's setting, and the backend's own PI_SANDBOX. With it on, the SDK
+      # inside the real Pi Browser expects a sandbox host that is not there and
+      # Pi.authenticate() never settles: the sign-in button spins until the
+      # timeout. Seen on a real device before this was flipped.
       - key: VITE_PI_SANDBOX
-        value: "true"
+        value: "false"
       # The address pioneers actually arrive from, used for referral links and
       # the "open in Pi Browser" screen.
       - key: VITE_APP_URL
