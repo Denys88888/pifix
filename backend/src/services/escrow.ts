@@ -65,6 +65,11 @@ export async function fundEscrow(params: {
   const settings = await getSettings();
 
   return prisma.$transaction(async (tx) => {
+    // Serialize everything that touches this order. Without the lock two
+    // approvals of the same escrow payment both read escrowStatus = NONE, both
+    // pass the guard below and both fund the order.
+    await tx.$executeRaw`SELECT id FROM orders WHERE id = ${params.orderId} FOR UPDATE`;
+
     const order = await tx.order.findUnique({
       where: { id: params.orderId },
       include: { responses: { where: { id: params.responseId } } },
@@ -161,6 +166,12 @@ export async function releaseEscrow(orderId: string, reason: ReleaseReason): Pro
   const settings = await getSettings();
 
   const result = await prisma.$transaction(async (tx) => {
+    // The idempotency guard below is a read-then-write check, so it only holds
+    // if concurrent releases queue up here first. Three callers can race for the
+    // same order — the client confirming, the lazy sweep and the cron — and
+    // without the lock all three read FUNDED and each credits the master.
+    await tx.$executeRaw`SELECT id FROM orders WHERE id = ${orderId} FOR UPDATE`;
+
     const order = await tx.order.findUnique({ where: { id: orderId } });
     if (!order) throw notFound('order_not_found', 'Order not found');
     if (order.escrowStatus !== EscrowStatus.FUNDED) return null; // already settled
@@ -214,6 +225,11 @@ export async function releaseEscrow(orderId: string, reason: ReleaseReason): Pro
 /** Refunds a funded escrow back to the client's balance (dispute resolution). */
 export async function refundEscrow(orderId: string, refundFees: boolean): Promise<Order | null> {
   return prisma.$transaction(async (tx) => {
+    // Same reasoning as releaseEscrow: two admins resolving one dispute at the
+    // same moment would otherwise both read FUNDED and refund the client twice.
+    // The lock also stops a refund and a release from settling the same escrow.
+    await tx.$executeRaw`SELECT id FROM orders WHERE id = ${orderId} FOR UPDATE`;
+
     const order = await tx.order.findUnique({ where: { id: orderId } });
     if (!order) throw notFound('order_not_found', 'Order not found');
     if (order.escrowStatus !== EscrowStatus.FUNDED) return null;
@@ -283,15 +299,29 @@ const SWEEP_KEY = 'escrow_sweep_at';
  */
 export async function lazySweep(intervalSeconds: number): Promise<void> {
   const now = Date.now();
-  const state = await prisma.systemState.findUnique({ where: { key: SWEEP_KEY } });
-  const last = state ? Number(state.value) : 0;
-  if (Number.isFinite(last) && now - last < intervalSeconds * 1000) return;
+  const cutoff = now - intervalSeconds * 1000;
 
-  await prisma.systemState.upsert({
-    where: { key: SWEEP_KEY },
-    update: { value: String(now) },
-    create: { key: SWEEP_KEY, value: String(now) },
-  });
+  // One conditional UPDATE decides who sweeps. Reading the timestamp and then
+  // writing it back lets two Render instances both clear the throttle and sweep
+  // in parallel; here exactly one UPDATE can match and the loser sees 0 rows.
+  // `value` is a text column, so the comparison is cast, not lexicographic —
+  // and the regex keeps a malformed row from blowing up the cast.
+  const claimed = await prisma.$executeRaw`
+    UPDATE system_state
+       SET value = ${String(now)}, "updatedAt" = NOW()
+     WHERE key = ${SWEEP_KEY}
+       AND value ~ '^[0-9]+$'
+       AND value::bigint < ${cutoff}::bigint
+  `;
+
+  if (claimed === 0) {
+    // Either another instance just claimed the slot, or this is the first sweep
+    // and the row does not exist yet. Only the insert winner carries on.
+    const created = await prisma.systemState
+      .create({ data: { key: SWEEP_KEY, value: String(now) } })
+      .catch(() => null);
+    if (!created) return;
+  }
 
   await autoReleaseExpiredEscrows().catch((error) =>
     logger.error('Lazy sweep failed', { error: (error as Error).message }),

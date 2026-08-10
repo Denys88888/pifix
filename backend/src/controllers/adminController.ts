@@ -586,8 +586,31 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
   if (!env.payoutsConfigured) {
     throw badRequest('payouts_disabled', 'Set PI_WALLET_PRIVATE_SEED and PAYOUTS_ENABLED to pay out');
   }
+  if (withdrawal.txid) {
+    throw conflict('already_paid', 'This withdrawal already has a chain transaction');
+  }
+  // Debited and claimed by an attempt that never reported back — a crash between
+  // the debit and the payout leaves this state. Sending again could pay twice,
+  // so it takes a human checking the payment against Pi before it moves.
+  if (withdrawal.status === WithdrawalStatus.APPROVED) {
+    throw conflict(
+      'needs_reconciliation',
+      'An earlier attempt already claimed this withdrawal — verify it on the Pi API before retrying',
+    );
+  }
 
   await prisma.$transaction(async (tx) => {
+    // Compare-and-swap on the status. Two admins pressing Pay at the same moment
+    // both clear the checks above; only the one that actually flips
+    // REQUESTED → APPROVED gets to debit the balance and send.
+    const claimed = await tx.withdrawalRequest.updateMany({
+      where: { id, status: WithdrawalStatus.REQUESTED },
+      data: { status: WithdrawalStatus.APPROVED },
+    });
+    if (claimed.count === 0) {
+      throw conflict('already_processing', 'This withdrawal is already being paid');
+    }
+
     await postTransaction(tx, {
       userId: withdrawal.userId,
       type: TransactionType.WITHDRAWAL,
@@ -595,7 +618,6 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
       description: `Withdrawal to ${withdrawal.walletAddress.slice(0, 8)}…`,
       requireFunds: true,
     });
-    await tx.withdrawalRequest.update({ where: { id }, data: { status: WithdrawalStatus.APPROVED } });
   });
 
   const payout = await sendPayout({

@@ -98,18 +98,51 @@ export async function sendPayout(params: {
       memoText: created.identifier,
     });
 
-    await completePayment(created.identifier, txid);
+    // ─── Point of no return: the Pi has left the app wallet. ───
+    // Everything below is bookkeeping. It must never turn into `ok: false`,
+    // because the caller answers a failed payout by crediting the balance back
+    // (see payWithdrawal) — which for money that is already on-chain pays the
+    // user twice. Persist the txid first so a crash here is still recoverable.
+    await prisma.payment
+      .update({ where: { id: payment.id }, data: { txid } })
+      .catch((error) =>
+        logger.error('Payout is on-chain but the txid could not be stored', {
+          piPaymentId: created.identifier,
+          txid,
+          error: (error as Error).message,
+        }),
+      );
 
-    await prisma.payment.update({
-      where: { id: payment.id },
-      data: { status: PaymentStatus.COMPLETED, txid, completedAt: new Date() },
-    });
+    try {
+      await completePayment(created.identifier, txid);
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: { status: PaymentStatus.COMPLETED, completedAt: new Date() },
+      });
+    } catch (error) {
+      // Pi has not been told the payment landed. The row stays APPROVED with a
+      // txid, which is exactly the shape clearIncompleteServerPayments() picks
+      // up and completes on the next payout.
+      logger.error('Payout landed on-chain but could not be completed — will reconcile', {
+        userId: params.userId,
+        piPaymentId: created.identifier,
+        txid,
+        error: (error as Error).message,
+      });
+    }
 
     logger.info('Payout completed', { userId: params.userId, amount: money(amount), txid });
     return { ok: true, txid, piPaymentId: created.identifier };
   } catch (error) {
+    // Only reachable before the Stellar submit, so no Pi has moved and the
+    // caller is safe to restore the balance.
     const message = (error as Error).message;
-    logger.error('Payout failed', { userId: params.userId, amount: money(amount), piPaymentId, error: message });
+    logger.error('Payout failed before any Pi moved', {
+      userId: params.userId,
+      amount: money(amount),
+      piPaymentId,
+      error: message,
+    });
     if (piPaymentId) {
       await prisma.payment
         .updateMany({
