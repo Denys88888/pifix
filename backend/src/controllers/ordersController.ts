@@ -279,10 +279,18 @@ export async function cancelOrder(req: Request, res: Response): Promise<void> {
   const withinRefundWindow =
     Date.now() - order.createdAt.getTime() <= settings.connectRefundWindowMinutes * 60 * 1000;
 
-  await prisma.order.update({
-    where: { id: order.id },
+  // Compare-and-swap on the status. The OPEN check above is a read-then-write
+  // guard, so two cancellations of the same order that arrive together both
+  // pass it and both fall into the refund loop below — paying every connect fee
+  // back twice. Putting the expected status in the WHERE clause means only the
+  // caller that actually moved the order out of OPEN goes on to refund.
+  const claimed = await prisma.order.updateMany({
+    where: { id: order.id, status: OrderStatus.OPEN },
     data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() },
   });
+  if (claimed.count === 0) {
+    throw conflict('order_not_open', 'Only an open order can be cancelled');
+  }
 
   let refunded = 0;
   if (withinRefundWindow) {

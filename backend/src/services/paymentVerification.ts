@@ -251,14 +251,34 @@ export async function completeIncomingPayment(piPaymentId: string, txid: string,
   const intent = parseIntent(verified);
   const amount = toPi(verified.amount);
 
-  await prisma.payment.update({
-    where: { piPaymentId },
+  // Claim the payment before granting anything. The COMPLETED check at the top
+  // of this function only rules out a *sequential* re-fire: between that read
+  // and this write sit three Pi API round-trips, and two callbacks that arrive
+  // inside that window both pass it. A plain `update` cannot separate them —
+  // both would write COMPLETED and both would go on to executeIntent, which for
+  // SUBSCRIPTION reads proUntil and extends it, handing out 60 days for one
+  // payment, and for CONNECT creates a second response row.
+  //
+  // `updateMany` with the status in the WHERE clause makes the transition a
+  // compare-and-swap: exactly one caller matches a row, the loser matches none.
+  const claimed = await prisma.payment.updateMany({
+    where: { piPaymentId, status: { not: PaymentStatus.COMPLETED } },
     data: {
       status: PaymentStatus.COMPLETED,
       txid: verified.transaction.txid,
       completedAt: new Date(),
     },
   });
+
+  if (claimed.count === 0) {
+    // Either a concurrent callback won the claim, or there is no payment row at
+    // all — handleIncompletePayment() reaches here for payments this server
+    // never approved, and that case has to keep answering 404 as it did when
+    // this was an `update`.
+    const current = await prisma.payment.findUnique({ where: { piPaymentId } });
+    if (!current) throw notFound('payment_not_found', 'Payment not found');
+    return { piPaymentId, status: PaymentStatus.COMPLETED, alreadyProcessed: true };
+  }
 
   const result = await executeIntent(intent, user, piPaymentId, amount);
 
@@ -426,8 +446,20 @@ async function markCancelled(piPaymentId: string, userId?: string, piPayment?: P
 export async function refundConnect(responseId: string, reason: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const response = await tx.response.findUnique({ where: { id: responseId } });
-    if (!response || response.connectRefunded) return;
+    if (!response) return;
     if (!toPi(response.connectPricePi).greaterThan(0)) return;
+
+    // Claim the refund before crediting it. Reading connectRefunded here and
+    // setting it at the end leaves a window where two callers — an order
+    // cancellation racing an admin refund, say — both read false and both
+    // credit the master. Moving the flag into the WHERE clause lets exactly one
+    // of them match a row; the loser matches none and returns having done
+    // nothing, which is what makes this function safe to call twice.
+    const claimed = await tx.response.updateMany({
+      where: { id: responseId, connectRefunded: false },
+      data: { connectRefunded: true, status: ResponseStatus.WITHDRAWN },
+    });
+    if (claimed.count === 0) return;
 
     await postTransaction(tx, {
       userId: response.masterId,
@@ -435,11 +467,6 @@ export async function refundConnect(responseId: string, reason: string): Promise
       amountPi: toPi(response.connectPricePi),
       description: reason.slice(0, 300),
       orderId: response.orderId,
-    });
-
-    await tx.response.update({
-      where: { id: responseId },
-      data: { connectRefunded: true, status: ResponseStatus.WITHDRAWN },
     });
   });
 }
