@@ -4,7 +4,7 @@
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--border);
-  background: #10101c;
+  background: #f5f5f5;
 }
 
 .map {
@@ -19,9 +19,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-dim);
+  color: #555;
   font-size: 14px;
-  background: #10101c;
+  background: #f5f5f5;
 }
 
 .fallback {
@@ -54,12 +54,12 @@
   height: 26px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #16213e;
+  background: #fff;
   border: 2px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .pin span {
@@ -84,21 +84,21 @@
    the only signal: tasks carry their price and masters their rating, so the
    two are still distinguishable without colour vision. */
 .pinTask {
-  border-color: #ff5a5f;
-  background: #2a1418;
+  border-color: #e53935;
+  background: #fff;
 }
 
 .pinTask span {
-  color: #ff8a8d;
+  color: #e53935;
 }
 
 .pinWorker {
-  border-color: #4caf50;
-  background: #12281a;
+  border-color: #2e7d32;
+  background: #fff;
 }
 
 .pinWorker span {
-  color: #7fdc86;
+  color: #2e7d32;
 }
 
 /* Online right now. The ring is a separate ::after so it can pulse without
@@ -149,13 +149,13 @@
 .popupTitle {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text);
+  color: #111;
   line-height: 1.25;
 }
 
 .popupLine {
   font-size: 12px;
-  color: var(--text-dim);
+  color: #555;
 }
 
 .popupAction {
@@ -175,11 +175,11 @@
    in its own stylesheet. These are its class names, not ours, so they need
    :global or CSS Modules would hash them and the override would never apply. */
 .wrap :global(.leaflet-popup-content-wrapper) {
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid var(--border);
+  background: #fff;
+  color: #111;
+  border: 1px solid #ddd;
   border-radius: var(--radius-sm);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .wrap :global(.leaflet-popup-content) {
@@ -187,32 +187,30 @@
 }
 
 .wrap :global(.leaflet-popup-tip) {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: #fff;
 }
 
 .wrap :global(.leaflet-popup-close-button) {
-  color: var(--text-dim);
+  color: #777;
 }
 
-/* Zoom buttons and the attribution strip are light by default too. */
 .wrap :global(.leaflet-bar a) {
-  background: var(--card);
-  color: var(--text);
-  border-bottom-color: var(--border);
+  background: #fff;
+  color: #333;
+  border-bottom-color: #ddd;
 }
 
 .wrap :global(.leaflet-bar a:hover) {
-  background: var(--surface-2, #1c2748);
+  background: #f0f0f0;
 }
 
 .wrap :global(.leaflet-control-attribution) {
-  background: rgba(16, 16, 28, 0.8);
-  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.8);
+  color: #777;
 }
 
 .wrap :global(.leaflet-control-attribution a) {
-  color: var(--text-dim);
+  color: #555;
 }
 
 /* Leaflet styles every anchor inside the map with `.leaflet-container a`,

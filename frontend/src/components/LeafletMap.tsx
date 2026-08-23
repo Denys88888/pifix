@@ -43,17 +43,9 @@ interface Props {
 
 const DEFAULT_CENTER = { lat: 20, lng: 0 };
 
-/**
- * CartoDB Dark Matter rather than standard OSM tiles: the app is dark
- * throughout, and a bright beige map in the middle of it reads as a broken
- * image. Still OpenStreetMap data, still no API key and no billing.
- *
- * `{r}` resolves to "@2x" on retina, which every phone this ships to has —
- * without it the labels are visibly soft.
- */
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+// CartoDB Positron — светлая карта с русскими подписями, без API ключа.
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 const ATTRIBUTION = '&copy; OpenStreetMap &copy; CARTO';
-/** Carto serves dark_all up to z20; asking for more returns blank tiles. */
 const MAX_ZOOM = 20;
 
 /**
