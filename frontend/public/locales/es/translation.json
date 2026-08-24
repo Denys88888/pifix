@@ -232,7 +232,8 @@
     "amount": "Importe (π)",
     "withdrawNote": "Los Pi se envían al monedero vinculado a tu cuenta de Pi.",
     "requestWithdrawal": "Solicitar retiro",
-    "tab_map": "Mapa"
+    "tab_map": "Mapa",
+    "payoutsUnavailable": "Los retiros no están disponibles temporalmente. Tu saldo está a salvo."
   },
   "verification": {
     "UNVERIFIED": "Tu perfil no está verificado. Aún no puedes enviar propuestas.",
@@ -317,7 +318,8 @@
     "limit": "Puedes subir como máximo {{count}} archivo(s).",
     "badType": "Solo se aceptan imágenes JPEG y PNG.",
     "tooLarge": "{{name}} supera los 5 MB.",
-    "failed": "La subida falló. Inténtalo de nuevo."
+    "failed": "La subida falló. Inténtalo de nuevo.",
+    "unavailable": "La subida de fotos no está disponible temporalmente."
   },
   "payment": {
     "creating": "Abriendo el monedero de Pi…",

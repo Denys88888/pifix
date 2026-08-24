@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { uploadsApi, type UploadFolder } from '../api/endpoints';
 import { ApiError } from '../api/client';
+import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import styles from '../styles/ImageUploader.module.css';
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -23,6 +24,7 @@ interface Props {
  */
 export function ImageUploader({ folder, value, onChange, max, label, hint }: Props): JSX.Element {
   const { t } = useTranslation();
+  const { settings } = usePlatformSettings();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -70,6 +72,11 @@ export function ImageUploader({ folder, value, onChange, max, label, hint }: Pro
 
   const remove = (url: string) => onChange(value.filter((item) => item !== url));
 
+  // Optimistic while settings are still in flight: the picker only disappears
+  // once the server has actually reported uploads as off. Already-attached
+  // photos stay visible and removable — only adding new ones is withdrawn.
+  const uploadsOff = settings ? !settings.uploadsEnabled : false;
+
   return (
     <div className={styles.wrap}>
       {label ? <span className="label">{label}</span> : null}
@@ -89,7 +96,7 @@ export function ImageUploader({ folder, value, onChange, max, label, hint }: Pro
           </div>
         ))}
 
-        {value.length < max ? (
+        {value.length < max && !uploadsOff ? (
           <button
             type="button"
             className={styles.add}
@@ -115,7 +122,8 @@ export function ImageUploader({ folder, value, onChange, max, label, hint }: Pro
         onChange={(event) => void pick(event.target.files)}
       />
 
-      {hint ? <p className="hint">{hint}</p> : null}
+      {uploadsOff ? <p className="hint">{t('upload.unavailable')}</p> : null}
+      {hint && !uploadsOff ? <p className="hint">{hint}</p> : null}
       {error ? <p className="error-text">{error}</p> : null}
     </div>
   );

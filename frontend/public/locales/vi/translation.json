@@ -232,7 +232,8 @@
     "amount": "Số tiền (π)",
     "withdrawNote": "Pi sẽ được gửi tới địa chỉ ví liên kết với tài khoản Pi của bạn.",
     "requestWithdrawal": "Yêu cầu rút tiền",
-    "tab_map": "Bản đồ"
+    "tab_map": "Bản đồ",
+    "payoutsUnavailable": "Rút tiền tạm thời không khả dụng. Số dư của bạn vẫn an toàn."
   },
   "verification": {
     "UNVERIFIED": "Hồ sơ chưa được xác minh. Bạn chưa thể gửi chào giá.",
@@ -317,7 +318,8 @@
     "limit": "Tối đa {{count}} tệp.",
     "badType": "Chỉ chấp nhận ảnh JPEG và PNG.",
     "tooLarge": "{{name}} lớn hơn 5 MB.",
-    "failed": "Tải lên thất bại. Hãy thử lại."
+    "failed": "Tải lên thất bại. Hãy thử lại.",
+    "unavailable": "Tải ảnh lên tạm thời không khả dụng."
   },
   "payment": {
     "creating": "Đang mở ví Pi…",

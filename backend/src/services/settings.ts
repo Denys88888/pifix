@@ -1,6 +1,7 @@
 import type { PlatformSettings } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { logger } from '../lib/logger';
+import { env } from '../config/env';
 
 /**
  * platform_settings is a single row (id = 1) read on every request.
@@ -79,6 +80,11 @@ export function publicSettings(settings: PlatformSettings) {
     connectRefundWindowMinutes: settings.connectRefundWindowMinutes,
     minWithdrawalPi: settings.minWithdrawalPi.toString(),
     maintenanceMode: settings.maintenanceMode,
+    // Server capabilities, not operator settings. Without them the client shows
+    // a photo picker and a withdraw button that can only ever fail — the
+    // feature reads as broken rather than as not yet switched on.
+    uploadsEnabled: env.cloudinaryConfigured,
+    payoutsEnabled: env.payoutsConfigured,
   };
 }
 

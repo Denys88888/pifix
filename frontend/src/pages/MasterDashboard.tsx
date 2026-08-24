@@ -258,13 +258,20 @@ export default function MasterDashboard(): JSX.Element {
                   setWithdrawOpen(true);
                 }}
                 disabled={
+                  settings?.payoutsEnabled === false ||
                   !stats?.walletAddress ||
                   Number(stats?.balancePi ?? '0') < Number(settings?.minWithdrawalPi ?? '5')
                 }
               >
                 {t('dashboard.withdraw')}
               </button>
-              <p className="hint">{t('dashboard.withdrawHint', { min: settings?.minWithdrawalPi ?? '5' })}</p>
+              {/* The balance is still real and still owed — only the payout
+                  channel is off, so the wording must not read as lost money. */}
+              <p className="hint">
+                {settings?.payoutsEnabled === false
+                  ? t('dashboard.payoutsUnavailable')
+                  : t('dashboard.withdrawHint', { min: settings?.minWithdrawalPi ?? '5' })}
+              </p>
             </div>
 
             {withdrawals.length > 0 ? (

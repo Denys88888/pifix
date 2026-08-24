@@ -232,7 +232,8 @@
     "amount": "Kwota (π)",
     "withdrawNote": "Pi trafią na adres portfela powiązany z Twoim kontem Pi.",
     "requestWithdrawal": "Zgłoś wypłatę",
-    "tab_map": "Mapa"
+    "tab_map": "Mapa",
+    "payoutsUnavailable": "Wypłaty są chwilowo niedostępne. Twoje saldo jest bezpieczne."
   },
   "verification": {
     "UNVERIFIED": "Profil niezweryfikowany. Nie możesz jeszcze zgłaszać się do zleceń.",
@@ -317,7 +318,8 @@
     "limit": "Możesz przesłać maksymalnie {{count}} plik(ów).",
     "badType": "Akceptowane są tylko pliki JPEG i PNG.",
     "tooLarge": "{{name}} przekracza 5 MB.",
-    "failed": "Wysyłanie nie powiodło się. Spróbuj ponownie."
+    "failed": "Wysyłanie nie powiodło się. Spróbuj ponownie.",
+    "unavailable": "Przesyłanie zdjęć jest chwilowo niedostępne."
   },
   "payment": {
     "creating": "Otwieramy portfel Pi…",

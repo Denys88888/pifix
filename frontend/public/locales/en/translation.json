@@ -232,7 +232,8 @@
     "amount": "Amount (π)",
     "withdrawNote": "The Pi is sent to the wallet address linked to your Pi account.",
     "requestWithdrawal": "Request a withdrawal",
-    "tab_map": "Map"
+    "tab_map": "Map",
+    "payoutsUnavailable": "Withdrawals are temporarily unavailable. Your balance is safe and stays yours."
   },
   "verification": {
     "UNVERIFIED": "Your profile is not verified. You cannot respond to jobs yet.",
@@ -317,7 +318,8 @@
     "limit": "You can upload at most {{count}} file(s).",
     "badType": "Only JPEG and PNG images are accepted.",
     "tooLarge": "{{name}} is larger than 5 MB.",
-    "failed": "Upload failed. Try again."
+    "failed": "Upload failed. Try again.",
+    "unavailable": "Photo upload is temporarily unavailable."
   },
   "payment": {
     "creating": "Opening the Pi wallet…",

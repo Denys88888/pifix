@@ -232,7 +232,8 @@
     "amount": "Jumlah (π)",
     "withdrawNote": "Pi dikirim ke alamat dompet yang terhubung dengan akun Pi Anda.",
     "requestWithdrawal": "Ajukan penarikan",
-    "tab_map": "Peta"
+    "tab_map": "Peta",
+    "payoutsUnavailable": "Penarikan sementara tidak tersedia. Saldo Anda tetap aman."
   },
   "verification": {
     "UNVERIFIED": "Profil Anda belum terverifikasi. Anda belum bisa mengirim penawaran.",
@@ -317,7 +318,8 @@
     "limit": "Maksimal {{count}} berkas.",
     "badType": "Hanya gambar JPEG dan PNG yang diterima.",
     "tooLarge": "{{name}} lebih dari 5 MB.",
-    "failed": "Unggahan gagal. Coba lagi."
+    "failed": "Unggahan gagal. Coba lagi.",
+    "unavailable": "Unggah foto untuk sementara tidak tersedia."
   },
   "payment": {
     "creating": "Membuka dompet Pi…",

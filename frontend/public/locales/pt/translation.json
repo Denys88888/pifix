@@ -232,7 +232,8 @@
     "amount": "Valor (π)",
     "withdrawNote": "Os Pi vão para o endereço de carteira vinculado à sua conta Pi.",
     "requestWithdrawal": "Solicitar saque",
-    "tab_map": "Mapa"
+    "tab_map": "Mapa",
+    "payoutsUnavailable": "Os saques estão temporariamente indisponíveis. Seu saldo está seguro."
   },
   "verification": {
     "UNVERIFIED": "Seu perfil não está verificado. Você ainda não pode enviar propostas.",
@@ -317,7 +318,8 @@
     "limit": "Você pode enviar no máximo {{count}} arquivo(s).",
     "badType": "Somente imagens JPEG e PNG são aceitas.",
     "tooLarge": "{{name}} tem mais de 5 MB.",
-    "failed": "Falha no envio. Tente novamente."
+    "failed": "Falha no envio. Tente novamente.",
+    "unavailable": "O envio de fotos está temporariamente indisponível."
   },
   "payment": {
     "creating": "Abrindo a carteira Pi…",

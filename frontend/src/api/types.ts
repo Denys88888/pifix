@@ -186,6 +186,9 @@ export interface PlatformSettings {
   connectRefundWindowMinutes: number;
   minWithdrawalPi: string;
   maintenanceMode: boolean;
+  /** Server capabilities — false while the operator has not configured them. */
+  uploadsEnabled: boolean;
+  payoutsEnabled: boolean;
 }
 
 export interface Paginated<T> {
