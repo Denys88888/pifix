@@ -16,7 +16,7 @@
  * ("auth.piNoResponse") on the first load after a deploy and only comes good on
  * the next one — seen for real in Pi Browser. The manifest is precached, so a
  * new icon set is invisible to "Add to Home Screen" until this changes too. */
-const VERSION = 'pifix-v5';
+const VERSION = 'pifix-v6';
 const STATIC_CACHE = `${VERSION}-static`;
 const SHELL_CACHE = `${VERSION}-shell`;
 const SHELL_URL = '/index.html';
