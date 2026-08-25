@@ -32,6 +32,49 @@
   padding: 16px;
 }
 
+/* Sits above Leaflet's own controls (z-index 400 in its stylesheet) and clear
+   of the zoom buttons in the opposite corner. 44px is the smallest target that
+   is comfortable with a thumb. */
+.locate {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  z-index: 500;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #1a6b2f;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.locate:disabled {
+  color: #999;
+  cursor: default;
+}
+
+.geoError {
+  position: absolute;
+  top: 62px;
+  inset-inline-end: 10px;
+  z-index: 500;
+  max-width: 65%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e0b4b4;
+  border-radius: var(--radius-sm);
+  padding: 6px 9px;
+  font-size: 12px;
+  color: #8a2f2f;
+  text-align: end;
+}
+
 .hint {
   position: absolute;
   inset-inline: 8px;

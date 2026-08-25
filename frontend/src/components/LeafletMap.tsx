@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGeolocation } from '../hooks/useGeolocation';
 import styles from '../styles/LeafletMap.module.css';
 import type * as LeafletTypes from 'leaflet';
 
@@ -79,6 +80,20 @@ export function LeafletMap({
 
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const geo = useGeolocation();
+
+  /**
+   * The crosshair every map app has. It recentres, and where the map is a
+   * picker it drops the pin too — otherwise finding yourself would leave the
+   * order still pointing at wherever the map happened to open.
+   */
+  const locateMe = useCallback(async () => {
+    const coords = await geo.request();
+    const map = mapRef.current;
+    if (!coords || !map) return;
+    map.setView([coords.lat, coords.lng], Math.max(map.getZoom(), 15));
+    onPickRef.current?.({ lat: coords.lat, lng: coords.lng });
+  }, [geo]);
 
   useEffect(() => {
     let cancelled = false;
@@ -208,6 +223,19 @@ export function LeafletMap({
   return (
     <div className={styles.wrap} style={{ height }}>
       <div ref={containerRef} className={styles.map} />
+      {ready ? (
+        <button
+          type="button"
+          className={styles.locate}
+          onClick={() => void locateMe()}
+          disabled={geo.loading}
+          title={t('geo.useMyLocation')}
+          aria-label={t('geo.useMyLocation')}
+        >
+          {geo.loading ? '…' : '◎'}
+        </button>
+      ) : null}
+      {geo.errorCode ? <div className={styles.geoError}>{t(`geo.${geo.errorCode}`)}</div> : null}
       {!ready ? <div className={styles.loading}>{t('map.loading')}</div> : null}
       {onPick ? <div className={styles.hint}>{t('map.tapHint')}</div> : null}
     </div>
