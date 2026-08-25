@@ -157,7 +157,10 @@
     "photos": "Fotos (até 3)",
     "photosHint": "JPEG ou PNG, até 5 MB cada.",
     "payLaterHint": "Você não paga nada agora. O pagamento acontece ao escolher o profissional.",
-    "publish": "Publicar o serviço"
+    "publish": "Publicar o serviço",
+    "missing": "Para publicar, preencha:",
+    "needChars": "pelo menos {{n}} caracteres",
+    "needMin": "pelo menos {{min}} π"
   },
   "price": {
     "budget": "Orçamento",

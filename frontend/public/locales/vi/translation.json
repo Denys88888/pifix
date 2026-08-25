@@ -157,7 +157,10 @@
     "photos": "Ảnh (tối đa 3)",
     "photosHint": "JPEG hoặc PNG, tối đa 5 MB mỗi ảnh.",
     "payLaterHint": "Bây giờ bạn chưa phải trả gì. Thanh toán khi chọn thợ.",
-    "publish": "Đăng công việc"
+    "publish": "Đăng công việc",
+    "missing": "Để đăng, hãy điền:",
+    "needChars": "ít nhất {{n}} ký tự",
+    "needMin": "ít nhất {{min}} π"
   },
   "price": {
     "budget": "Ngân sách",

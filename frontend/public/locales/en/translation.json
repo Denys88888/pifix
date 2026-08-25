@@ -157,7 +157,10 @@
     "photos": "Photos (up to 3)",
     "photosHint": "JPEG or PNG, up to 5 MB each.",
     "payLaterHint": "You pay nothing now. Payment happens when you pick a master.",
-    "publish": "Publish the job"
+    "publish": "Publish the job",
+    "missing": "To publish, fill in:",
+    "needChars": "at least {{n}} characters",
+    "needMin": "at least {{min}} π"
   },
   "price": {
     "budget": "Budget",

@@ -157,7 +157,10 @@
     "photos": "Fotos (hasta 3)",
     "photosHint": "JPEG o PNG, máximo 5 MB cada una.",
     "payLaterHint": "Ahora no pagas nada. El pago se hace al elegir profesional.",
-    "publish": "Publicar el trabajo"
+    "publish": "Publicar el trabajo",
+    "missing": "Para publicar, completa:",
+    "needChars": "al menos {{n}} caracteres",
+    "needMin": "al menos {{min}} π"
   },
   "price": {
     "budget": "Presupuesto",

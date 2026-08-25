@@ -53,14 +53,29 @@ export default function CreateOrder(): JSX.Element {
     if (coords) setPoint({ lat: coords.lat, lng: coords.lng });
   };
 
-  const canSubmit =
-    Boolean(categorySlug) &&
-    title.trim().length >= 4 &&
-    description.trim().length >= 10 &&
-    Number(budget) >= Number(minBudget) &&
-    address.trim().length >= 3 &&
-    point !== null &&
-    !submitting;
+  /**
+   * Six separate conditions gate publishing, and a greyed-out button showed
+   * none of them — the form simply dead-ended with no way to tell which field
+   * was at fault. The map point is the usual culprit: it has no visible input,
+   * so someone who filled every field still cannot publish and cannot see why.
+   */
+  const missing = useMemo(() => {
+    const items: string[] = [];
+    const chars = (n: number) => t('createOrder.needChars', { n });
+
+    if (!categorySlug) items.push(t('createOrder.category'));
+    if (title.trim().length < 4) items.push(`${t('createOrder.jobTitle')} — ${chars(4)}`);
+    if (description.trim().length < 10) items.push(`${t('createOrder.description')} — ${chars(10)}`);
+    if (!(Number(budget) >= Number(minBudget))) {
+      items.push(`${t('createOrder.budget')} — ${t('createOrder.needMin', { min: minBudget })}`);
+    }
+    if (address.trim().length < 3) items.push(`${t('createOrder.address')} — ${chars(3)}`);
+    if (point === null) items.push(t('createOrder.pickPoint'));
+
+    return items;
+  }, [categorySlug, title, description, budget, minBudget, address, point, t]);
+
+  const canSubmit = missing.length === 0 && !submitting;
 
   const submit = async () => {
     if (!point) {
@@ -256,6 +271,17 @@ export default function CreateOrder(): JSX.Element {
       ) : null}
 
       {error ? <div className="alert alert--error">{error}</div> : null}
+
+      {missing.length > 0 ? (
+        <div className={styles.missing}>
+          <span className="label">{t('createOrder.missing')}</span>
+          <ul>
+            {missing.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <button className="btn" onClick={() => void submit()} disabled={!canSubmit}>
         {submitting ? t('common.loading') : t('createOrder.publish')}

@@ -157,7 +157,10 @@
     "photos": "Foto (maks. 3)",
     "photosHint": "JPEG atau PNG, maksimal 5 MB per file.",
     "payLaterHint": "Anda belum membayar sekarang. Pembayaran dilakukan saat memilih tukang.",
-    "publish": "Pasang pekerjaan"
+    "publish": "Pasang pekerjaan",
+    "missing": "Untuk memublikasikan, lengkapi:",
+    "needChars": "minimal {{n}} karakter",
+    "needMin": "minimal {{min}} π"
   },
   "price": {
     "budget": "Anggaran",

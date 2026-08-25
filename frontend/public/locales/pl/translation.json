@@ -157,7 +157,10 @@
     "photos": "Zdjęcia (do 3)",
     "photosHint": "JPEG lub PNG, do 5 MB każde.",
     "payLaterHint": "Teraz nic nie płacisz. Płatność następuje przy wyborze fachowca.",
-    "publish": "Opublikuj zlecenie"
+    "publish": "Opublikuj zlecenie",
+    "missing": "Aby opublikować, uzupełnij:",
+    "needChars": "co najmniej {{n}} znaków",
+    "needMin": "co najmniej {{min}} π"
   },
   "price": {
     "budget": "Budżet",

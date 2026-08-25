@@ -185,6 +185,27 @@
   color: var(--text-dim);
 }
 
+/* Shown only while the publish button is disabled, so it must read as guidance
+   rather than as an error the person already made. */
+.missing {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.missing ul {
+  margin: 6px 0 0;
+  padding-inline-start: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.missing li {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
 .priceBreakdown {
   display: flex;
   flex-direction: column;
