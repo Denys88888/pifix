@@ -36,6 +36,16 @@ const schema = z.object({
   ADMIN_USERNAME: z.string().min(1).default('admin'),
   ADMIN_PASSWORD_HASH: z.string().optional().default(''),
   ADMIN_PASSWORD: z.string().optional().default(''),
+  /**
+   * Comma-separated Pi uids that get the admin panel with no password, same
+   * shape as taxi-pro's ADMIN_UIDS. The uid rather than the username because
+   * it never changes hands: a username can in principle be renamed and later
+   * claimed by somebody else, and that would hand them the panel.
+   *
+   * Only as strong as the phone the Pi Browser is signed in on, so the
+   * password login stays as the way in from a desktop.
+   */
+  ADMIN_UIDS: z.string().optional().default(''),
 
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   JWT_EXPIRES_IN: z.string().default('30d'),

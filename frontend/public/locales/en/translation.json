@@ -23,7 +23,8 @@
     "label": "Main navigation",
     "orders": "Jobs",
     "masters": "Masters",
-    "profile": "Profile"
+    "profile": "Profile",
+    "admin": "Admin"
   },
   "auth": {
     "signIn": "Sign in with Pi",

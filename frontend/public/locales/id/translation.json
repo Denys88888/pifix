@@ -23,7 +23,8 @@
     "label": "Navigasi utama",
     "orders": "Pekerjaan",
     "masters": "Tukang",
-    "profile": "Profil"
+    "profile": "Profil",
+    "admin": "Admin"
   },
   "auth": {
     "signIn": "Masuk dengan Pi",

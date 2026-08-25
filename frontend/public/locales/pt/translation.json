@@ -23,7 +23,8 @@
     "label": "Navegação principal",
     "orders": "Serviços",
     "masters": "Profissionais",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "admin": "Admin"
   },
   "auth": {
     "signIn": "Entrar com Pi",

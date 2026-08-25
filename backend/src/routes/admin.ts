@@ -1,12 +1,18 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/validate';
 import { requireAdmin } from '../middleware/adminAuth';
+import { requireAuth } from '../middleware/auth';
 import { adminLoginLimiter } from '../middleware/rateLimit';
 import * as admin from '../controllers/adminController';
 
 export const adminRouter = Router();
 
 adminRouter.post('/login', adminLoginLimiter, asyncHandler(admin.adminLogin));
+
+// The developer's own Pi session, traded for an admin token. Rate-limited like
+// the password door because it is one, and guarded by requireAuth so only a
+// Pi-verified identity ever reaches the check.
+adminRouter.post('/login-pi', adminLoginLimiter, requireAuth, asyncHandler(admin.adminLoginWithPi));
 
 // Everything below requires a valid admin JWT or HTTP Basic Auth.
 adminRouter.use(requireAdmin);

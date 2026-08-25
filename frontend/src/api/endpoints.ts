@@ -339,6 +339,15 @@ export const adminApiClient = {
     });
     return data;
   },
+  /**
+   * Trades the signed-in Pi session for an admin token. Goes through the normal
+   * user client, not adminApi, because the credential being presented here is
+   * the pioneer's own token.
+   */
+  async loginWithPi() {
+    const { data } = await api.post<{ token: string; username: string }>('/admin/login-pi');
+    return data;
+  },
   async dashboard() {
     const { data } = await adminApi.get<AdminDashboard>('/admin/dashboard');
     return data;

@@ -8,6 +8,7 @@ import type {
   WithdrawalRequest,
 } from '@prisma/client';
 import { money } from './money';
+import { isAdminPiUid } from '../middleware/adminAuth';
 
 type WithCategory = Order & { category?: Category | null };
 type WithClient = { client?: Pick<User, 'id' | 'username' | 'ratingAvg' | 'ratingCount'> | null };
@@ -52,6 +53,9 @@ export function selfUser(user: User & { masterProfile?: MasterProfile | null }) 
     referralLink: `?ref=${user.username}`,
     createdAt: user.createdAt.toISOString(),
     masterProfile: user.masterProfile ? masterProfileDTO(user.masterProfile) : null,
+    // Only so the app knows whether to offer the admin entrance. Every admin
+    // route still re-checks server-side; this flag grants nothing on its own.
+    isAdmin: isAdminPiUid(user.piUid),
   };
 }
 

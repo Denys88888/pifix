@@ -23,8 +23,24 @@ if (!passwordHash) {
   logger.error('No admin password configured — the admin panel is disabled');
 }
 
+const adminUids = new Set(
+  env.ADMIN_UIDS.split(',')
+    .map((uid) => uid.trim())
+    .filter(Boolean),
+);
+
 export function adminConfigured(): boolean {
-  return Boolean(passwordHash);
+  return Boolean(passwordHash) || adminUids.size > 0;
+}
+
+/**
+ * Whether a Pi-verified identity is allowed to open the admin panel without a
+ * password. Read from the database record rather than from the token, so
+ * revoking someone by editing ADMIN_UIDS takes effect on their next request
+ * instead of whenever their month-long session happens to expire.
+ */
+export function isAdminPiUid(piUid: string | null | undefined): boolean {
+  return Boolean(piUid) && adminUids.has(piUid as string);
 }
 
 export async function verifyAdminCredentials(username: string, password: string): Promise<boolean> {

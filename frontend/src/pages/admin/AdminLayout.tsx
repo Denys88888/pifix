@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { getAdminToken, setAdminToken } from '../../api/client';
+import { adminApiClient } from '../../api/endpoints';
+import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/Admin.module.css';
 
 const LINKS = [
@@ -14,10 +16,47 @@ const LINKS = [
 
 export default function AdminLayout(): JSX.Element {
   const navigate = useNavigate();
+  const { status, user } = useAuth();
+  const [checking, setChecking] = useState(!getAdminToken());
 
+  /**
+   * Opened from the developer's own phone there is nothing to type: the Pi
+   * session already proves who they are, so it is traded for an admin token
+   * before falling back to the password page. On a desktop, where there is no
+   * Pi session, this does nothing and the password page appears as before.
+   */
   useEffect(() => {
-    if (!getAdminToken()) navigate('/admin/login', { replace: true });
-  }, [navigate]);
+    if (getAdminToken()) {
+      setChecking(false);
+      return;
+    }
+    if (status === 'booting' || status === 'signing_in') return;
+
+    if (status !== 'signed_in' || !user?.isAdmin) {
+      navigate('/admin/login', { replace: true });
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const result = await adminApiClient.loginWithPi();
+        if (cancelled) return;
+        setAdminToken(result.token);
+        setChecking(false);
+      } catch {
+        if (!cancelled) navigate('/admin/login', { replace: true });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, status, user?.isAdmin]);
+
+  if (checking) {
+    return <div className={styles.shell} />;
+  }
 
   const signOut = () => {
     setAdminToken(null);

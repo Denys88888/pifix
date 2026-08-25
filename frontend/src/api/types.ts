@@ -67,6 +67,8 @@ export interface SelfUser {
   referralLink: string;
   createdAt: string;
   masterProfile: MasterProfile | null;
+  /** Whether to offer the admin entrance. The server re-checks on every call. */
+  isAdmin: boolean;
 }
 
 export interface Order {

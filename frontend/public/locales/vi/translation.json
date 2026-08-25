@@ -23,7 +23,8 @@
     "label": "Điều hướng chính",
     "orders": "Công việc",
     "masters": "Thợ",
-    "profile": "Hồ sơ"
+    "profile": "Hồ sơ",
+    "admin": "Quản trị"
   },
   "auth": {
     "signIn": "Đăng nhập bằng Pi",

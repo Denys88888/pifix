@@ -23,7 +23,8 @@
     "label": "Nawigacja główna",
     "orders": "Zlecenia",
     "masters": "Fachowcy",
-    "profile": "Profil"
+    "profile": "Profil",
+    "admin": "Admin"
   },
   "auth": {
     "signIn": "Zaloguj przez Pi",

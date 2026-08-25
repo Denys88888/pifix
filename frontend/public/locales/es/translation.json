@@ -23,7 +23,8 @@
     "label": "Navegación principal",
     "orders": "Trabajos",
     "masters": "Profesionales",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "admin": "Admin"
   },
   "auth": {
     "signIn": "Entrar con Pi",

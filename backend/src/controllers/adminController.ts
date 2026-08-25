@@ -13,7 +13,7 @@ import { logger } from '../lib/logger';
 import { badRequest, conflict, notFound, unauthorized } from '../lib/errors';
 import { money, toPi } from '../lib/money';
 import { masterProfileDTO, orderDTO, paginate, reviewDTO, withdrawalDTO } from '../lib/serializers';
-import { signAdminToken, verifyAdminCredentials } from '../middleware/adminAuth';
+import { isAdminPiUid, signAdminToken, verifyAdminCredentials } from '../middleware/adminAuth';
 import { getSettings, updateSettings } from '../services/settings';
 import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
@@ -42,6 +42,22 @@ export async function adminLogin(req: Request, res: Response): Promise<void> {
   }
   await audit(input.username, 'login');
   res.json({ token: signAdminToken(input.username), username: input.username });
+}
+
+/**
+ * Exchanges the developer's own Pi session for an admin token, so the panel
+ * opens from their phone without a second password. Runs behind requireAuth,
+ * so the identity here has already been verified against the Pi API — this
+ * only decides whether that verified person is the configured developer.
+ */
+export async function adminLoginWithPi(req: Request, res: Response): Promise<void> {
+  const user = req.user!;
+  if (!isAdminPiUid(user.piUid)) {
+    logger.warn('Pi account tried the developer entrance', { username: user.username, ip: req.ip });
+    throw unauthorized('not_admin', 'This Pi account is not the app developer');
+  }
+  await audit(user.username, 'login_pi');
+  res.json({ token: signAdminToken(user.username), username: user.username });
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
