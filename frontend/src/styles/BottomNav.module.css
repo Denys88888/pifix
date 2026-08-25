@@ -13,7 +13,11 @@
   margin: 0 auto;
   height: var(--nav-h);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Column count follows the number of tabs. It was pinned at three, so the
+     admin tab wrapped onto a second row and fell off the bottom of the
+     viewport — present in the DOM, invisible on the phone. */
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 }
 
 .tab {
