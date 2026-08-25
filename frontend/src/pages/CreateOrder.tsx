@@ -61,7 +61,9 @@ export default function CreateOrder(): JSX.Element {
    */
   const missing = useMemo(() => {
     const items: string[] = [];
-    const chars = (n: number) => t('createOrder.needChars', { n });
+    // `count`, not a plain number: it is what makes i18next pick the right
+    // plural form. Russian needs three ("1 символ", "4 символа", "10 символов").
+    const chars = (count: number) => t('createOrder.needChars', { count });
 
     if (!categorySlug) items.push(t('createOrder.category'));
     if (title.trim().length < 4) items.push(`${t('createOrder.jobTitle')} — ${chars(4)}`);

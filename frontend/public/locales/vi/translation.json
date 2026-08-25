@@ -159,8 +159,8 @@
     "payLaterHint": "Bây giờ bạn chưa phải trả gì. Thanh toán khi chọn thợ.",
     "publish": "Đăng công việc",
     "missing": "Để đăng, hãy điền:",
-    "needChars": "ít nhất {{n}} ký tự",
-    "needMin": "ít nhất {{min}} π"
+    "needMin": "ít nhất {{min}} π",
+    "needChars_other": "ít nhất {{count}} ký tự"
   },
   "price": {
     "budget": "Ngân sách",

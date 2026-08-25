@@ -159,8 +159,9 @@
     "payLaterHint": "अभी कुछ नहीं देना है। भुगतान कारीगर चुनते समय होता है।",
     "publish": "काम प्रकाशित करें",
     "missing": "प्रकाशित करने के लिए भरें:",
-    "needChars": "कम से कम {{n}} अक्षर",
-    "needMin": "कम से कम {{min}} π"
+    "needMin": "कम से कम {{min}} π",
+    "needChars_one": "कम से कम {{count}} अक्षर",
+    "needChars_other": "कम से कम {{count}} अक्षर"
   },
   "price": {
     "budget": "बजट",

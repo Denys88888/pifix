@@ -159,8 +159,11 @@
     "payLaterHint": "Сейчас платить не нужно. Оплата — при выборе мастера.",
     "publish": "Опубликовать заказ",
     "missing": "Чтобы опубликовать, заполните:",
-    "needChars": "минимум {{n}} символов",
-    "needMin": "минимум {{min}} π"
+    "needMin": "минимум {{min}} π",
+    "needChars_one": "минимум {{count}} символ",
+    "needChars_few": "минимум {{count}} символа",
+    "needChars_many": "минимум {{count}} символов",
+    "needChars_other": "минимум {{count}} символов"
   },
   "price": {
     "budget": "Бюджет",

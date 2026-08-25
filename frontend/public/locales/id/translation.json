@@ -159,8 +159,8 @@
     "payLaterHint": "Anda belum membayar sekarang. Pembayaran dilakukan saat memilih tukang.",
     "publish": "Pasang pekerjaan",
     "missing": "Untuk memublikasikan, lengkapi:",
-    "needChars": "minimal {{n}} karakter",
-    "needMin": "minimal {{min}} π"
+    "needMin": "minimal {{min}} π",
+    "needChars_other": "minimal {{count}} karakter"
   },
   "price": {
     "budget": "Anggaran",

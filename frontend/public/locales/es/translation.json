@@ -159,8 +159,9 @@
     "payLaterHint": "Ahora no pagas nada. El pago se hace al elegir profesional.",
     "publish": "Publicar el trabajo",
     "missing": "Para publicar, completa:",
-    "needChars": "al menos {{n}} caracteres",
-    "needMin": "al menos {{min}} π"
+    "needMin": "al menos {{min}} π",
+    "needChars_one": "al menos {{count}} carácter",
+    "needChars_other": "al menos {{count}} caracteres"
   },
   "price": {
     "budget": "Presupuesto",

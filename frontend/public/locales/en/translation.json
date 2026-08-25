@@ -159,8 +159,9 @@
     "payLaterHint": "You pay nothing now. Payment happens when you pick a master.",
     "publish": "Publish the job",
     "missing": "To publish, fill in:",
-    "needChars": "at least {{n}} characters",
-    "needMin": "at least {{min}} π"
+    "needMin": "at least {{min}} π",
+    "needChars_one": "at least {{count}} character",
+    "needChars_other": "at least {{count}} characters"
   },
   "price": {
     "budget": "Budget",

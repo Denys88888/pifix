@@ -159,8 +159,11 @@
     "payLaterHint": "Teraz nic nie płacisz. Płatność następuje przy wyborze fachowca.",
     "publish": "Opublikuj zlecenie",
     "missing": "Aby opublikować, uzupełnij:",
-    "needChars": "co najmniej {{n}} znaków",
-    "needMin": "co najmniej {{min}} π"
+    "needMin": "co najmniej {{min}} π",
+    "needChars_one": "co najmniej {{count}} znak",
+    "needChars_few": "co najmniej {{count}} znaki",
+    "needChars_many": "co najmniej {{count}} znaków",
+    "needChars_other": "co najmniej {{count}} znaków"
   },
   "price": {
     "budget": "Budżet",

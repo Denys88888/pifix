@@ -159,8 +159,13 @@
     "payLaterHint": "لا تدفع شيئًا الآن. الدفع يتم عند اختيار الحرفي.",
     "publish": "نشر الطلب",
     "missing": "للنشر، أكمل:",
-    "needChars": "‏{{n}} حرفًا على الأقل",
-    "needMin": "‏{{min}} π على الأقل"
+    "needMin": "‏{{min}} π على الأقل",
+    "needChars_zero": "حرف على الأقل",
+    "needChars_one": "حرف واحد على الأقل",
+    "needChars_two": "حرفان على الأقل",
+    "needChars_few": "{{count}} أحرف على الأقل",
+    "needChars_many": "{{count}} حرفًا على الأقل",
+    "needChars_other": "{{count}} حرف على الأقل"
   },
   "price": {
     "budget": "الميزانية",

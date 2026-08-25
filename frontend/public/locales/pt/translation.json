@@ -159,8 +159,9 @@
     "payLaterHint": "Você não paga nada agora. O pagamento acontece ao escolher o profissional.",
     "publish": "Publicar o serviço",
     "missing": "Para publicar, preencha:",
-    "needChars": "pelo menos {{n}} caracteres",
-    "needMin": "pelo menos {{min}} π"
+    "needMin": "pelo menos {{min}} π",
+    "needChars_one": "pelo menos {{count}} caractere",
+    "needChars_other": "pelo menos {{count}} caracteres"
   },
   "price": {
     "budget": "Orçamento",
