@@ -70,6 +70,7 @@ export function LeafletMap({
   const layerRef = useRef<LeafletTypes.LayerGroup | null>(null);
   const circleRef = useRef<LeafletTypes.Circle | null>(null);
   const leafletRef = useRef<typeof LeafletTypes | null>(null);
+  const touchCleanupRef = useRef<(() => void) | null>(null);
   const onPickRef = useRef(onPick);
   const onMarkerClickRef = useRef(onMarkerClick);
   const onNavigateRef = useRef(onNavigate);
@@ -121,6 +122,33 @@ export function LeafletMap({
           onPickRef.current?.({ lat: event.latlng.lat, lng: event.latlng.lng });
         });
 
+        /*
+         * On a phone this map sits in the middle of a scrolling form, and with
+         * one-finger dragging left on it the form cannot be scrolled past:
+         * every swipe that lands on the map pans the map instead of the page,
+         * so the publish button below is unreachable. Seen for real in Pi
+         * Browser. Same rule as an embedded Google map — one finger scrolls the
+         * page, two fingers pan the map. Tapping to place a point and pinching
+         * to zoom both still work.
+         */
+        // `pointer: coarse` rather than Leaflet's touch flag, which is also true
+        // on a touchscreen laptop where the mouse should still drag normally.
+        if (window.matchMedia?.('(pointer: coarse)').matches) {
+          map.dragging.disable();
+          const enableForTwoFingers = (event: TouchEvent) => {
+            if (event.touches.length >= 2) map.dragging.enable();
+            else map.dragging.disable();
+          };
+          const disableDragging = () => map.dragging.disable();
+          const node = containerRef.current;
+          node.addEventListener('touchstart', enableForTwoFingers, { passive: true });
+          node.addEventListener('touchend', disableDragging, { passive: true });
+          touchCleanupRef.current = () => {
+            node.removeEventListener('touchstart', enableForTwoFingers);
+            node.removeEventListener('touchend', disableDragging);
+          };
+        }
+
         mapRef.current = map;
         setReady(true);
 
@@ -133,6 +161,8 @@ export function LeafletMap({
 
     return () => {
       cancelled = true;
+      touchCleanupRef.current?.();
+      touchCleanupRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
       layerRef.current = null;
