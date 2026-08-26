@@ -305,7 +305,9 @@ model Payment {
 
   /// Payment identifier issued by the Pi Platform API.
   piPaymentId String  @unique
-  txid        String?
+  // Unique as a second line of defence behind piPaymentId: one on-chain
+  // transaction can only ever settle one payment record.
+  txid        String? @unique
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -376,7 +378,8 @@ model WithdrawalRequest {
   walletAddress String
   status        WithdrawalStatus @default(REQUESTED)
 
-  txid        String?
+  // Same reasoning as Payment.txid: one payout transaction, one request.
+  txid        String? @unique
   piPaymentId String?
   adminNote   String? @db.VarChar(500)
 

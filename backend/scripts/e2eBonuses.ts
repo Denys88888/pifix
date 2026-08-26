@@ -16,6 +16,14 @@ import crypto from 'crypto';
 const prisma = new PrismaClient();
 const API = process.env.TEST_API_URL ?? 'http://localhost:3010/api';
 const FAKE = process.env.FAKE_PI_URL ?? 'http://localhost:4010';
+
+/**
+ * Payment.txid is unique in the database, so a literal reused across runs would
+ * collide on the second one. Within a run the value is stable, which keeps the
+ * "same payment completed twice" check honest.
+ */
+const RUN = Date.now().toString(36);
+
 const ADMIN_BASIC = `${process.env.ADMIN_USERNAME ?? 'admin'}:${process.env.ADMIN_PASSWORD ?? ''}`;
 
 if (!process.env.ADMIN_PASSWORD) {
@@ -200,7 +208,7 @@ async function main() {
 
   const boost = await craftPayment({ uid: carol.uid, amount: boostPrice, metadata: { purpose: 'BOOST' } });
   await api('POST', '/payments/approve', { token: carol.jwt, body: { paymentId: boost } });
-  const boostDone = await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: boost, txid: 'tx_boost' } });
+  const boostDone = await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: boost, txid: `tx_boost_${RUN}` } });
   check('boost purchase completes', boostDone.status === 200, `got ${boostDone.status}`);
 
   const boosted = await prisma.masterProfile.findUniqueOrThrow({ where: { userId: carol.id } });
@@ -212,7 +220,7 @@ async function main() {
   const subPrice = Number(settings.proSubscriptionPricePi);
   const sub = await craftPayment({ uid: carol.uid, amount: subPrice, metadata: { purpose: 'SUBSCRIPTION' } });
   await api('POST', '/payments/approve', { token: carol.jwt, body: { paymentId: sub } });
-  const subDone = await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: sub, txid: 'tx_sub' } });
+  const subDone = await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: sub, txid: `tx_sub_${RUN}` } });
   check('subscription completes', subDone.status === 200, `got ${subDone.status}`);
 
   const subbed = await prisma.masterProfile.findUniqueOrThrow({ where: { userId: carol.id } });
@@ -222,7 +230,7 @@ async function main() {
   // Renewing before expiry must extend, not reset.
   const sub2 = await craftPayment({ uid: carol.uid, amount: subPrice, metadata: { purpose: 'SUBSCRIPTION' } });
   await api('POST', '/payments/approve', { token: carol.jwt, body: { paymentId: sub2 } });
-  await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: sub2, txid: 'tx_sub2' } });
+  await api('POST', '/payments/complete', { token: carol.jwt, body: { paymentId: sub2, txid: `tx_sub2_${RUN}` } });
   const subbed2 = await prisma.masterProfile.findUniqueOrThrow({ where: { userId: carol.id } });
   const subDays2 = subbed2.proUntil ? (subbed2.proUntil.getTime() - Date.now()) / 86400_000 : 0;
   check('early renewal extends instead of resetting', subDays2 > 59.9 && subDays2 < 60.1, subDays2.toFixed(2));

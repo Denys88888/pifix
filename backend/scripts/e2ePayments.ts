@@ -14,6 +14,14 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const API = process.env.TEST_API_URL ?? 'http://localhost:3010/api';
 const FAKE = process.env.FAKE_PI_URL ?? 'http://localhost:4010';
+
+/**
+ * Payment.txid is unique in the database, so a literal reused across runs would
+ * collide on the second one. Within a run the value is stable, which keeps the
+ * "same payment completed twice" check honest.
+ */
+const RUN = Date.now().toString(36);
+
 const ADMIN_BASIC = `${process.env.ADMIN_USERNAME ?? 'admin'}:${process.env.ADMIN_PASSWORD ?? ''}`;
 
 if (!process.env.ADMIN_PASSWORD) {
@@ -259,7 +267,7 @@ async function main() {
   check('approval alone grants nothing', stillNoResponse === 0, String(stillNoResponse));
 
   const goodComplete = await api('POST', '/payments/complete', {
-    token: masterJwt, body: { paymentId: good, txid: 'tx_connect_ok' },
+    token: masterJwt, body: { paymentId: good, txid: `tx_connect_ok_${RUN}` },
   });
   check('completion grants the response', goodComplete.status === 200, `got ${goodComplete.status}`);
   const responseRow = await prisma.response.findFirst({ where: { orderId, masterId: { not: undefined } } });
@@ -270,7 +278,7 @@ async function main() {
 
   // Replay the same completion.
   const replay = await api('POST', '/payments/complete', {
-    token: masterJwt, body: { paymentId: good, txid: 'tx_connect_ok' },
+    token: masterJwt, body: { paymentId: good, txid: `tx_connect_ok_${RUN}` },
   });
   check('replaying a completed payment is idempotent',
     replay.status === 200 && replay.body?.alreadyProcessed === true, JSON.stringify(replay.body).slice(0, 120));
@@ -315,7 +323,7 @@ async function main() {
   });
   await api('POST', '/payments/approve', { token: clientJwt, body: { paymentId: unverified } });
   const unverifiedRes = await api('POST', '/payments/complete', {
-    token: clientJwt, body: { paymentId: unverified, txid: 'tx_not_verified' },
+    token: clientJwt, body: { paymentId: unverified, txid: `tx_not_verified_${RUN}` },
   });
   check('completion refused while the transaction is unverified',
     unverifiedRes.status === 400 && unverifiedRes.body?.error?.code === 'payment_not_verified',
@@ -331,7 +339,7 @@ async function main() {
   const escApprove = await api('POST', '/payments/approve', { token: clientJwt, body: { paymentId: escrow } });
   check('honest escrow approved', escApprove.status === 200, `got ${escApprove.status}`);
   const escComplete = await api('POST', '/payments/complete', {
-    token: clientJwt, body: { paymentId: escrow, txid: 'tx_escrow_ok' },
+    token: clientJwt, body: { paymentId: escrow, txid: `tx_escrow_ok_${RUN}` },
   });
   check('escrow completion funds the order', escComplete.status === 200, `got ${escComplete.status} ${JSON.stringify(escComplete.body).slice(0,140)}`);
 

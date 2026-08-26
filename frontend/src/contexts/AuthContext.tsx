@@ -137,7 +137,14 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   useEffect(() => {
     captureReferrer();
 
-    const sandbox = String(import.meta.env.VITE_PI_SANDBOX ?? 'true') !== 'false';
+    // VITE_PI_NETWORK is the switch; VITE_PI_SANDBOX stays as a fallback so an
+    // existing deployment keeps working. Anything that is not exactly
+    // "mainnet" stays on the sandbox — the safe direction to fail in.
+    const network = String(import.meta.env.VITE_PI_NETWORK ?? '').trim().toLowerCase();
+    const sandbox = network
+      ? network !== 'mainnet'
+      : String(import.meta.env.VITE_PI_SANDBOX ?? 'true') !== 'false';
+
     const ready = initPi({ sandbox, onIncompletePaymentFound: handleIncompletePayment });
     piAvailable.current = ready;
 
