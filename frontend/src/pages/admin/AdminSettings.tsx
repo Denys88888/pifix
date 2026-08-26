@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { AdminSettings as Settings } from '../../api/types';
@@ -31,6 +32,7 @@ const FIELDS: FieldSpec[] = [
 ];
 
 export default function AdminSettings(): JSX.Element {
+  const { t } = useTranslation();
   const [values, setValues] = useState<Record<string, string>>({});
   const [maintenance, setMaintenance] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<string>('');
@@ -78,7 +80,7 @@ export default function AdminSettings(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Platform settings</h1>
+      <h1 style={{ margin: 0 }}>{t('admin.platformSettings')}</h1>
       <p className="hint" style={{ margin: 0 }}>
         Last updated: {updatedAt ? new Date(updatedAt).toLocaleString() : '—'}
       </p>
@@ -117,7 +119,7 @@ export default function AdminSettings(): JSX.Element {
         </label>
 
         <button className="btn" onClick={() => void save()} disabled={saving}>
-          {saving ? 'Saving…' : 'Save settings'}
+          {saving ? t('admin.saving') : t('admin.saveSettings')}
         </button>
       </div>
     </>

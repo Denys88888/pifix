@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError, setAdminToken } from '../../api/client';
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminLogin(): JSX.Element {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -32,12 +34,10 @@ export default function AdminLogin(): JSX.Element {
         <h1 style={{ margin: 0 }}>
           Pi<span style={{ color: 'var(--accent)' }}>Fix</span> admin
         </h1>
-        <p className="muted" style={{ margin: 0 }}>
-          Sign in with the credentials from the server environment.
-        </p>
+        <p className="muted" style={{ margin: 0 }}>{t('admin.signInHint')}</p>
 
         <label>
-          <span className="label">Username</span>
+          <span className="label">{t('admin.username')}</span>
           <input
             value={username}
             onChange={(event) => setUsername(event.target.value)}
@@ -47,7 +47,7 @@ export default function AdminLogin(): JSX.Element {
         </label>
 
         <label>
-          <span className="label">Password</span>
+          <span className="label">{t('admin.password')}</span>
           <input
             type="password"
             value={password}
@@ -60,7 +60,7 @@ export default function AdminLogin(): JSX.Element {
         {error ? <div className="alert alert--error">{error}</div> : null}
 
         <button className="btn" type="submit" disabled={busy || !username || !password}>
-          {busy ? 'Signing in…' : 'Sign in'}
+          {busy ? t('admin.signingIn') : t('admin.signIn')}
         </button>
       </form>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
@@ -6,6 +7,7 @@ import type { AdminDashboard as Dashboard } from '../../api/types';
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminDashboard(): JSX.Element {
+  const { t } = useTranslation();
   const [data, setData] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,12 +33,12 @@ export default function AdminDashboard(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Dashboard</h1>
+      <h1 style={{ margin: 0 }}>{t('admin.nav.dashboard')}</h1>
 
       <div className={styles.grid}>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.users.total}</span>
-          <span className={styles.tileLabel}>Users</span>
+          <span className={styles.tileLabel}>{t('admin.users')}</span>
         </div>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.users.masters}</span>
@@ -48,49 +50,49 @@ export default function AdminDashboard(): JSX.Element {
         </div>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.orders.completed}</span>
-          <span className={styles.tileLabel}>Completed deals</span>
+          <span className={styles.tileLabel}>{t('admin.completedDeals')}</span>
         </div>
       </div>
 
       <div className={styles.panel}>
-        <h2 style={{ margin: 0, fontSize: 17 }}>Revenue (commission + express + connects)</h2>
+        <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.revenue')}</h2>
         <div className={styles.grid}>
           <div className={styles.tile}>
             <span className={styles.tileValue}>{money(data.revenue.todayPi, data.revenue.todayUsd)}</span>
-            <span className={styles.tileLabel}>Today</span>
+            <span className={styles.tileLabel}>{t('admin.today')}</span>
           </div>
           <div className={styles.tile}>
             <span className={styles.tileValue}>{money(data.revenue.weekPi, data.revenue.weekUsd)}</span>
-            <span className={styles.tileLabel}>Last 7 days</span>
+            <span className={styles.tileLabel}>{t('admin.last7')}</span>
           </div>
           <div className={styles.tile}>
             <span className={styles.tileValue}>{money(data.revenue.monthPi, data.revenue.monthUsd)}</span>
-            <span className={styles.tileLabel}>Last 30 days</span>
+            <span className={styles.tileLabel}>{t('admin.last30')}</span>
           </div>
         </div>
         {Number(data.revenue.piUsdRate) === 0 ? (
           <p className="hint" style={{ margin: 0 }}>
-            Set <code>piUsdRate</code> in Settings to see USD equivalents.
+            {t('admin.setRateHint')}
           </p>
         ) : null}
       </div>
 
       <div className={styles.panel}>
-        <h2 style={{ margin: 0, fontSize: 17 }}>Liabilities</h2>
+        <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.liabilities')}</h2>
         <div className={styles.grid}>
           <div className={styles.tile}>
             <span className={styles.tileValue}>{data.liabilities.escrowHeldPi} π</span>
-            <span className={styles.tileLabel}>Held in escrow</span>
+            <span className={styles.tileLabel}>{t('admin.heldInEscrow')}</span>
           </div>
           <div className={styles.tile}>
             <span className={styles.tileValue}>{data.liabilities.userBalancesPi} π</span>
-            <span className={styles.tileLabel}>Owed to user balances</span>
+            <span className={styles.tileLabel}>{t('admin.owedToBalances')}</span>
           </div>
         </div>
       </div>
 
       <div className={styles.panel}>
-        <h2 style={{ margin: 0, fontSize: 17 }}>Queue</h2>
+        <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.queue')}</h2>
         <div className={styles.actions}>
           <Link to="/admin/verifications" className={styles.smallBtn}>
             Verifications: {data.queue.pendingVerifications}
@@ -105,7 +107,7 @@ export default function AdminDashboard(): JSX.Element {
       </div>
 
       <div className={styles.panel}>
-        <h2 style={{ margin: 0, fontSize: 17 }}>System</h2>
+        <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.system')}</h2>
         <div className={styles.actions}>
           <span className={`${styles.pill} ${data.system.sandbox ? styles.pillWarn : styles.pillGood}`}>
             {data.system.sandbox ? 'Sandbox / Testnet' : 'Mainnet'}
@@ -120,7 +122,7 @@ export default function AdminDashboard(): JSX.Element {
             KYC gate {data.system.requireKyc ? 'on' : 'off'}
           </span>
           {data.system.maintenanceMode ? (
-            <span className={`${styles.pill} ${styles.pillBad}`}>Maintenance mode ON</span>
+            <span className={`${styles.pill} ${styles.pillBad}`}>{t('admin.maintenanceOn')}</span>
           ) : null}
         </div>
       </div>

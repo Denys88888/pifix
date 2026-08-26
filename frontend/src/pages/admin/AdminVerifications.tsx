@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { MasterProfile } from '../../api/types';
@@ -7,6 +8,7 @@ import styles from '../../styles/Admin.module.css';
 const STATUSES = ['PENDING', 'VERIFIED', 'REJECTED', 'UNVERIFIED', ''];
 
 export default function AdminVerifications(): JSX.Element {
+  const { t } = useTranslation();
   const [status, setStatus] = useState('PENDING');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -65,13 +67,11 @@ export default function AdminVerifications(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Master verification</h1>
+      <h1 style={{ margin: 0 }}>{t('admin.masterVerification')}</h1>
 
       <div className={styles.panel}>
         <div className={styles.filterBar}>
-          <label>
-            Status
-            <select
+          <label>{t('admin.status')}<select
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -85,19 +85,15 @@ export default function AdminVerifications(): JSX.Element {
               ))}
             </select>
           </label>
-          <label>
-            Search
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="username" />
+          <label>{t('admin.search')}<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('admin.searchUsername')} />
           </label>
-          <button className={styles.smallBtn} onClick={() => void load()}>
-            Apply
-          </button>
+          <button className={styles.smallBtn} onClick={() => void load()}>{t('admin.apply')}</button>
         </div>
       </div>
 
       {error ? <div className="alert alert--error">{error}</div> : null}
 
-      {items.length === 0 ? <p className="muted">Nothing in this queue.</p> : null}
+      {items.length === 0 ? <p className="muted">{t('admin.nothingInQueue')}</p> : null}
 
       {items.map((profile) => (
         <div key={profile.id} className={styles.panel}>
@@ -123,7 +119,7 @@ export default function AdminVerifications(): JSX.Element {
                 <span className={styles.pill}>
                   ★ {profile.ratingAvg.toFixed(1)} ({profile.ratingCount})
                 </span>
-                {profile.isBlocked ? <span className={`${styles.pill} ${styles.pillBad}`}>BLOCKED</span> : null}
+                {profile.isBlocked ? <span className={`${styles.pill} ${styles.pillBad}`}>{t('admin.blocked')}</span> : null}
               </div>
             </div>
           </div>
@@ -140,7 +136,7 @@ export default function AdminVerifications(): JSX.Element {
 
           {profile.verificationDocs && profile.verificationDocs.length > 0 ? (
             <>
-              <strong style={{ fontSize: 13 }}>Submitted documents</strong>
+              <strong style={{ fontSize: 13 }}>{t('admin.submittedDocs')}</strong>
               <div className={styles.docStrip}>
                 {profile.verificationDocs.map((url) => (
                   <a key={url} href={url} target="_blank" rel="noreferrer noopener">
@@ -150,12 +146,12 @@ export default function AdminVerifications(): JSX.Element {
               </div>
             </>
           ) : (
-            <span className="hint">No documents submitted.</span>
+            <span className="hint">{t('admin.noDocs')}</span>
           )}
 
           {profile.portfolio.length > 0 ? (
             <>
-              <strong style={{ fontSize: 13 }}>Portfolio</strong>
+              <strong style={{ fontSize: 13 }}>{t('admin.portfolio')}</strong>
               <div className={styles.docStrip}>
                 {profile.portfolio.map((url) => (
                   <img key={url} src={url} alt="portfolio" />
@@ -169,22 +165,18 @@ export default function AdminVerifications(): JSX.Element {
               className={styles.smallBtn}
               disabled={busy || profile.verificationStatus === 'VERIFIED'}
               onClick={() => void decide(profile, 'approve')}
-            >
-              Approve
-            </button>
+            >{t('admin.approve')}</button>
             <button
               className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
               disabled={busy || profile.verificationStatus === 'REJECTED'}
               onClick={() => void decide(profile, 'reject')}
-            >
-              Reject
-            </button>
+            >{t('admin.reject')}</button>
             <button
               className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
               disabled={busy}
               onClick={() => void toggleBlock(profile)}
             >
-              {profile.isBlocked ? 'Unblock user' : 'Block user'}
+              {profile.isBlocked ? t('admin.unblockUser') : t('admin.blockUser')}
             </button>
           </div>
         </div>
@@ -195,17 +187,13 @@ export default function AdminVerifications(): JSX.Element {
           className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
           disabled={page === 1}
           onClick={() => setPage((current) => Math.max(1, current - 1))}
-        >
-          Previous
-        </button>
+        >{t('admin.previous')}</button>
         <span className="hint">Page {page}</span>
         <button
           className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
           disabled={!hasMore}
           onClick={() => setPage((current) => current + 1)}
-        >
-          Next
-        </button>
+        >{t('admin.next')}</button>
       </div>
     </>
   );

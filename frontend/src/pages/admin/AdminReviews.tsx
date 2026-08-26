@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { Review } from '../../api/types';
@@ -6,6 +7,7 @@ import { formatDateTime } from '../../lib/format';
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminReviews(): JSX.Element {
+  const { t } = useTranslation();
   const [hidden, setHidden] = useState('');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<Review[]>([]);
@@ -42,22 +44,20 @@ export default function AdminReviews(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Review moderation</h1>
+      <h1 style={{ margin: 0 }}>{t('admin.reviewModeration')}</h1>
 
       <div className={styles.panel}>
         <div className={styles.filterBar}>
-          <label>
-            Visibility
-            <select
+          <label>{t('admin.visibility')}<select
               value={hidden}
               onChange={(event) => {
                 setHidden(event.target.value);
                 setPage(1);
               }}
             >
-              <option value="">All</option>
-              <option value="false">Visible</option>
-              <option value="true">Hidden</option>
+              <option value="">{t('admin.all')}</option>
+              <option value="false">{t('admin.visible')}</option>
+              <option value="true">{t('admin.hidden')}</option>
             </select>
           </label>
         </div>
@@ -70,12 +70,12 @@ export default function AdminReviews(): JSX.Element {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Rating</th>
-                <th>Text</th>
+                <th>{t('admin.rating')}</th>
+                <th>{t('admin.text')}</th>
                 <th>From → To</th>
-                <th>Job</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>{t('admin.job')}</th>
+                <th>{t('admin.date')}</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -101,16 +101,14 @@ export default function AdminReviews(): JSX.Element {
                       disabled={busy}
                       onClick={() => void toggle(review)}
                     >
-                      {review.isHidden ? 'Restore' : 'Hide'}
+                      {review.isHidden ? t('admin.restore') : t('admin.hide')}
                     </button>
                   </td>
                 </tr>
               ))}
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="muted">
-                    Nothing to show.
-                  </td>
+                  <td colSpan={6} className="muted">{t('admin.nothingToShow')}</td>
                 </tr>
               ) : null}
             </tbody>
@@ -122,17 +120,13 @@ export default function AdminReviews(): JSX.Element {
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
-          >
-            Previous
-          </button>
+          >{t('admin.previous')}</button>
           <span className="hint">Page {page}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}
             onClick={() => setPage((current) => current + 1)}
-          >
-            Next
-          </button>
+          >{t('admin.next')}</button>
         </div>
       </div>
     </>

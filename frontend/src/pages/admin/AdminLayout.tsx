@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { getAdminToken, setAdminToken } from '../../api/client';
 import { adminApiClient } from '../../api/endpoints';
@@ -6,15 +7,16 @@ import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/Admin.module.css';
 
 const LINKS = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/orders', label: 'Orders' },
-  { to: '/admin/verifications', label: 'Verifications' },
-  { to: '/admin/withdrawals', label: 'Withdrawals' },
-  { to: '/admin/reviews', label: 'Reviews' },
-  { to: '/admin/settings', label: 'Settings' },
+  { to: '/admin', labelKey: 'admin.nav.dashboard', end: true },
+  { to: '/admin/orders', labelKey: 'admin.nav.orders' },
+  { to: '/admin/verifications', labelKey: 'admin.nav.verifications' },
+  { to: '/admin/withdrawals', labelKey: 'admin.nav.withdrawals' },
+  { to: '/admin/reviews', labelKey: 'admin.nav.reviews' },
+  { to: '/admin/settings', labelKey: 'admin.nav.settings' },
 ];
 
 export default function AdminLayout(): JSX.Element {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { status, user } = useAuth();
   const [checking, setChecking] = useState(!getAdminToken());
@@ -79,12 +81,10 @@ export default function AdminLayout(): JSX.Element {
                 isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink
               }
             >
-              {link.label}
+              {t(link.labelKey)}
             </NavLink>
           ))}
-          <button className={`${styles.navLink} ${styles.smallBtnGhost}`} onClick={signOut}>
-            Sign out
-          </button>
+          <button className={`${styles.navLink} ${styles.smallBtnGhost}`} onClick={signOut}>{t('admin.signOut')}</button>
         </nav>
       </header>
 

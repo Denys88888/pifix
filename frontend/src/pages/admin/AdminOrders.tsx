@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
@@ -9,6 +10,7 @@ import styles from '../../styles/Admin.module.css';
 const STATUSES = ['', 'OPEN', 'IN_PROGRESS', 'AWAITING_CONFIRMATION', 'COMPLETED', 'CANCELLED', 'DISPUTED'];
 
 export default function AdminOrders(): JSX.Element {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [status, setStatus] = useState(searchParams.get('status') ?? '');
   const [search, setSearch] = useState('');
@@ -63,9 +65,7 @@ export default function AdminOrders(): JSX.Element {
 
       <div className={styles.panel}>
         <div className={styles.filterBar}>
-          <label>
-            Status
-            <select
+          <label>{t('admin.status')}<select
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -81,9 +81,7 @@ export default function AdminOrders(): JSX.Element {
             </select>
           </label>
 
-          <label>
-            Search (id, title, client)
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="A7K3QD" />
+          <label>{t('admin.searchOrders')}<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="A7K3QD" />
           </label>
 
           <button
@@ -92,9 +90,7 @@ export default function AdminOrders(): JSX.Element {
               setPage(1);
               void load();
             }}
-          >
-            Apply
-          </button>
+          >{t('admin.apply')}</button>
         </div>
       </div>
 
@@ -105,13 +101,13 @@ export default function AdminOrders(): JSX.Element {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Job</th>
-                <th>Status</th>
-                <th>Escrow</th>
-                <th>Amounts</th>
-                <th>Parties</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th>{t('admin.job')}</th>
+                <th>{t('admin.status')}</th>
+                <th>{t('admin.escrow')}</th>
+                <th>{t('admin.amounts')}</th>
+                <th>{t('admin.parties')}</th>
+                <th>{t('admin.created')}</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -152,32 +148,24 @@ export default function AdminOrders(): JSX.Element {
                             className={styles.smallBtn}
                             disabled={busy}
                             onClick={() => void resolve(order.id, 'release')}
-                          >
-                            Release
-                          </button>
+                          >{t('admin.release')}</button>
                           <button
                             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
                             disabled={busy}
                             onClick={() => void resolve(order.id, 'refund')}
-                          >
-                            Refund
-                          </button>
+                          >{t('admin.refund')}</button>
                           <button
                             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
                             disabled={busy}
                             onClick={() => void resolve(order.id, 'refund_with_fees')}
-                          >
-                            Refund + fees
-                          </button>
+                          >{t('admin.refundPlusFees')}</button>
                         </>
                       ) : order.status === 'OPEN' ? (
                         <button
                           className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
                           disabled={busy}
                           onClick={() => void resolve(order.id, 'cancel')}
-                        >
-                          Cancel
-                        </button>
+                        >{t('admin.cancel')}</button>
                       ) : (
                         <span className="hint">—</span>
                       )}
@@ -187,9 +175,7 @@ export default function AdminOrders(): JSX.Element {
               ))}
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="muted">
-                    Nothing to show.
-                  </td>
+                  <td colSpan={7} className="muted">{t('admin.nothingToShow')}</td>
                 </tr>
               ) : null}
             </tbody>
@@ -201,17 +187,13 @@ export default function AdminOrders(): JSX.Element {
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
-          >
-            Previous
-          </button>
+          >{t('admin.previous')}</button>
           <span className="hint">Page {page}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}
             onClick={() => setPage((current) => current + 1)}
-          >
-            Next
-          </button>
+          >{t('admin.next')}</button>
         </div>
       </div>
     </>

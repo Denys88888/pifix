@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { Withdrawal } from '../../api/types';
@@ -8,6 +9,7 @@ import styles from '../../styles/Admin.module.css';
 const STATUSES = ['REQUESTED', 'APPROVED', 'PAID', 'REJECTED', ''];
 
 export default function AdminWithdrawals(): JSX.Element {
+  const { t } = useTranslation();
   const [status, setStatus] = useState('REQUESTED');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<Withdrawal[]>([]);
@@ -67,13 +69,11 @@ export default function AdminWithdrawals(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Withdrawal requests</h1>
+      <h1 style={{ margin: 0 }}>{t('admin.withdrawalRequests')}</h1>
 
       <div className={styles.panel}>
         <div className={styles.filterBar}>
-          <label>
-            Status
-            <select
+          <label>{t('admin.status')}<select
               value={status}
               onChange={(event) => {
                 setStatus(event.target.value);
@@ -98,12 +98,12 @@ export default function AdminWithdrawals(): JSX.Element {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Wallet</th>
-                <th>Status</th>
-                <th>Requested</th>
-                <th>Actions</th>
+                <th>{t('admin.user')}</th>
+                <th>{t('admin.amount')}</th>
+                <th>{t('admin.wallet')}</th>
+                <th>{t('admin.status')}</th>
+                <th>{t('admin.requested')}</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -139,24 +139,20 @@ export default function AdminWithdrawals(): JSX.Element {
                         disabled={busyId === withdrawal.id || withdrawal.status === 'PAID'}
                         onClick={() => void pay(withdrawal)}
                       >
-                        {busyId === withdrawal.id ? 'Paying…' : 'Pay out'}
+                        {busyId === withdrawal.id ? t('admin.paying') : t('admin.payOut')}
                       </button>
                       <button
                         className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
                         disabled={busyId === withdrawal.id || withdrawal.status === 'PAID'}
                         onClick={() => void reject(withdrawal)}
-                      >
-                        Reject
-                      </button>
+                      >{t('admin.reject')}</button>
                     </div>
                   </td>
                 </tr>
               ))}
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="muted">
-                    Nothing to show.
-                  </td>
+                  <td colSpan={6} className="muted">{t('admin.nothingToShow')}</td>
                 </tr>
               ) : null}
             </tbody>
@@ -168,17 +164,13 @@ export default function AdminWithdrawals(): JSX.Element {
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
-          >
-            Previous
-          </button>
+          >{t('admin.previous')}</button>
           <span className="hint">Page {page}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}
             onClick={() => setPage((current) => current + 1)}
-          >
-            Next
-          </button>
+          >{t('admin.next')}</button>
         </div>
       </div>
     </>
