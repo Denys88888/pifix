@@ -42,6 +42,15 @@ function appKeypair(): StellarSdk.Keypair {
  * Never throws: a failed payout must not roll back the balance bookkeeping that
  * already credited the user — the admin can retry from the withdrawal screen.
  */
+/**
+ * Whether a payout recipient must have passed KYC. Exported so the withdrawal
+ * form can refuse early, on the same rule the money gate below applies — one
+ * definition, so the two can never drift into telling the user different things.
+ */
+export function payoutsRequireKyc(): boolean {
+  return env.piNetwork === 'mainnet' || env.REQUIRE_KYC;
+}
+
 export async function sendPayout(params: {
   userId: string;
   piUid: string;
@@ -62,6 +71,33 @@ export async function sendPayout(params: {
       amount: money(amount),
     });
     return { ok: false, error: 'payouts_disabled' };
+  }
+
+  /*
+   * The authoritative KYC gate: every path that moves Pi out of the app goes
+   * through here, so it is the one place the check cannot be forgotten.
+   *
+   * Mainnet always requires it. On Testnet it follows REQUIRE_KYC, because the
+   * sandbox does not issue a real status and hard-requiring it would make
+   * payouts untestable.
+   *
+   * `kycVerified` is refreshed from GET /me at every sign-in, so a master who
+   * passed KYC after their last session reads as unverified here. Refusing is
+   * the safe direction, and re-opening the app clears it — which is what the
+   * error tells them to do.
+   */
+  if (payoutsRequireKyc()) {
+    const recipient = await prisma.user.findUnique({
+      where: { id: params.userId },
+      select: { kycVerified: true },
+    });
+    if (!recipient?.kycVerified) {
+      logger.warn('Payout refused — recipient has not passed KYC', {
+        userId: params.userId,
+        amount: money(amount),
+      });
+      return { ok: false, error: 'kyc_required' };
+    }
   }
 
   let piPaymentId: string | undefined;

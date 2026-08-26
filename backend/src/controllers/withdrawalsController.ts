@@ -7,6 +7,7 @@ import { badRequest, conflict } from '../lib/errors';
 import { money, toPi } from '../lib/money';
 import { paginate, withdrawalDTO } from '../lib/serializers';
 import { getSettings } from '../services/settings';
+import { payoutsRequireKyc } from '../services/piPayouts';
 
 export const requestWithdrawalSchema = z.object({
   amountPi: z
@@ -27,6 +28,15 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
 
   if (!user.walletAddress) {
     throw badRequest('no_wallet', 'Sign in with the payments scope so PiFix knows your wallet address');
+  }
+
+  // Refused here as well as at the payout itself, so the answer arrives before
+  // the balance is moved rather than as a failed transfer afterwards.
+  if (payoutsRequireKyc() && !user.kycVerified) {
+    throw badRequest(
+      'kyc_required',
+      'Complete KYC in the Pi app, then reopen PiFix so your status refreshes',
+    );
   }
 
   const amount = toPi(input.amountPi);

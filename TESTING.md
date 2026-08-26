@@ -79,7 +79,30 @@ section passes vacuously: with payouts disabled the controller refuses before it
 debits, so there is nothing to roll back and every assertion goes green for the
 wrong reason.
 
-Last full run: **42 + 45 + 24 + 17 = 128 passed, 0 failed** (2026-08-06, local).
+### `npm run test:kyc`
+
+```bash
+# same as test:extras, plus the gate switched on:
+PORT=3010 PI_API_BASE_URL=http://localhost:4010 ENABLE_INTERNAL_CRON=false \
+PAYOUTS_ENABLED=true PI_WALLET_PRIVATE_SEED=SBOGUS... REQUIRE_KYC=true \
+npm run dev
+# then
+npm run test:kyc
+```
+
+The KYC gate on payouts. Two gates enforce one rule — the withdrawal form
+refuses early so the answer arrives before the balance moves, and `sendPayout`
+refuses again because every path that moves Pi out of the app goes through it.
+
+The section that matters is the third: KYC is revoked *after* a withdrawal has
+already been accepted, so the form gate is behind us and only the gate inside
+`sendPayout` can still stop the transfer. It must refuse, restore the balance
+and reopen the request.
+
+Like the payout suite, it first asserts the gate is switched on: with
+`REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
+
+Last full run: **42 + 45 + 24 + 17 + 11 = 139 passed, 0 failed** (2026-08-26, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.
