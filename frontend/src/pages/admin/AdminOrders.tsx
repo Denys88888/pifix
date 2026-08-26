@@ -47,7 +47,7 @@ export default function AdminOrders(): JSX.Element {
     id: string,
     action: 'release' | 'refund' | 'refund_with_fees' | 'cancel',
   ) => {
-    const note = window.prompt(`Note for "${action}" (optional)`) ?? undefined;
+    const note = window.prompt(t('admin.notePrompt')) ?? undefined;
     setBusy(true);
     try {
       await adminApiClient.resolveOrder(id, action, note);

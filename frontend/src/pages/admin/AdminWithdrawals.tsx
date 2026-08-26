@@ -36,7 +36,7 @@ export default function AdminWithdrawals(): JSX.Element {
   const pay = async (withdrawal: Withdrawal) => {
     const confirmed = window.confirm(
       `Send ${withdrawal.amountPi} π to ${withdrawal.walletAddress} (@${withdrawal.username})?\n\n` +
-        'This creates a real App→User payment on the Pi network.',
+        t('admin.payoutConfirm'),
     );
     if (!confirmed) return;
 

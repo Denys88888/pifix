@@ -5,30 +5,29 @@ import { ApiError } from '../../api/client';
 import type { AdminSettings as Settings } from '../../api/types';
 import styles from '../../styles/Admin.module.css';
 
+/** Label and hint live in the translation bundle under `admin.field.<key>`. */
 interface FieldSpec {
   key: keyof Settings;
-  label: string;
-  hint: string;
   type: 'decimal' | 'percent' | 'int';
 }
 
 const FIELDS: FieldSpec[] = [
-  { key: 'connectPricePi', label: 'Connect price (π)', hint: 'Paid by a master to respond to an order.', type: 'decimal' },
-  { key: 'clientFeePercent', label: 'Client fee (%)', hint: 'Commission added on top of the budget.', type: 'percent' },
-  { key: 'masterFeePercent', label: 'Master fee (%)', hint: '0 = the master receives the full budget.', type: 'percent' },
-  { key: 'expressFeePi', label: 'Express fee (π)', hint: 'Added when the order is marked urgent.', type: 'decimal' },
-  { key: 'profileBoostPricePi', label: 'Profile boost (π)', hint: '7 days at the top of search.', type: 'decimal' },
-  { key: 'proSubscriptionPricePi', label: 'PRO subscription (π)', hint: '30 days.', type: 'decimal' },
-  { key: 'escrowTimeoutDays', label: 'Escrow timeout (days)', hint: 'Auto-release after this many days.', type: 'int' },
-  { key: 'referralBonusDirectPi', label: 'Referral bonus L1 (π)', hint: 'Paid after the referral’s first deal.', type: 'decimal' },
-  { key: 'referralBonusIndirectPi', label: 'Referral bonus L2 (π)', hint: 'Second-level referral bonus.', type: 'decimal' },
-  { key: 'minBudgetPi', label: 'Minimum budget (π)', hint: 'Lowest allowed order budget.', type: 'decimal' },
-  { key: 'maxOpenOrdersPerClient', label: 'Max open orders / client', hint: 'Active orders at once.', type: 'int' },
-  { key: 'maxActiveResponsesPerMaster', label: 'Max responses / master', hint: 'Active responses at once.', type: 'int' },
-  { key: 'connectRefundWindowMinutes', label: 'Connect refund window (min)', hint: 'Refund allowed inside this window.', type: 'int' },
-  { key: 'minWithdrawalPi', label: 'Minimum withdrawal (π)', hint: 'Below this, withdrawals are refused.', type: 'decimal' },
-  { key: 'autoWithdrawalPi', label: 'Auto-withdrawal threshold (π)', hint: '0 = always manual.', type: 'decimal' },
-  { key: 'piUsdRate', label: 'Pi→USD rate', hint: 'Dashboard display only. Never used for on-chain math.', type: 'decimal' },
+  { key: 'connectPricePi', type: 'decimal' },
+  { key: 'clientFeePercent', type: 'percent' },
+  { key: 'masterFeePercent', type: 'percent' },
+  { key: 'expressFeePi', type: 'decimal' },
+  { key: 'profileBoostPricePi', type: 'decimal' },
+  { key: 'proSubscriptionPricePi', type: 'decimal' },
+  { key: 'escrowTimeoutDays', type: 'int' },
+  { key: 'referralBonusDirectPi', type: 'decimal' },
+  { key: 'referralBonusIndirectPi', type: 'decimal' },
+  { key: 'minBudgetPi', type: 'decimal' },
+  { key: 'maxOpenOrdersPerClient', type: 'int' },
+  { key: 'maxActiveResponsesPerMaster', type: 'int' },
+  { key: 'connectRefundWindowMinutes', type: 'int' },
+  { key: 'minWithdrawalPi', type: 'decimal' },
+  { key: 'autoWithdrawalPi', type: 'decimal' },
+  { key: 'piUsdRate', type: 'decimal' },
 ];
 
 export default function AdminSettings(): JSX.Element {
@@ -68,7 +67,7 @@ export default function AdminSettings(): JSX.Element {
       }
       const saved = await adminApiClient.saveSettings(patch);
       setUpdatedAt(saved.updatedAt);
-      setMessage('Saved. New prices apply to the next request — no deploy needed.');
+      setMessage(t('admin.saved'));
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'Save failed');
     } finally {
@@ -82,7 +81,7 @@ export default function AdminSettings(): JSX.Element {
     <>
       <h1 style={{ margin: 0 }}>{t('admin.platformSettings')}</h1>
       <p className="hint" style={{ margin: 0 }}>
-        Last updated: {updatedAt ? new Date(updatedAt).toLocaleString() : '—'}
+        {t('admin.lastUpdated')}: {updatedAt ? new Date(updatedAt).toLocaleString() : '—'}
       </p>
 
       {error ? <div className="alert alert--error">{error}</div> : null}
@@ -92,7 +91,7 @@ export default function AdminSettings(): JSX.Element {
         <div className={styles.settingsGrid}>
           {FIELDS.map((field) => (
             <div key={field.key} className={styles.field}>
-              <label htmlFor={field.key}>{field.label}</label>
+              <label htmlFor={field.key}>{t(`admin.field.${field.key}.label`)}</label>
               <input
                 id={field.key}
                 inputMode="decimal"
@@ -101,7 +100,7 @@ export default function AdminSettings(): JSX.Element {
                   setValues((current) => ({ ...current, [field.key]: event.target.value }))
                 }
               />
-              <small>{field.hint}</small>
+              <small>{t(`admin.field.${field.key}.hint`)}</small>
             </div>
           ))}
         </div>
@@ -114,7 +113,7 @@ export default function AdminSettings(): JSX.Element {
             style={{ width: 20, minHeight: 20 }}
           />
           <span>
-            Maintenance mode — blocks new orders and shows a banner in the app.
+            {t('admin.maintenanceLabel')}
           </span>
         </label>
 

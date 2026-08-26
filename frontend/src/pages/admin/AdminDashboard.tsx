@@ -19,7 +19,7 @@ export default function AdminDashboard(): JSX.Element {
         if (!cancelled) setData(result);
       })
       .catch((caught: unknown) => {
-        if (!cancelled) setError(caught instanceof ApiError ? caught.message : 'Failed to load');
+        if (!cancelled) setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed'));
       });
     return () => {
       cancelled = true;
@@ -27,7 +27,7 @@ export default function AdminDashboard(): JSX.Element {
   }, []);
 
   if (error) return <div className="alert alert--error">{error}</div>;
-  if (!data) return <p className="muted">Loading…</p>;
+  if (!data) return <p className="muted">{t('admin.loading')}</p>;
 
   const money = (pi: string, usd: string | null) => (usd ? `${pi} π ($${usd})` : `${pi} π`);
 
@@ -42,11 +42,11 @@ export default function AdminDashboard(): JSX.Element {
         </div>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.users.masters}</span>
-          <span className={styles.tileLabel}>Masters ({data.users.verifiedMasters} verified)</span>
+          <span className={styles.tileLabel}>{t('admin.mastersTile', { n: data.users.verifiedMasters })}</span>
         </div>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.orders.total}</span>
-          <span className={styles.tileLabel}>Orders ({data.orders.open} open)</span>
+          <span className={styles.tileLabel}>{t('admin.ordersTile', { n: data.orders.open })}</span>
         </div>
         <div className={styles.tile}>
           <span className={styles.tileValue}>{data.orders.completed}</span>
@@ -95,13 +95,13 @@ export default function AdminDashboard(): JSX.Element {
         <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.queue')}</h2>
         <div className={styles.actions}>
           <Link to="/admin/verifications" className={styles.smallBtn}>
-            Verifications: {data.queue.pendingVerifications}
+            {t('admin.queueVerifications', { n: data.queue.pendingVerifications })}
           </Link>
           <Link to="/admin/withdrawals" className={styles.smallBtn}>
-            Withdrawals: {data.queue.pendingWithdrawals}
+            {t('admin.queueWithdrawals', { n: data.queue.pendingWithdrawals })}
           </Link>
           <Link to="/admin/orders?status=DISPUTED" className={styles.smallBtn}>
-            Disputes: {data.orders.disputes}
+            {t('admin.queueDisputes', { n: data.orders.disputes })}
           </Link>
         </div>
       </div>
@@ -110,16 +110,16 @@ export default function AdminDashboard(): JSX.Element {
         <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.system')}</h2>
         <div className={styles.actions}>
           <span className={`${styles.pill} ${data.system.sandbox ? styles.pillWarn : styles.pillGood}`}>
-            {data.system.sandbox ? 'Sandbox / Testnet' : 'Mainnet'}
+            {data.system.sandbox ? t('admin.netTestnet') : t('admin.netMainnet')}
           </span>
           <span className={`${styles.pill} ${data.system.payoutsConfigured ? styles.pillGood : styles.pillBad}`}>
-            Payouts {data.system.payoutsConfigured ? 'ready' : 'not configured'}
+            {t(data.system.payoutsConfigured ? 'admin.payoutsReady' : 'admin.payoutsOff')}
           </span>
           <span className={`${styles.pill} ${data.system.cloudinaryConfigured ? styles.pillGood : styles.pillBad}`}>
-            Cloudinary {data.system.cloudinaryConfigured ? 'ready' : 'not configured'}
+            {t(data.system.cloudinaryConfigured ? 'admin.cloudinaryReady' : 'admin.cloudinaryOff')}
           </span>
           <span className={`${styles.pill} ${data.system.requireKyc ? styles.pillGood : styles.pillWarn}`}>
-            KYC gate {data.system.requireKyc ? 'on' : 'off'}
+            {t(data.system.requireKyc ? 'admin.kycOn' : 'admin.kycOff')}
           </span>
           {data.system.maintenanceMode ? (
             <span className={`${styles.pill} ${styles.pillBad}`}>{t('admin.maintenanceOn')}</span>
