@@ -26,16 +26,25 @@ export default function AdminLayout(): JSX.Element {
    * session already proves who they are, so it is traded for an admin token
    * before falling back to the password page. On a desktop, where there is no
    * Pi session, this does nothing and the password page appears as before.
+   *
+   * A Pi admin mints a fresh token on every mount rather than reusing whatever
+   * is in sessionStorage. Admin tokens last 12 hours and the Pi session lasts
+   * far longer, so trusting the stored one left the panel showing "Admin
+   * session expired" with no way out — the recovery is one cheap call, and the
+   * stale token is the only thing standing in front of it.
    */
   useEffect(() => {
-    if (getAdminToken()) {
-      setChecking(false);
-      return;
-    }
     if (status === 'booting' || status === 'signing_in') return;
 
-    if (status !== 'signed_in' || !user?.isAdmin) {
-      navigate('/admin/login', { replace: true });
+    const piAdmin = status === 'signed_in' && user?.isAdmin === true;
+
+    if (!piAdmin) {
+      // No Pi session to trade: the stored token is all there is.
+      if (getAdminToken()) {
+        setChecking(false);
+      } else {
+        navigate('/admin/login', { replace: true });
+      }
       return;
     }
 
@@ -47,7 +56,12 @@ export default function AdminLayout(): JSX.Element {
         setAdminToken(result.token);
         setChecking(false);
       } catch {
-        if (!cancelled) navigate('/admin/login', { replace: true });
+        // The Pi door did not open — drop whatever stale token was there so the
+        // password page is not shadowed by a session that cannot work.
+        if (!cancelled) {
+          setAdminToken(null);
+          navigate('/admin/login', { replace: true });
+        }
       }
     })();
 
