@@ -137,7 +137,7 @@ export function TaskMap({
         // Falls back to the map itself when a master somehow has no username,
         // so the popup can never render a link to /masters/undefined.
         action: worker.username
-          ? { label: t('map.viewMaster'), href: `/masters/${worker.username}` }
+          ? { label: t('map.viewMaster'), href: `/masters/${encodeURIComponent(worker.username)}` }
           : undefined,
       },
     }));

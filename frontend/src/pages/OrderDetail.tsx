@@ -274,7 +274,7 @@ export default function OrderDetail(): JSX.Element {
         {order.master ? (
           <div className="spread">
             <span className="muted">{t('order.master')}</span>
-            <Link to={`/masters/${order.master.username}`}>@{order.master.username}</Link>
+            <Link to={`/masters/${encodeURIComponent(order.master.username)}`}>@{order.master.username}</Link>
           </div>
         ) : null}
         <div className="spread">
@@ -378,7 +378,7 @@ export default function OrderDetail(): JSX.Element {
               {responses.map((response) => (
                 <div key={response.id} className={detail.response}>
                   <div className="spread">
-                    <Link to={`/masters/${response.master?.username ?? ''}`} className={detail.responseName}>
+                    <Link to={`/masters/${encodeURIComponent(response.master?.username ?? '')}`} className={detail.responseName}>
                       {response.masterName ?? response.master?.username}
                       {response.masterVerified ? <span className={detail.verified}>✓</span> : null}
                     </Link>

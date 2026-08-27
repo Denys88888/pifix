@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios';
+import { z } from 'zod';
 import { env } from '../config/env';
 import { AppError, badRequest, serverError, unauthorized } from '../lib/errors';
 import { logger } from '../lib/logger';
@@ -65,17 +66,50 @@ function wrap(error: unknown, code: string, fallback: string): AppError {
   return serverError(code, `${fallback}: ${detail}`);
 }
 
+/**
+ * Every field a pioneer sends is validated with zod, and until now the one
+ * response we took on faith was this one — an interface is a compile-time
+ * claim, not a runtime check, so whatever Pi returned went straight into the
+ * database.
+ *
+ * The username is deliberately not allow-listed: rejecting a shape a real Pi
+ * account legitimately has would lock that person out of the app, which is
+ * worse than the risk being defended against. Only characters that cannot
+ * appear in a username and would change the meaning of a URL path are
+ * refused — separators, control characters and whitespace.
+ */
+const piMeSchema = z.object({
+  uid: z.string().trim().min(1).max(128),
+  username: z
+    .string()
+    .trim()
+    .min(1)
+    .max(128)
+    .refine((value) => !/[\s/\\?#%]/.test(value), {
+      message: 'Pi username contains characters that cannot appear in a URL path',
+    }),
+  kyc_status: z.string().max(64).optional(),
+  roles: z.array(z.string().max(64)).optional(),
+  credentials: z.unknown().optional(),
+  wallet_address: z.string().trim().max(120).optional().nullable(),
+});
+
 /** Verifies a user access token issued by Pi.authenticate on the client. */
 export async function verifyAccessToken(accessToken: string): Promise<PiMe> {
   try {
-    const { data } = await axios.get<PiMe>(`${env.PI_API_BASE_URL}/v2/me`, {
+    const { data } = await axios.get<unknown>(`${env.PI_API_BASE_URL}/v2/me`, {
       timeout: 15_000,
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!data?.uid || !data?.username) {
+
+    const parsed = piMeSchema.safeParse(data);
+    if (!parsed.success) {
+      logger.error('Pi /me returned a shape this server will not store', {
+        issues: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`),
+      });
       throw unauthorized('pi_auth_invalid', 'Pi did not return a valid identity');
     }
-    return data;
+    return parsed.data as PiMe;
   } catch (error) {
     if (error instanceof AppError) throw error;
     const status = (error as AxiosError).response?.status;

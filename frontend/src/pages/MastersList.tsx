@@ -88,7 +88,7 @@ export default function MastersList(): JSX.Element {
           ...(master.distanceKm !== undefined ? [t('map.distanceAway', { km: master.distanceKm })] : []),
         ],
         action: master.username
-          ? { label: t('map.viewMaster'), href: `/masters/${master.username}` }
+          ? { label: t('map.viewMaster'), href: `/masters/${encodeURIComponent(master.username)}` }
           : undefined,
       },
     }));

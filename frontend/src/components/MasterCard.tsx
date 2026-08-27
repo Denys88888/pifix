@@ -10,7 +10,7 @@ export function MasterCard({ master }: { master: MasterProfile }): JSX.Element {
   const initials = master.displayName.trim().charAt(0).toUpperCase() || '?';
 
   return (
-    <Link to={`/masters/${master.username ?? ''}`} className={styles.card}>
+    <Link to={`/masters/${encodeURIComponent(master.username ?? '')}`} className={styles.card}>
       <div className={styles.head}>
         {master.avatarUrl ? (
           <img src={master.avatarUrl} alt="" className={styles.avatar} loading="lazy" />

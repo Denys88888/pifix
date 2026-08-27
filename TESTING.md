@@ -2,7 +2,9 @@
 
 ## Automated first
 
-Four suites, 128 assertions. All refuse to run with `NODE_ENV=production`.
+Six suites, 187 assertions. All refuse to run with `NODE_ENV=production`.
+`test:unit` needs nothing running; the rest need a database, and three of them
+need the fake Pi API as well.
 
 ### The money paths — 42 assertions
 
