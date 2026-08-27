@@ -79,6 +79,22 @@ section passes vacuously: with payouts disabled the controller refuses before it
 debits, so there is nothing to roll back and every assertion goes green for the
 wrong reason.
 
+### `npm run test:unit`
+
+```bash
+npm run test:unit          # no database, no server, no fake Pi
+```
+
+The money layer on its own: rounding direction, the display formatter, and
+`computeOrderCharges` — the single source of truth that the quote endpoint,
+payment approval and the escrow bookkeeping all read. If those three ever
+disagree, someone is charged one number and paid another.
+
+The last section is the one worth keeping: for a spread of budgets, fee
+percentages that never divide evenly, and amounts below the 7-decimal floor, it
+asserts that **what the client pays equals what the master receives plus what
+the platform keeps**. Anything else means arithmetic created or destroyed Pi.
+
 ### `npm run test:kyc`
 
 ```bash
@@ -102,7 +118,7 @@ and reopen the request.
 Like the payout suite, it first asserts the gate is switched on: with
 `REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
 
-Last full run: **42 + 45 + 24 + 17 + 11 = 139 passed, 0 failed** (2026-08-26, local).
+Last full run: **48 + 42 + 45 + 24 + 17 + 11 = 187 passed, 0 failed** (2026-08-27, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.

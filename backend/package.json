@@ -16,6 +16,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "test:unit": "tsx scripts/unitMoney.ts",
     "test:money": "tsx scripts/e2eMoney.ts",
     "test:payments": "tsx scripts/e2ePayments.ts",
     "test:extras": "tsx scripts/e2eBonuses.ts",
