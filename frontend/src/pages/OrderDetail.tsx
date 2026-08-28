@@ -12,6 +12,7 @@ import { SkeletonList } from '../components/SkeletonCard';
 import { useAuth } from '../hooks/useAuth';
 import { usePayment } from '../hooks/usePayment';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
+import { usePolling } from '../hooks/usePolling';
 import { formatDateTime, timeLeft } from '../lib/format';
 import styles from '../styles/Pages.module.css';
 import detail from '../styles/OrderDetail.module.css';
@@ -88,6 +89,50 @@ export default function OrderDetail(): JSX.Element {
   useEffect(() => {
     if (isOwner || isAssignedMaster) void loadResponses();
   }, [isOwner, isAssignedMaster, loadResponses]);
+
+  /*
+   * Quiet refreshers for the poller. The first load may replace the page with
+   * an error banner, but a network blip fifteen seconds later must not — the
+   * page is already on screen and still correct.
+   */
+  const refreshOrder = useCallback(async () => {
+    const data = await ordersApi.get(id);
+    setOrder(data.order);
+    setQuote(data.quote);
+  }, [id]);
+
+  const refreshResponses = useCallback(async () => {
+    const page = await ordersApi.responses(id, { sort: responseSort, limit: 20 });
+    setResponses(page.items);
+  }, [id, responseSort]);
+
+  /*
+   * Nothing on this page moved on its own before: a client watched an order
+   * with no responses and had no way to learn one had arrived except to
+   * reload. Pi Browser's WebView blocks WebSockets, so an interval is the
+   * mechanism available — usePolling already stands still while the tab is
+   * hidden or the device is offline, so a backgrounded phone costs nothing.
+   *
+   * Polling stops once the order reaches a final state, because nothing more
+   * can happen to it, and pauses while an action of the user's own is in
+   * flight so a refresh cannot overwrite what they just did.
+   */
+  const orderIsLive =
+    order !== null && !['COMPLETED', 'CANCELLED'].includes(order.status);
+
+  usePolling(refreshOrder, {
+    intervalMs: 15_000,
+    enabled: orderIsLive && !busy,
+    immediate: false,
+  });
+
+  // Responses only arrive while the order is still open, and only its owner
+  // is allowed to read them.
+  usePolling(refreshResponses, {
+    intervalMs: 15_000,
+    enabled: orderIsLive && isOwner && order?.status === 'OPEN' && !busy,
+    immediate: false,
+  });
 
   useEffect(() => {
     if (!order || order.status !== 'COMPLETED' || !user) return;
