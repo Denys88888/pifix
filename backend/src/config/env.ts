@@ -143,6 +143,26 @@ if (piNetwork === 'mainnet' && /testnet/i.test(`${piHorizonUrl} ${piNetworkPassp
   process.exit(1);
 }
 
+/*
+ * Pi's own documentation, payments_advanced.md, states plainly:
+ *
+ *   "Please note that the A2U payments feature is currently available only on
+ *    the Testnet."
+ *
+ * So a Mainnet instance with payouts switched on is configured for something
+ * the platform does not offer: masters would earn a balance and every payout
+ * would fail. Warned rather than refused, because Pi may enable it and a hard
+ * stop would then block a setup that had started working.
+ */
+if (piNetwork === 'mainnet' && raw.PAYOUTS_ENABLED) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    'WARNING: PAYOUTS_ENABLED on Mainnet. Pi documents App-to-User payments as ' +
+      'Testnet-only, so payouts to masters are expected to fail until Pi ships them ' +
+      'on Mainnet. Balances will still accrue; only the transfer out is affected.',
+  );
+}
+
 export const env = {
   ...raw,
   piNetwork,
