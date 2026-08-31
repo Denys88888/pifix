@@ -96,6 +96,8 @@ async function craftPayment(input: {
   cancelled?: boolean;
   transaction_verified?: boolean;
   direction?: 'user_to_app' | 'app_to_user';
+  /** Set to model a payment whose Pi already reached the chain. */
+  txid?: string;
 }) {
   const identifier = nextId();
   await control('/_control/payment', {
@@ -107,6 +109,7 @@ async function craftPayment(input: {
     cancelled: input.cancelled ?? false,
     transaction_verified: input.transaction_verified ?? true,
     direction: input.direction ?? 'user_to_app',
+    txid: input.txid,
   });
   return identifier;
 }
@@ -385,6 +388,77 @@ async function main() {
 
   const payRow = await prisma.payment.findUnique({ where: { piPaymentId: dangling } });
   check('cancellation recorded locally', payRow?.status === 'CANCELLED', payRow?.status);
+
+  /*
+   * The branch that protects the user's money, and the one the suite was
+   * missing: the Pi already left their wallet and reached the chain, but the
+   * app never completed the payment. Cancelling here would take the money and
+   * deliver nothing — it must be finished instead, and the purchase granted.
+   */
+  const recoverJob = await api('POST', '/orders', {
+    token: clientJwt,
+    body: {
+      categorySlug: 'plumbing', title: 'Job for the incomplete-payment recovery',
+      description: 'The master paid to respond but the app never completed it.',
+      budgetPi: '30', address: 'Warsaw', lat: 52.23, lng: 21.01, isUrgent: false, photos: [],
+    },
+  });
+  const recoverJobId = recoverJob.body?.order?.id as string;
+  check('order for the recovery case published', recoverJob.status === 201, `got ${recoverJob.status}`);
+
+  /*
+   * The sequence that actually produces one of these: the app approved the
+   * payment (which is what writes the local row), the user signed, the chain
+   * confirmed it — and only then did the app fail to call complete. A crafted
+   * payment with a txid but no local row is not reachable in production,
+   * because Pi will not let the user sign before the developer has approved,
+   * and approving is what creates the row.
+   */
+  const paidTxid = `tx_recovered_${RUN}`;
+  const onChain = await craftPayment({
+    uid: masterUid,
+    amount: connectPrice,
+    metadata: { purpose: 'CONNECT', orderId: recoverJobId, pricePi: '10', message: 'paid but never completed' },
+  });
+
+  const approvedIt = await api('POST', '/payments/approve', { token: masterJwt, body: { paymentId: onChain } });
+  check('the app approved it, which is what records it locally',
+    approvedIt.status === 200, `got ${approvedIt.status} ${JSON.stringify(approvedIt.body).slice(0, 120)}`);
+
+  // The chain confirms while the app is not looking; complete is never called.
+  await control('/_control/payment', {
+    identifier: onChain,
+    user_uid: masterUid,
+    amount: connectPrice,
+    memo: 'test',
+    metadata: { purpose: 'CONNECT', orderId: recoverJobId, pricePi: '10', message: 'paid but never completed' },
+    developer_approved: true,
+    transaction_verified: true,
+    developer_completed: false,
+    txid: paidTxid,
+  });
+
+  const recovered = await api('POST', '/payments/cancel-incomplete', {
+    token: masterJwt, body: { payment: { identifier: onChain } },
+  });
+  check('a payment that already reached the chain is handled',
+    recovered.status === 200, `got ${recovered.status} ${JSON.stringify(recovered.body).slice(0, 140)}`);
+  check('it is COMPLETED, not cancelled — the money was already taken',
+    recovered.body?.action === 'completed',
+    `action was ${recovered.body?.action}`);
+
+  const recoveredRow = await prisma.payment.findUnique({ where: { piPaymentId: onChain } });
+  check('recorded locally as completed with the chain txid',
+    recoveredRow?.status === 'COMPLETED' && recoveredRow?.txid === paidTxid,
+    `${recoveredRow?.status} / ${recoveredRow?.txid}`);
+
+  // The whole point: the master paid to respond, so the response must exist.
+  const grantedResponse = await prisma.response.findFirst({
+    where: { orderId: recoverJobId, master: { piUid: masterUid } },
+  });
+  check('THE PURCHASE WAS DELIVERED — the response the master paid for exists',
+    grantedResponse !== null,
+    'the master was charged and got nothing');
 
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);
   if (fail > 0) {

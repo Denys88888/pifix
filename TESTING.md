@@ -2,7 +2,7 @@
 
 ## Automated first
 
-Six suites, 187 assertions. All refuse to run with `NODE_ENV=production`.
+Six suites, 193 assertions. All refuse to run with `NODE_ENV=production`.
 `test:unit` needs nothing running; the rest need a database, and three of them
 need the fake Pi API as well.
 
@@ -18,7 +18,7 @@ erasure, ledger integrity. Payment-gated transitions are seeded into exactly the
 state a verified payment produces; everything downstream runs through the real
 HTTP API.
 
-### Payment verification, adversarially — 45 assertions
+### Payment verification, adversarially — 51 assertions
 
 ```bash
 # terminal 1
@@ -41,6 +41,8 @@ payments the real SDK would never produce. What it proves:
 - **approval alone grants nothing** — the response only appears after completion
 - replaying a completed payment is idempotent: no second response, no second grant
 - an escrow that skips the commission is refused and the order stays `OPEN`
+- a payment left incomplete **after the chain confirmed it** is finished, not
+  cancelled — the money had already gone, so the purchase must still be granted
 - completion is refused while the chain has not verified the transaction
 - the honest escrow books 38.5 / 3.85 / 42.35 Pi exactly
 
@@ -120,7 +122,7 @@ and reopen the request.
 Like the payout suite, it first asserts the gate is switched on: with
 `REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
 
-Last full run: **48 + 42 + 45 + 24 + 17 + 11 = 187 passed, 0 failed** (2026-08-27, local).
+Last full run: **48 + 42 + 51 + 24 + 17 + 11 = 193 passed, 0 failed** (2026-08-31, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.
