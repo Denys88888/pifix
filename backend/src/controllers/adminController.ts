@@ -504,6 +504,7 @@ export const settingsSchema = z.object({
   autoWithdrawalPi: decimalField.optional(),
   piUsdRate: decimalField.optional(),
   maintenanceMode: z.boolean().optional(),
+  supportContact: z.string().trim().max(200).optional(),
 });
 
 export async function getAdminSettings(_req: Request, res: Response): Promise<void> {
@@ -527,6 +528,7 @@ export async function getAdminSettings(_req: Request, res: Response): Promise<vo
       autoWithdrawalPi: settings.autoWithdrawalPi.toString(),
       piUsdRate: settings.piUsdRate.toString(),
       maintenanceMode: settings.maintenanceMode,
+      supportContact: settings.supportContact,
       updatedAt: settings.updatedAt.toISOString(),
     },
   });

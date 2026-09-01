@@ -32,6 +32,7 @@ const DEFAULTS = {
   autoWithdrawalPi: '0',
   piUsdRate: '0',
   maintenanceMode: false,
+  supportContact: '',
 } as const;
 
 export async function getSettings(): Promise<PlatformSettings> {
@@ -80,6 +81,9 @@ export function publicSettings(settings: PlatformSettings) {
     connectRefundWindowMinutes: settings.connectRefundWindowMinutes,
     minWithdrawalPi: settings.minWithdrawalPi.toString(),
     maintenanceMode: settings.maintenanceMode,
+    // Empty means "no channel configured" — the client hides the block rather
+    // than pointing people at an address nobody reads.
+    supportContact: settings.supportContact,
     // Server capabilities, not operator settings. Without them the client shows
     // a photo picker and a withdraw button that can only ever fail — the
     // feature reads as broken rather than as not yet switched on.

@@ -188,6 +188,8 @@ export interface PlatformSettings {
   connectRefundWindowMinutes: number;
   minWithdrawalPi: string;
   maintenanceMode: boolean;
+  /** Empty when no channel is configured — the app hides the contact block. */
+  supportContact: string;
   /** Server capabilities — false while the operator has not configured them. */
   uploadsEnabled: boolean;
   payoutsEnabled: boolean;

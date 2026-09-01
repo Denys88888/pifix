@@ -397,7 +397,8 @@
     "cookiesBody": "PiFix uses no advertising or tracking cookies. Your session token and language choice are kept in your browser's local storage.",
     "contactTitle": "Contact",
     "contactBody": "For any privacy request, contact the app owner through the Pi Developer Portal listing for PiFix.",
-    "manageData": "Manage my data"
+    "manageData": "Manage my data",
+    "contactWithChannel": "For questions about your data — what we hold, or deleting it — write to:"
   },
   "availability": {
     "on": "Taking work",
@@ -569,6 +570,15 @@
     "lastUpdated": "Last updated",
     "maintenanceLabel": "Maintenance mode — blocks new orders and shows a banner in the app.",
     "payoutConfirm": "This creates a real App→User payment on the Pi network.",
-    "notePrompt": "Note (optional)"
+    "notePrompt": "Note (optional)",
+    "supportContact": {
+      "label": "Support contact",
+      "placeholder": "email, Telegram, anything a person can reach you at",
+      "hint": "Shown in the profile and in the privacy policy. Leave empty to hide it — an address nobody reads is worse than none."
+    }
+  },
+  "support": {
+    "title": "Contact us",
+    "body": "Something went wrong, or a payment is stuck? Write to us — a person reads this."
   }
 }

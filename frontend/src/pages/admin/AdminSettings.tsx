@@ -34,6 +34,7 @@ export default function AdminSettings(): JSX.Element {
   const { t } = useTranslation();
   const [values, setValues] = useState<Record<string, string>>({});
   const [maintenance, setMaintenance] = useState(false);
+  const [supportContact, setSupportContact] = useState('');
   const [updatedAt, setUpdatedAt] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,6 +49,7 @@ export default function AdminSettings(): JSX.Element {
         for (const field of FIELDS) next[field.key] = String(settings[field.key] ?? '');
         setValues(next);
         setMaintenance(settings.maintenanceMode);
+        setSupportContact(settings.supportContact ?? '');
         setUpdatedAt(settings.updatedAt);
       })
       .catch((caught: unknown) => setError(caught instanceof ApiError ? caught.message : 'Failed to load'))
@@ -59,7 +61,12 @@ export default function AdminSettings(): JSX.Element {
     setError(null);
     setMessage(null);
     try {
-      const patch: Record<string, string | number | boolean> = { maintenanceMode: maintenance };
+      // supportContact is sent even when empty: clearing it is how an operator
+      // takes the channel down, so a blank must reach the server.
+      const patch: Record<string, string | number | boolean> = {
+        maintenanceMode: maintenance,
+        supportContact: supportContact.trim(),
+      };
       for (const field of FIELDS) {
         const raw = values[field.key]?.trim();
         if (raw === undefined || raw === '') continue;
@@ -103,6 +110,17 @@ export default function AdminSettings(): JSX.Element {
               <small>{t(`admin.field.${field.key}.hint`)}</small>
             </div>
           ))}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="supportContact">{t('admin.supportContact.label')}</label>
+          <input
+            id="supportContact"
+            value={supportContact}
+            placeholder={t('admin.supportContact.placeholder')}
+            onChange={(event) => setSupportContact(event.target.value.slice(0, 200))}
+          />
+          <small>{t('admin.supportContact.hint')}</small>
         </div>
 
         <label className="row" style={{ gap: 10 }}>

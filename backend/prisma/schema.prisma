@@ -439,6 +439,11 @@ model PlatformSettings {
   piUsdRate           Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
   maintenanceMode     Boolean @default(false) @map("maintenance_mode")
 
+  /// Where a pioneer can reach a human — an email, a Telegram handle, anything.
+  /// Empty hides the contact block rather than showing somewhere to write to
+  /// that nobody reads. Also cited by the privacy policy for data requests.
+  supportContact      String  @default("") @map("support_contact") @db.VarChar(200)
+
   updatedAt DateTime @updatedAt
 
   @@map("platform_settings")

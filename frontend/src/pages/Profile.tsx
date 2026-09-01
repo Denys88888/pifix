@@ -154,6 +154,18 @@ export default function Profile(): JSX.Element {
           </Link>
         </div>
 
+        {/* Hidden until an operator fills it in: pointing people at an address
+            nobody reads is worse than showing nothing. */}
+        {settings?.supportContact ? (
+          <div className="card stack">
+            <h2>{t('support.title')}</h2>
+            <p className="muted" style={{ margin: 0 }}>{t('support.body')}</p>
+            <p style={{ margin: 0, fontWeight: 600, wordBreak: 'break-all' }}>
+              {settings.supportContact}
+            </p>
+          </div>
+        ) : null}
+
         <div className={styles.sectionTitle}>
           <h2>{t('profile.myOrders')}</h2>
           <Link to="/orders/new" className={styles.link}>
