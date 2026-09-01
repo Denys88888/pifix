@@ -290,6 +290,50 @@ export async function autoReleaseExpiredEscrows(limit = 50): Promise<number> {
   return released;
 }
 
+/**
+ * Closes OPEN orders nobody answered. Without this an unanswered order sits on
+ * the board forever, and once there are enough of them the live ones drown.
+ *
+ * Deliberately narrow. Only orders that are still OPEN, hold no escrow and have
+ * no master selected are touched: anything holding money is somebody's Pi, not
+ * a stale listing, and it settles through the escrow paths instead. Zero days
+ * turns the whole thing off.
+ */
+export async function expireStaleOrders(limit = 50): Promise<number> {
+  const settings = await getSettings();
+  const days = settings.orderExpiryDays;
+  if (days <= 0) return 0;
+
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+  const stale = await prisma.order.findMany({
+    where: {
+      status: OrderStatus.OPEN,
+      escrowStatus: EscrowStatus.NONE,
+      masterId: null,
+      selectedResponseId: null,
+      createdAt: { lt: cutoff },
+    },
+    select: { id: true, publicId: true },
+    take: limit,
+    orderBy: { createdAt: 'asc' },
+  });
+
+  let closed = 0;
+  for (const order of stale) {
+    // Status in the WHERE clause, so an order someone funded or cancelled in
+    // the meantime is left alone rather than overwritten by this sweep.
+    const claimed = await prisma.order.updateMany({
+      where: { id: order.id, status: OrderStatus.OPEN, escrowStatus: EscrowStatus.NONE },
+      data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() },
+    });
+    if (claimed.count > 0) closed += 1;
+  }
+
+  if (closed > 0) logger.info(`Expired ${closed} unanswered order(s) older than ${days} days`);
+  return closed;
+}
+
 const SWEEP_KEY = 'escrow_sweep_at';
 
 /**
@@ -323,6 +367,9 @@ export async function lazySweep(intervalSeconds: number): Promise<void> {
     if (!created) return;
   }
 
+  await expireStaleOrders().catch((error) =>
+    logger.error('Lazy order expiry failed', { error: (error as Error).message }),
+  );
   await autoReleaseExpiredEscrows().catch((error) =>
     logger.error('Lazy sweep failed', { error: (error as Error).message }),
   );

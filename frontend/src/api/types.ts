@@ -256,6 +256,7 @@ export interface AdminDashboard {
 
 export interface AdminSettings extends PlatformSettings {
   masterFeePercent: string;
+  orderExpiryDays: number;
   autoWithdrawalPi: string;
   piUsdRate: string;
   updatedAt: string;

@@ -33,6 +33,7 @@ const DEFAULTS = {
   piUsdRate: '0',
   maintenanceMode: false,
   supportContact: '',
+  orderExpiryDays: 30,
 } as const;
 
 export async function getSettings(): Promise<PlatformSettings> {

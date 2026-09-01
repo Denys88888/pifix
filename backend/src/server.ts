@@ -4,7 +4,7 @@ import { env } from './config/env';
 import { logger } from './lib/logger';
 import { connectDatabase, disconnectDatabase } from './lib/prisma';
 import { createApp } from './app';
-import { autoReleaseExpiredEscrows } from './services/escrow';
+import { autoReleaseExpiredEscrows, expireStaleOrders } from './services/escrow';
 import { clearIncompleteServerPayments } from './services/piPayouts';
 
 async function bootstrap(): Promise<void> {
@@ -29,6 +29,9 @@ async function bootstrap(): Promise<void> {
     cron.schedule('0 * * * *', () => {
       void autoReleaseExpiredEscrows(200).catch((error) =>
         logger.error('Cron auto-release failed', { error: (error as Error).message }),
+      );
+      void expireStaleOrders(200).catch((error) =>
+        logger.error('Cron order expiry failed', { error: (error as Error).message }),
       );
       void clearIncompleteServerPayments().catch(() => undefined);
     });

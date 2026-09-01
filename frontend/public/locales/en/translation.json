@@ -564,6 +564,10 @@
       "piUsdRate": {
         "label": "Pi→USD rate",
         "hint": "Dashboard display only. Never used for on-chain math."
+      },
+      "orderExpiryDays": {
+        "label": "Order expiry (days)",
+        "hint": "An unanswered order closes after this many days. 0 = never. Orders holding escrow are never touched."
       }
     },
     "saved": "Saved. New prices apply to the next request — no deploy needed.",

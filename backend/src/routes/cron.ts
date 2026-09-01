@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { env } from '../config/env';
 import { unauthorized } from '../lib/errors';
 import { asyncHandler } from '../middleware/validate';
-import { autoReleaseExpiredEscrows } from '../services/escrow';
+import { autoReleaseExpiredEscrows, expireStaleOrders } from '../services/escrow';
 import { clearIncompleteServerPayments } from '../services/piPayouts';
 
 export const cronRouter = Router();
@@ -32,6 +32,7 @@ cronRouter.post(
     assertCronSecret(provided);
 
     const released = await autoReleaseExpiredEscrows(200);
+    const expired = await expireStaleOrders(200);
     await clearIncompleteServerPayments().catch(() => undefined);
 
     res.json({ ok: true, released, at: new Date().toISOString() });

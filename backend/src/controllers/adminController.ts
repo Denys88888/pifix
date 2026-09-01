@@ -505,6 +505,7 @@ export const settingsSchema = z.object({
   piUsdRate: decimalField.optional(),
   maintenanceMode: z.boolean().optional(),
   supportContact: z.string().trim().max(200).optional(),
+  orderExpiryDays: z.coerce.number().int().min(0).max(365).optional(),
 });
 
 export async function getAdminSettings(_req: Request, res: Response): Promise<void> {
@@ -529,6 +530,7 @@ export async function getAdminSettings(_req: Request, res: Response): Promise<vo
       piUsdRate: settings.piUsdRate.toString(),
       maintenanceMode: settings.maintenanceMode,
       supportContact: settings.supportContact,
+      orderExpiryDays: settings.orderExpiryDays,
       updatedAt: settings.updatedAt.toISOString(),
     },
   });

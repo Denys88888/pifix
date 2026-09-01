@@ -439,6 +439,11 @@ model PlatformSettings {
   piUsdRate           Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
   maintenanceMode     Boolean @default(false) @map("maintenance_mode")
 
+  /// Days an unanswered OPEN order stays on the board before it is closed
+  /// automatically. 0 disables it. Orders holding escrow are never touched —
+  /// that is someone's money, not a stale listing.
+  orderExpiryDays     Int     @default(30) @map("order_expiry_days")
+
   /// Where a pioneer can reach a human — an email, a Telegram handle, anything.
   /// Empty hides the contact block rather than showing somewhere to write to
   /// that nobody reads. Also cited by the privacy policy for data requests.

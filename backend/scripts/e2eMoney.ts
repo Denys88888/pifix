@@ -7,6 +7,8 @@
  * Run with: npm run test:money  (needs the API on :3000 and a seeded database)
  */
 import { PrismaClient, EscrowStatus, OrderStatus, ResponseStatus } from '@prisma/client';
+import { expireStaleOrders } from '../src/services/escrow';
+import { invalidateSettings } from '../src/services/settings';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
@@ -322,6 +324,57 @@ async function main() {
   check('master rating survives the client deletion', survivingReview === 1, String(survivingReview));
   const survivingOrders = await prisma.order.count({ where: { clientId: client.id, status: 'COMPLETED' } });
   check('completed jobs stay in the statistics', survivingOrders >= 1, String(survivingOrders));
+
+  console.log('\n═══ 8. Unanswered orders expire, funded ones never do ═══');
+
+  const expirySettings = await prisma.platformSettings.findUniqueOrThrow({ where: { id: 1 } });
+  const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+  const past = daysAgo(expirySettings.orderExpiryDays + 5);
+
+  // Three orders old enough to expire, differing only in what they hold.
+  const staleOpen = await prisma.order.findFirst({ where: { status: 'OPEN', escrowStatus: 'NONE', masterId: null } });
+  const fundedOne = await prisma.order.findFirst({ where: { escrowStatus: 'FUNDED' } });
+
+  if (staleOpen) await prisma.order.update({ where: { id: staleOpen.id }, data: { createdAt: past } });
+  if (fundedOne) await prisma.order.update({ where: { id: fundedOne.id }, data: { createdAt: past } });
+
+  const closed = await expireStaleOrders(200);
+  check('the sweep closed at least the stale open order', closed >= (staleOpen ? 1 : 0), `closed ${closed}`);
+
+  if (staleOpen) {
+    const after = await prisma.order.findUniqueOrThrow({ where: { id: staleOpen.id } });
+    check('an unanswered order older than the window is closed',
+      after.status === 'CANCELLED', after.status);
+  }
+
+  if (fundedOne) {
+    const after = await prisma.order.findUniqueOrThrow({ where: { id: fundedOne.id } });
+    check('AN ORDER HOLDING ESCROW IS NEVER TOUCHED — that is someone\'s money',
+      after.escrowStatus === 'FUNDED' && after.status !== 'CANCELLED',
+      `${after.status}/${after.escrowStatus}`);
+  }
+
+  // Zero must switch the whole thing off, not mean "expire everything today".
+  await prisma.platformSettings.update({ where: { id: 1 }, data: { orderExpiryDays: 0 } });
+  // Written straight to the table, so the 5-second cache the service keeps has
+  // to be dropped by hand. The admin path does this through updateSettings().
+  invalidateSettings();
+  const freshOpen = await prisma.order.create({
+    data: {
+      publicId: `EXP${Date.now().toString(36).slice(-5).toUpperCase()}`,
+      clientId: client.id, categoryId: (await prisma.category.findFirstOrThrow()).id,
+      title: 'Should survive with expiry disabled', description: 'Zero days means never.',
+      budgetPi: '10', address: 'Warsaw', lat: 52.23, lng: 21.01, createdAt: past,
+    },
+  });
+  const closedWithZero = await expireStaleOrders(200);
+  const survivor = await prisma.order.findUniqueOrThrow({ where: { id: freshOpen.id } });
+  check('0 days disables expiry instead of expiring everything',
+    closedWithZero === 0 && survivor.status === 'OPEN', `closed ${closedWithZero}, ${survivor.status}`);
+  await prisma.platformSettings.update({
+    where: { id: 1 }, data: { orderExpiryDays: expirySettings.orderExpiryDays },
+  });
+  invalidateSettings();
 
   console.log('\n═══ 8. Ledger integrity ═══');
 

@@ -28,6 +28,7 @@ const FIELDS: FieldSpec[] = [
   { key: 'minWithdrawalPi', type: 'decimal' },
   { key: 'autoWithdrawalPi', type: 'decimal' },
   { key: 'piUsdRate', type: 'decimal' },
+  { key: 'orderExpiryDays', type: 'int' },
 ];
 
 export default function AdminSettings(): JSX.Element {
