@@ -62,11 +62,26 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
    * Dangling payments must be cleared before a new one can be created, so this
    * handler is wired into Pi.init and reused by every authenticate() call.
    */
+  const pendingIncomplete = useRef<IncompletePayment[]>([]);
+
   const handleIncompletePayment = useCallback((payment: IncompletePayment) => {
+    // Pi reports it from inside authenticate(), before the login call below has
+    // produced a session, so the request would be refused and the payment would
+    // keep blocking every new one. Held here and sent once signed in.
+    if (!getAuthToken()) {
+      pendingIncomplete.current.push(payment);
+      return;
+    }
     void paymentsApi.cancelIncomplete(payment).catch(() => {
-      // The user may not have a session yet on the very first load; the same
-      // payment is surfaced again on the next authenticate().
+      pendingIncomplete.current.push(payment);
     });
+  }, []);
+
+  const flushIncomplete = useCallback(() => {
+    const queued = pendingIncomplete.current.splice(0);
+    for (const payment of queued) {
+      void paymentsApi.cancelIncomplete(payment).catch(() => undefined);
+    }
   }, []);
 
   const signIn = useCallback(async () => {
@@ -85,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       setAuthToken(result.token);
       setUserState(result.user);
       setStatus('signed_in');
+      flushIncomplete();
     } catch (caught) {
       const message =
         caught instanceof ApiError
@@ -107,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     } finally {
       signingIn.current = false;
     }
-  }, []);
+  }, [flushIncomplete]);
 
   const signOut = useCallback(() => {
     setAuthToken(null);

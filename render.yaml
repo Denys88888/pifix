@@ -8,7 +8,8 @@ databases:
   - name: pifix-db
     databaseName: pifix
     user: pifix
-    plan: free # upgrade to `starter` for daily backups
+    # What the live database runs on. `free` would expire it after 30 days.
+    plan: basic-256mb
     postgresMajorVersion: "16"
 
 services:
@@ -16,7 +17,8 @@ services:
   - type: web
     name: pifix-api
     runtime: node
-    plan: free
+    # A free service sleeps, and a sleeping API drops Pi payment callbacks.
+    plan: starter
     region: frankfurt
     rootDir: backend
     # --include=dev is required: NODE_ENV=production is already set for the
@@ -52,8 +54,10 @@ services:
         generateValue: true
       - key: PI_API_KEY
         sync: false
-      - key: PI_SANDBOX
-        value: "true"
+      # The one network switch (testnet | mainnet). Everything else derives
+      # from it; see backend/src/config/env.ts.
+      - key: PI_NETWORK
+        value: testnet
       - key: REQUIRE_KYC
         value: "false"
       - key: PI_WALLET_PRIVATE_SEED

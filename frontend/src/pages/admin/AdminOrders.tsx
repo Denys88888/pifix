@@ -35,7 +35,7 @@ export default function AdminOrders(): JSX.Element {
       setTotal(result.total);
       setHasMore(result.hasMore);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Failed to load');
+      setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed'));
     }
   }, [page, status, search]);
 
@@ -53,7 +53,7 @@ export default function AdminOrders(): JSX.Element {
       await adminApiClient.resolveOrder(id, action, note);
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Action failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
     } finally {
       setBusy(false);
     }
@@ -61,7 +61,9 @@ export default function AdminOrders(): JSX.Element {
 
   return (
     <>
-      <h1 style={{ margin: 0 }}>Orders ({total})</h1>
+      <h1 style={{ margin: 0 }}>
+        {t('admin.nav.orders')} ({total})
+      </h1>
 
       <div className={styles.panel}>
         <div className={styles.filterBar}>
@@ -75,7 +77,7 @@ export default function AdminOrders(): JSX.Element {
             >
               {STATUSES.map((value) => (
                 <option key={value || 'all'} value={value}>
-                  {value || 'All'}
+                  {value ? t(`orderStatus.${value}`) : t('admin.all')}
                 </option>
               ))}
             </select>
@@ -118,7 +120,7 @@ export default function AdminOrders(): JSX.Element {
                     <div className="hint">{order.title}</div>
                   </td>
                   <td>
-                    <span className={styles.pill}>{order.status}</span>
+                    <span className={styles.pill}>{t(`orderStatus.${order.status}`)}</span>
                   </td>
                   <td>
                     <span
@@ -126,13 +128,16 @@ export default function AdminOrders(): JSX.Element {
                         order.escrowStatus === 'FUNDED' ? styles.pillWarn : styles.pill
                       }`}
                     >
-                      {order.escrowStatus}
+                      {t(`admin.escrowStatus.${order.escrowStatus}`)}
                     </span>
                   </td>
                   <td>
-                    <div>budget {order.budgetPi} π</div>
+                    <div>
+                      {t('admin.budget')} {order.budgetPi} π
+                    </div>
                     <div className="hint">
-                      paid {order.totalPaidPi} π · fee {order.clientFeePi} π · payout {order.masterPayoutPi} π
+                      {t('admin.paidLabel')} {order.totalPaidPi} π · {t('admin.feeLabel')} {order.clientFeePi} π ·{' '}
+                      {t('admin.payoutLabel')} {order.masterPayoutPi} π
                     </div>
                   </td>
                   <td>
@@ -188,7 +193,7 @@ export default function AdminOrders(): JSX.Element {
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
           >{t('admin.previous')}</button>
-          <span className="hint">Page {page}</span>
+          <span className="hint">{t('admin.pageNumber', { page })}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}

@@ -15,6 +15,9 @@ import { badRequest, conflict, notFound } from '../lib/errors';
 import { getSettings } from './settings';
 import { postTransaction } from './ledger';
 import { payReferralBonuses } from './referral';
+// Circular with paymentVerification, which is safe: each side only calls the
+// other inside function bodies, never while the module is loading.
+import { reconcileStuckPayments } from './paymentVerification';
 
 export interface OrderCharges {
   /** Held for the master. */
@@ -61,10 +64,15 @@ export async function fundEscrow(params: {
   clientId: string;
   piPaymentId: string;
   paidAmountPi: Prisma.Decimal;
+  /** Marks the payment granted; runs first so a duplicate grant rolls back. */
+  claim?: (tx: Prisma.TransactionClient) => Promise<void>;
 }): Promise<Order> {
   const settings = await getSettings();
 
   return prisma.$transaction(async (tx) => {
+    // Payment row first, then the order.
+    if (params.claim) await params.claim(tx);
+
     // Serialize everything that touches this order. Without the lock two
     // approvals of the same escrow payment both read escrowStatus = NONE, both
     // pass the guard below and both fund the order.
@@ -372,6 +380,9 @@ export async function lazySweep(intervalSeconds: number): Promise<void> {
   );
   await autoReleaseExpiredEscrows().catch((error) =>
     logger.error('Lazy sweep failed', { error: (error as Error).message }),
+  );
+  await reconcileStuckPayments().catch((error) =>
+    logger.error('Payment reconciliation failed', { error: (error as Error).message }),
   );
 }
 

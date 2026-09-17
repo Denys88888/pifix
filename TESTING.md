@@ -2,7 +2,7 @@
 
 ## Automated first
 
-Six suites, 197 assertions. All refuse to run with `NODE_ENV=production`.
+Six suites, 205 assertions. All refuse to run with `NODE_ENV=production`.
 `test:unit` needs nothing running; the rest need a database, and three of them
 need the fake Pi API as well.
 
@@ -19,7 +19,7 @@ integrity. Payment-gated transitions are seeded into exactly the
 state a verified payment produces; everything downstream runs through the real
 HTTP API.
 
-### Payment verification, adversarially — 51 assertions
+### Payment verification, adversarially — 59 assertions
 
 ```bash
 # terminal 1
@@ -123,7 +123,7 @@ and reopen the request.
 Like the payout suite, it first asserts the gate is switched on: with
 `REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
 
-Last full run: **48 + 46 + 51 + 24 + 17 + 11 = 197 passed, 0 failed** (2026-09-01, local).
+Last full run: **48 + 46 + 59 + 24 + 17 + 11 = 205 passed, 0 failed** (2026-09-17, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.

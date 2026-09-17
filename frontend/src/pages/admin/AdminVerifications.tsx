@@ -29,7 +29,7 @@ export default function AdminVerifications(): JSX.Element {
       setItems(result.items);
       setHasMore(result.hasMore);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Failed to load');
+      setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed'));
     }
   }, [page, status, search]);
 
@@ -40,14 +40,14 @@ export default function AdminVerifications(): JSX.Element {
   const decide = async (profile: MasterProfile, decision: 'approve' | 'reject') => {
     const note =
       decision === 'reject'
-        ? (window.prompt('Reason shown to the master (optional)') ?? undefined)
+        ? (window.prompt(t('admin.rejectReasonMaster')) ?? undefined)
         : undefined;
     setBusy(true);
     try {
       await adminApiClient.verifyMaster(profile.id, decision, note);
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Action failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
     } finally {
       setBusy(false);
     }
@@ -59,7 +59,7 @@ export default function AdminVerifications(): JSX.Element {
       await adminApiClient.blockUser(profile.userId, !profile.isBlocked);
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Action failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
     } finally {
       setBusy(false);
     }
@@ -80,7 +80,7 @@ export default function AdminVerifications(): JSX.Element {
             >
               {STATUSES.map((value) => (
                 <option key={value || 'all'} value={value}>
-                  {value || 'All'}
+                  {value ? t(`admin.verificationStatus.${value}`) : t('admin.all')}
                 </option>
               ))}
             </select>
@@ -113,9 +113,9 @@ export default function AdminVerifications(): JSX.Element {
                         : styles.pillBad
                   }`}
                 >
-                  {profile.verificationStatus}
+                  {t(`admin.verificationStatus.${profile.verificationStatus}`)}
                 </span>
-                <span className={styles.pill}>{profile.completedJobs} jobs</span>
+                <span className={styles.pill}>{t('admin.jobsDone', { count: profile.completedJobs })}</span>
                 <span className={styles.pill}>
                   ★ {profile.ratingAvg.toFixed(1)} ({profile.ratingCount})
                 </span>
@@ -188,7 +188,7 @@ export default function AdminVerifications(): JSX.Element {
           disabled={page === 1}
           onClick={() => setPage((current) => Math.max(1, current - 1))}
         >{t('admin.previous')}</button>
-        <span className="hint">Page {page}</span>
+        <span className="hint">{t('admin.pageNumber', { page })}</span>
         <button
           className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
           disabled={!hasMore}

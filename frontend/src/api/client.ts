@@ -114,6 +114,24 @@ export function getAdminToken(): string | null {
   return adminToken;
 }
 
+/**
+ * Whether the stored admin token is still valid for at least `seconds`.
+ * Only the `exp` claim is read — the signature is the server's business; this
+ * is here so the panel does not ask for a new token it does not need, and does
+ * not start a page with one that expires mid-request.
+ */
+export function adminTokenUsableFor(seconds: number): boolean {
+  const token = getAdminToken();
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1] ?? '')) as { exp?: number };
+    if (!payload.exp) return false;
+    return payload.exp * 1000 - Date.now() > seconds * 1000;
+  } catch {
+    return false;
+  }
+}
+
 export const adminApi: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 30_000,

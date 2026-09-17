@@ -649,6 +649,24 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
     metadata: { withdrawalId: withdrawal.id },
   });
 
+  if (!payout.ok && payout.uncertain) {
+    // The Pi may already be in the wallet. The balance stays debited and the
+    // request stays APPROVED, which the check above refuses to pay again until
+    // someone has looked the payment up on the Pi side.
+    await prisma.withdrawalRequest.update({
+      where: { id },
+      data: {
+        piPaymentId: payout.piPaymentId ?? null,
+        adminNote: `Payout outcome unknown — check Pi payment ${payout.piPaymentId ?? '?'} before retrying`.slice(0, 500),
+      },
+    });
+    await audit(req.admin!.username, 'withdrawal:unconfirmed', id, { piPaymentId: payout.piPaymentId });
+    throw conflict(
+      'needs_reconciliation',
+      'The transfer was sent but not confirmed — check it on the Pi side before retrying',
+    );
+  }
+
   if (!payout.ok) {
     // Give the money back and reopen the request so it can be retried.
     await prisma.$transaction(async (tx) => {

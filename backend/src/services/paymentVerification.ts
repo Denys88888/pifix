@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { logger } from '../lib/logger';
 import { money, toPi } from '../lib/money';
-import { badRequest, conflict, forbidden, notFound } from '../lib/errors';
+import { AppError, badRequest, conflict, forbidden, notFound } from '../lib/errors';
 import { approvePayment, cancelPayment, completePayment, getPayment, type PiPaymentDTO } from './piApi';
 import { getSettings } from './settings';
 import { computeOrderCharges, fundEscrow } from './escrow';
@@ -166,6 +166,24 @@ async function assertIntentAllowed(intent: PaymentIntent, user: User): Promise<v
  * Nothing is granted here — the payment is only allowed to proceed on-chain.
  */
 export async function approveIncomingPayment(piPaymentId: string, user: User) {
+  // A payment that has already been granted is finished for good. Without this
+  // the upsert below rewrote it to PENDING, `complete` then saw a payment that
+  // was not granted yet, and the same on-chain transaction bought a second
+  // month of PRO — and a third, as often as the request was repeated.
+  const known = await prisma.payment.findUnique({ where: { piPaymentId } });
+  if (known && known.userId !== user.id) {
+    throw forbidden('payment_owner_mismatch', 'This payment belongs to another user');
+  }
+  if (known?.completedAt) {
+    return {
+      piPaymentId,
+      status: PaymentStatus.COMPLETED,
+      amountPi: money(known.amountPi),
+      purpose: known.type,
+      alreadyProcessed: true,
+    };
+  }
+
   const piPayment = await getPayment(piPaymentId);
   assertOwnership(piPayment, user);
 
@@ -225,7 +243,7 @@ export async function approveIncomingPayment(piPaymentId: string, user: User) {
 export async function completeIncomingPayment(piPaymentId: string, txid: string, user: User) {
   const existing = await prisma.payment.findUnique({ where: { piPaymentId } });
 
-  if (existing?.status === PaymentStatus.COMPLETED) {
+  if (existing?.completedAt) {
     // Pi may re-fire the callback; the grant already happened.
     return { piPaymentId, status: PaymentStatus.COMPLETED, alreadyProcessed: true };
   }
@@ -250,54 +268,87 @@ export async function completeIncomingPayment(piPaymentId: string, txid: string,
 
   const intent = parseIntent(verified);
   const amount = toPi(verified.amount);
+  const chainTxid = verified.transaction.txid;
 
-  // Claim the payment before granting anything. The COMPLETED check at the top
-  // of this function only rules out a *sequential* re-fire: between that read
-  // and this write sit three Pi API round-trips, and two callbacks that arrive
-  // inside that window both pass it. A plain `update` cannot separate them —
-  // both would write COMPLETED and both would go on to executeIntent, which for
-  // SUBSCRIPTION reads proUntil and extends it, handing out 60 days for one
-  // payment, and for CONNECT creates a second response row.
+  // The grant and the COMPLETED mark are written in ONE database transaction,
+  // and the mark goes first. It is a compare-and-swap on `completedAt IS NULL`,
+  // so it row-locks the payment: a concurrent callback waits there, then
+  // matches nothing and rolls back before granting anything.
   //
-  // `updateMany` with the status in the WHERE clause makes the transition a
-  // compare-and-swap: exactly one caller matches a row, the loser matches none.
-  const claimed = await prisma.payment.updateMany({
-    where: { piPaymentId, status: { not: PaymentStatus.COMPLETED } },
-    data: {
-      status: PaymentStatus.COMPLETED,
-      txid: verified.transaction.txid,
-      completedAt: new Date(),
-    },
-  });
-
-  if (claimed.count === 0) {
-    // Either a concurrent callback won the claim, or there is no payment row at
-    // all — handleIncompletePayment() reaches here for payments this server
-    // never approved, and that case has to keep answering 404 as it did when
-    // this was an `update`.
-    const current = await prisma.payment.findUnique({ where: { piPaymentId } });
-    if (!current) throw notFound('payment_not_found', 'Payment not found');
-    return { piPaymentId, status: PaymentStatus.COMPLETED, alreadyProcessed: true };
+  // Marking the payment complete *before* granting, in a separate statement,
+  // meant a restart between the two left a paid payment with nothing granted
+  // and no way to retry, because every retry saw COMPLETED and stopped. Now
+  // both are committed or neither is, and a payment that is still incomplete
+  // is picked up again by reconcileStuckPayments().
+  let result: Record<string, unknown>;
+  try {
+    result = await executeIntent(intent, user, piPaymentId, amount, (tx) =>
+      claimGrant(tx, piPaymentId, chainTxid),
+    );
+  } catch (error) {
+    if (error instanceof AlreadyGranted) {
+      // handleIncompletePayment() reaches here for payments this server never
+      // approved; that case keeps answering 404.
+      const current = await prisma.payment.findUnique({ where: { piPaymentId } });
+      if (!current) throw notFound('payment_not_found', 'Payment not found');
+      return { piPaymentId, status: PaymentStatus.COMPLETED, alreadyProcessed: true };
+    }
+    if (error instanceof AppError && error.status < 500) {
+      // A business rule refused the grant (the order closed while the pioneer
+      // was signing, say). Retrying cannot change that, so the payment is parked
+      // as ERROR where the admin sees it instead of being retried forever.
+      await prisma.payment
+        .updateMany({
+          where: { piPaymentId, completedAt: null },
+          data: {
+            status: PaymentStatus.ERROR,
+            txid: chainTxid,
+            errorText: `${error.code}: ${error.message}`.slice(0, 500),
+          },
+        })
+        .catch(() => undefined);
+      logger.error('Paid payment could not be granted — needs an admin', {
+        piPaymentId,
+        purpose: intent.purpose,
+        code: error.code,
+      });
+    }
+    throw error;
   }
-
-  const result = await executeIntent(intent, user, piPaymentId, amount);
 
   logger.info('Payment completed', {
     piPaymentId,
     purpose: intent.purpose,
     amount: money(amount),
-    txid: verified.transaction.txid,
+    txid: chainTxid,
   });
 
   return { piPaymentId, status: PaymentStatus.COMPLETED, purpose: intent.purpose, ...result };
 }
 
-/** Grants what the payment bought. Runs only after on-chain verification. */
+type Tx = Prisma.TransactionClient;
+type Claim = (tx: Tx) => Promise<void>;
+
+class AlreadyGranted extends Error {}
+
+async function claimGrant(tx: Tx, piPaymentId: string, txid: string): Promise<void> {
+  const claimed = await tx.payment.updateMany({
+    where: { piPaymentId, completedAt: null },
+    data: { status: PaymentStatus.COMPLETED, txid, completedAt: new Date(), errorText: null },
+  });
+  if (claimed.count === 0) throw new AlreadyGranted();
+}
+
+/**
+ * Grants what the payment bought. Runs only after on-chain verification, and
+ * always inside the same transaction as `claim`, which marks the payment done.
+ */
 async function executeIntent(
   intent: PaymentIntent,
   user: User,
   piPaymentId: string,
   amount: Prisma.Decimal,
+  claim: Claim,
 ): Promise<Record<string, unknown>> {
   const settings = await getSettings();
 
@@ -305,6 +356,7 @@ async function executeIntent(
     case 'CONNECT': {
       await assertIntentAllowed(intent, user);
       const response = await prisma.$transaction(async (tx) => {
+        await claim(tx);
         const created = await tx.response.create({
           data: {
             orderId: intent.orderId,
@@ -341,44 +393,100 @@ async function executeIntent(
         clientId: user.id,
         piPaymentId,
         paidAmountPi: amount,
+        claim,
       });
       return { orderId: order.id, orderStatus: order.status };
     }
 
     case 'BOOST': {
       const until = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      await prisma.masterProfile.update({ where: { userId: user.id }, data: { boostedUntil: until } });
-      await prisma.transaction.create({
-        data: {
-          userId: user.id,
-          type: TransactionType.BOOST,
-          amountPi: amount.negated(),
-          balanceAfter: user.balancePi,
-          description: 'Profile boost (7 days)',
-          affectsBalance: false,
-        },
+      await prisma.$transaction(async (tx) => {
+        await claim(tx);
+        await tx.masterProfile.update({ where: { userId: user.id }, data: { boostedUntil: until } });
+        await tx.transaction.create({
+          data: {
+            userId: user.id,
+            type: TransactionType.BOOST,
+            amountPi: amount.negated(),
+            balanceAfter: user.balancePi,
+            description: 'Profile boost (7 days)',
+            affectsBalance: false,
+          },
+        });
       });
       return { boostedUntil: until.toISOString() };
     }
 
     case 'SUBSCRIPTION': {
-      const profile = await prisma.masterProfile.findUniqueOrThrow({ where: { userId: user.id } });
-      const base = profile.proUntil && profile.proUntil > new Date() ? profile.proUntil : new Date();
-      const until = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000);
-      await prisma.masterProfile.update({ where: { userId: user.id }, data: { proUntil: until } });
-      await prisma.transaction.create({
-        data: {
-          userId: user.id,
-          type: TransactionType.SUBSCRIPTION,
-          amountPi: amount.negated(),
-          balanceAfter: user.balancePi,
-          description: `PRO subscription (30 days, ${money(settings.proSubscriptionPricePi)} Pi)`,
-          affectsBalance: false,
-        },
+      const until = await prisma.$transaction(async (tx) => {
+        await claim(tx);
+        // Read after the claim: its row lock is what keeps this read and the
+        // write below from being repeated by a second grant.
+        const profile = await tx.masterProfile.findUniqueOrThrow({ where: { userId: user.id } });
+        const base = profile.proUntil && profile.proUntil > new Date() ? profile.proUntil : new Date();
+        const next = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000);
+        await tx.masterProfile.update({ where: { userId: user.id }, data: { proUntil: next } });
+        await tx.transaction.create({
+          data: {
+            userId: user.id,
+            type: TransactionType.SUBSCRIPTION,
+            amountPi: amount.negated(),
+            balanceAfter: user.balancePi,
+            description: `PRO subscription (30 days, ${money(settings.proSubscriptionPricePi)} Pi)`,
+            affectsBalance: false,
+          },
+        });
+        return next;
       });
       return { proUntil: until.toISOString() };
     }
   }
+}
+
+/** How long a paid-but-ungranted payment is left to its own callbacks. */
+const STUCK_AFTER_MS = 5 * 60 * 1000;
+
+/**
+ * Finishes user→app payments that were approved but never granted — the
+ * server restarted mid-way, or the pioneer closed Pi Browser after signing.
+ * Once this server has told Pi the payment is complete, Pi stops offering it
+ * to onIncompletePaymentFound, so nothing else would ever pick it up.
+ */
+export async function reconcileStuckPayments(limit = 20): Promise<number> {
+  const stuck = await prisma.payment.findMany({
+    where: {
+      direction: PaymentDirection.U2A,
+      status: { in: [PaymentStatus.PENDING, PaymentStatus.APPROVED] },
+      completedAt: null,
+      updatedAt: { lt: new Date(Date.now() - STUCK_AFTER_MS) },
+    },
+    include: { user: true },
+    orderBy: { updatedAt: 'asc' },
+    take: limit,
+  });
+
+  let finished = 0;
+  for (const payment of stuck) {
+    try {
+      const piPayment = await getPayment(payment.piPaymentId);
+      if (piPayment.status.cancelled || piPayment.status.user_cancelled) {
+        await markCancelled(payment.piPaymentId);
+        continue;
+      }
+      // Not signed yet: nothing has moved, and Pi expires it on its own.
+      if (!piPayment.transaction?.txid) continue;
+
+      await completeIncomingPayment(payment.piPaymentId, piPayment.transaction.txid, payment.user);
+      finished += 1;
+      logger.warn('Recovered a paid payment that was never granted', { piPaymentId: payment.piPaymentId });
+    } catch (error) {
+      logger.error('Could not reconcile a stuck payment', {
+        piPaymentId: payment.piPaymentId,
+        error: (error as Error).message,
+      });
+    }
+  }
+  return finished;
 }
 
 /**

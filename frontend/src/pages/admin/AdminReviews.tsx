@@ -22,7 +22,7 @@ export default function AdminReviews(): JSX.Element {
       setItems(result.items);
       setHasMore(result.hasMore);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Failed to load');
+      setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed'));
     }
   }, [page, hidden]);
 
@@ -36,7 +36,7 @@ export default function AdminReviews(): JSX.Element {
       await adminApiClient.hideReview(review.id, !review.isHidden);
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Action failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
     } finally {
       setBusy(false);
     }
@@ -121,7 +121,7 @@ export default function AdminReviews(): JSX.Element {
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
           >{t('admin.previous')}</button>
-          <span className="hint">Page {page}</span>
+          <span className="hint">{t('admin.pageNumber', { page })}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}

@@ -16,7 +16,7 @@
  * ("auth.piNoResponse") on the first load after a deploy and only comes good on
  * the next one — seen for real in Pi Browser. The manifest is precached, so a
  * new icon set is invisible to "Add to Home Screen" until this changes too. */
-const VERSION = 'pifix-v9';
+const VERSION = 'pifix-v11';
 const STATIC_CACHE = `${VERSION}-static`;
 const SHELL_CACHE = `${VERSION}-shell`;
 const SHELL_URL = '/index.html';
@@ -104,8 +104,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          void caches.open(SHELL_CACHE).then((cache) => cache.put(SHELL_URL, copy));
+          // Only a good page may become the offline shell; caching a 5xx here
+          // would show the error screen every time the network drops.
+          if (response.ok) {
+            const copy = response.clone();
+            void caches.open(SHELL_CACHE).then((cache) => cache.put(SHELL_URL, copy));
+          }
           return response;
         })
         .catch(() => caches.match(SHELL_URL).then((cached) => cached ?? Response.error())),

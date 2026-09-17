@@ -2,17 +2,24 @@ import { Router } from 'express';
 import { asyncHandler } from '../middleware/validate';
 import { requireAdmin } from '../middleware/adminAuth';
 import { requireAuth } from '../middleware/auth';
-import { adminLoginLimiter } from '../middleware/rateLimit';
+import { adminLoginLimiter, piAdminLimiter } from '../middleware/rateLimit';
 import * as admin from '../controllers/adminController';
 
 export const adminRouter = Router();
 
 adminRouter.post('/login', adminLoginLimiter, asyncHandler(admin.adminLogin));
 
-// The developer's own Pi session, traded for an admin token. Rate-limited like
-// the password door because it is one, and guarded by requireAuth so only a
-// Pi-verified identity ever reaches the check.
-adminRouter.post('/login-pi', adminLoginLimiter, requireAuth, asyncHandler(admin.adminLoginWithPi));
+/*
+ * The developer's own Pi session, traded for an admin token.
+ *
+ * NOT the password limiter: there is no secret to guess here — requireAuth has
+ * already proved who the caller is, and the uid either is in ADMIN_UIDS or is
+ * not. Sharing the 10-per-15-minutes brake meant the panel locked the developer
+ * out of their own phone after ten openings and dropped them on the password
+ * page with no explanation. The brake that belongs here is per-user and only
+ * has to stop a loop, so requireAuth runs first and the key is the user id.
+ */
+adminRouter.post('/login-pi', requireAuth, piAdminLimiter, asyncHandler(admin.adminLoginWithPi));
 
 // Everything below requires a valid admin JWT or HTTP Basic Auth.
 adminRouter.use(requireAdmin);

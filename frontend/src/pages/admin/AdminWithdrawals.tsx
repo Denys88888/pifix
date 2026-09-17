@@ -25,7 +25,7 @@ export default function AdminWithdrawals(): JSX.Element {
       setItems(result.items);
       setHasMore(result.hasMore);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Failed to load');
+      setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed'));
     }
   }, [page, status]);
 
@@ -35,8 +35,11 @@ export default function AdminWithdrawals(): JSX.Element {
 
   const pay = async (withdrawal: Withdrawal) => {
     const confirmed = window.confirm(
-      `Send ${withdrawal.amountPi} π to ${withdrawal.walletAddress} (@${withdrawal.username})?\n\n` +
-        t('admin.payoutConfirm'),
+      `${t('admin.payoutAsk', {
+        amount: withdrawal.amountPi,
+        wallet: withdrawal.walletAddress,
+        user: withdrawal.username ?? '—',
+      })}\n\n${t('admin.payoutConfirm')}`,
     );
     if (!confirmed) return;
 
@@ -45,23 +48,23 @@ export default function AdminWithdrawals(): JSX.Element {
     setMessage(null);
     try {
       const updated = await adminApiClient.payWithdrawal(withdrawal.id);
-      setMessage(`Paid. txid: ${updated.txid ?? '—'}`);
+      setMessage(t('admin.paidWithTx', { txid: updated.txid ?? '—' }));
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Payout failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.payoutFailed'));
     } finally {
       setBusyId(null);
     }
   };
 
   const reject = async (withdrawal: Withdrawal) => {
-    const note = window.prompt('Reason for rejection') ?? undefined;
+    const note = window.prompt(t('admin.rejectReason')) ?? undefined;
     setBusyId(withdrawal.id);
     try {
       await adminApiClient.rejectWithdrawal(withdrawal.id, note);
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'Action failed');
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
     } finally {
       setBusyId(null);
     }
@@ -82,7 +85,7 @@ export default function AdminWithdrawals(): JSX.Element {
             >
               {STATUSES.map((value) => (
                 <option key={value || 'all'} value={value}>
-                  {value || 'All'}
+                  {value ? t(`withdrawalStatus.${value}`) : t('admin.all')}
                 </option>
               ))}
             </select>
@@ -127,7 +130,7 @@ export default function AdminWithdrawals(): JSX.Element {
                             : styles.pillWarn
                       }`}
                     >
-                      {withdrawal.status}
+                      {t(`withdrawalStatus.${withdrawal.status}`)}
                     </span>
                     {withdrawal.adminNote ? <div className="hint">{withdrawal.adminNote}</div> : null}
                   </td>
@@ -165,7 +168,7 @@ export default function AdminWithdrawals(): JSX.Element {
             disabled={page === 1}
             onClick={() => setPage((current) => Math.max(1, current - 1))}
           >{t('admin.previous')}</button>
-          <span className="hint">Page {page}</span>
+          <span className="hint">{t('admin.pageNumber', { page })}</span>
           <button
             className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
             disabled={!hasMore}

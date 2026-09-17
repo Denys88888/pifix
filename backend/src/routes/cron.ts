@@ -5,6 +5,7 @@ import { unauthorized } from '../lib/errors';
 import { asyncHandler } from '../middleware/validate';
 import { autoReleaseExpiredEscrows, expireStaleOrders } from '../services/escrow';
 import { clearIncompleteServerPayments } from '../services/piPayouts';
+import { reconcileStuckPayments } from '../services/paymentVerification';
 
 export const cronRouter = Router();
 
@@ -34,7 +35,8 @@ cronRouter.post(
     const released = await autoReleaseExpiredEscrows(200);
     const expired = await expireStaleOrders(200);
     await clearIncompleteServerPayments().catch(() => undefined);
+    const recovered = await reconcileStuckPayments().catch(() => 0);
 
-    res.json({ ok: true, released, at: new Date().toISOString() });
+    res.json({ ok: true, released, expired, recovered, at: new Date().toISOString() });
   }),
 );

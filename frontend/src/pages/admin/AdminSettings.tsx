@@ -53,7 +53,7 @@ export default function AdminSettings(): JSX.Element {
         setSupportContact(settings.supportContact ?? '');
         setUpdatedAt(settings.updatedAt);
       })
-      .catch((caught: unknown) => setError(caught instanceof ApiError ? caught.message : 'Failed to load'))
+      .catch((caught: unknown) => setError(caught instanceof ApiError ? caught.message : t('admin.loadFailed')))
       .finally(() => setLoading(false));
   }, []);
 

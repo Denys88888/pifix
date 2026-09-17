@@ -579,7 +579,34 @@
       "label": "Support contact",
       "placeholder": "email, Telegram, anything a person can reach you at",
       "hint": "Shown in the profile and in the privacy policy. Leave empty to hide it — an address nobody reads is worse than none."
-    }
+    },
+    "pageNumber": "Page {{page}}",
+    "payoutAsk": "Send {{amount}} π to {{wallet}} (@{{user}})?",
+    "paidWithTx": "Paid. Transaction: {{txid}}",
+    "payoutFailed": "Payout failed",
+    "rejectReason": "Reason for rejection",
+    "rejectReasonMaster": "Reason shown to the master (optional)",
+    "actionFailed": "Action failed",
+    "budget": "budget",
+    "paidLabel": "paid",
+    "feeLabel": "fee",
+    "payoutLabel": "payout",
+    "jobsDone_one": "{{count}} job",
+    "jobsDone_other": "{{count}} jobs",
+    "verificationStatus": {
+      "UNVERIFIED": "Unverified",
+      "PENDING": "Pending review",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected"
+    },
+    "escrowStatus": {
+      "NONE": "No escrow",
+      "FUNDED": "Funds held",
+      "RELEASED": "Released to master",
+      "REFUNDED": "Refunded to client"
+    },
+    "enterWithPi": "Enter as the Pi developer",
+    "piEntranceFailed": "The Pi entrance did not open"
   },
   "support": {
     "title": "Contact us",

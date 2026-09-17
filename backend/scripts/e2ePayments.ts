@@ -288,6 +288,31 @@ async function main() {
   const responseCount = await prisma.response.count({ where: { orderId } });
   check('replay did not create a second response', responseCount === 1, String(responseCount));
 
+  // A finished payment sent back through approve used to be rewritten to
+  // PENDING, after which complete granted it again — a free month per replay.
+  const subPrice = Number(settings.proSubscriptionPricePi);
+  const sub = await craftPayment({ uid: masterUid, amount: subPrice, metadata: { purpose: 'SUBSCRIPTION' } });
+  await api('POST', '/payments/approve', { token: masterJwt, body: { paymentId: sub } });
+  const subDone = await api('POST', '/payments/complete', {
+    token: masterJwt, body: { paymentId: sub, txid: `tx_sub_${RUN}` },
+  });
+  check('subscription granted', subDone.status === 200 && !!subDone.body?.proUntil, JSON.stringify(subDone.body).slice(0, 120));
+  const proBefore = (await prisma.masterProfile.findUniqueOrThrow({ where: { id: profileId } })).proUntil;
+
+  const reApprove = await api('POST', '/payments/approve', { token: masterJwt, body: { paymentId: sub } });
+  check('approving a completed payment again changes nothing',
+    reApprove.status === 200 && reApprove.body?.alreadyProcessed === true, JSON.stringify(reApprove.body).slice(0, 120));
+  const subRow = await prisma.payment.findUniqueOrThrow({ where: { piPaymentId: sub } });
+  check('the completed payment keeps its status', subRow.status === 'COMPLETED', subRow.status);
+  const reComplete = await api('POST', '/payments/complete', {
+    token: masterJwt, body: { paymentId: sub, txid: `tx_sub_${RUN}` },
+  });
+  check('completing it again is refused as already processed',
+    reComplete.body?.alreadyProcessed === true, JSON.stringify(reComplete.body).slice(0, 120));
+  const proAfter = (await prisma.masterProfile.findUniqueOrThrow({ where: { id: profileId } })).proUntil;
+  check('the replay did not extend PRO', proAfter?.getTime() === proBefore?.getTime(),
+    `${proBefore?.toISOString()} → ${proAfter?.toISOString()}`);
+
   // Same master responding twice.
   const dupe = await craftPayment({
     uid: masterUid, amount: connectPrice,
@@ -459,6 +484,40 @@ async function main() {
   check('THE PURCHASE WAS DELIVERED — the response the master paid for exists',
     grantedResponse !== null,
     'the master was charged and got nothing');
+
+  /*
+   * The server told Pi the payment was complete and then died before granting.
+   * Pi no longer offers such a payment to onIncompletePaymentFound, so only
+   * the server's own sweep can finish it.
+   */
+  const boostPrice = Number(settings.profileBoostPricePi);
+  const crashed = await craftPayment({ uid: masterUid, amount: boostPrice, metadata: { purpose: 'BOOST' } });
+  await api('POST', '/payments/approve', { token: masterJwt, body: { paymentId: crashed } });
+  await control('/_control/payment', {
+    identifier: crashed,
+    user_uid: masterUid,
+    amount: boostPrice,
+    memo: 'test',
+    metadata: { purpose: 'BOOST' },
+    developer_approved: true,
+    transaction_verified: true,
+    developer_completed: true,
+    txid: `tx_crashed_${RUN}`,
+  });
+  await prisma.$executeRaw`UPDATE payments SET "updatedAt" = NOW() - INTERVAL '10 minutes' WHERE "piPaymentId" = ${crashed}`;
+  await prisma.masterProfile.update({ where: { id: profileId }, data: { boostedUntil: null } });
+
+  const sweep = await fetch(`${API}/cron/auto-release`, {
+    method: 'POST',
+    headers: { 'X-Cron-Secret': process.env.CRON_SECRET ?? '' },
+  }).then((r) => r.json() as Promise<{ recovered?: number }>);
+  check('the sweep reports a recovered payment', (sweep.recovered ?? 0) >= 1, JSON.stringify(sweep));
+  const crashedRow = await prisma.payment.findUniqueOrThrow({ where: { piPaymentId: crashed } });
+  check('the crashed payment is now COMPLETED', crashedRow.status === 'COMPLETED' && !!crashedRow.completedAt,
+    crashedRow.status);
+  const boosted = await prisma.masterProfile.findUniqueOrThrow({ where: { id: profileId } });
+  check('and the boost it paid for was granted', !!boosted.boostedUntil && boosted.boostedUntil > new Date(),
+    String(boosted.boostedUntil));
 
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);
   if (fail > 0) {

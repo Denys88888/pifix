@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { getAdminToken, setAdminToken } from '../../api/client';
+import { adminTokenUsableFor, getAdminToken, setAdminToken } from '../../api/client';
 import { adminApiClient } from '../../api/endpoints';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/Admin.module.css';
@@ -27,16 +27,20 @@ export default function AdminLayout(): JSX.Element {
    * before falling back to the password page. On a desktop, where there is no
    * Pi session, this does nothing and the password page appears as before.
    *
-   * A Pi admin mints a fresh token on every mount rather than reusing whatever
-   * is in sessionStorage. Admin tokens last 12 hours and the Pi session lasts
-   * far longer, so trusting the stored one left the panel showing "Admin
-   * session expired" with no way out — the recovery is one cheap call, and the
-   * stale token is the only thing standing in front of it.
+   * A Pi admin reuses the stored token while it is still good for a few more
+   * minutes and only mints a new one otherwise. Minting on every single mount
+   * spent the server's per-user allowance on openings that already had a
+   * working token, and once it ran out the panel dropped to the password page.
    */
   useEffect(() => {
     if (status === 'booting' || status === 'signing_in') return;
 
     const piAdmin = status === 'signed_in' && user?.isAdmin === true;
+
+    if (piAdmin && adminTokenUsableFor(5 * 60)) {
+      setChecking(false);
+      return;
+    }
 
     if (!piAdmin) {
       // No Pi session to trade: the stored token is all there is.
@@ -76,7 +80,9 @@ export default function AdminLayout(): JSX.Element {
 
   const signOut = () => {
     setAdminToken(null);
-    navigate('/admin/login', { replace: true });
+    // A Pi admin sent to the login page would be let straight back in by their
+    // own Pi session, so "sign out" takes them back to the app instead.
+    navigate(status === 'signed_in' && user?.isAdmin ? '/' : '/admin/login', { replace: true });
   };
 
   return (
