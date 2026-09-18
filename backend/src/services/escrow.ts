@@ -15,6 +15,7 @@ import { badRequest, conflict, notFound } from '../lib/errors';
 import { getSettings } from './settings';
 import { postTransaction } from './ledger';
 import { payReferralBonuses } from './referral';
+import { adminNote } from '../lib/adminNotes';
 // Circular with paymentVerification, which is safe: each side only calls the
 // other inside function bodies, never while the module is loading.
 import { reconcileStuckPayments } from './paymentVerification';
@@ -408,7 +409,7 @@ async function maybeAutoWithdraw(userId: string, settings: PlatformSettings): Pr
       userId,
       amountPi: toPi(user.balancePi),
       walletAddress: user.walletAddress,
-      adminNote: 'Created automatically (auto_withdrawal_pi threshold reached)',
+      adminNote: adminNote('auto_created'),
     },
   });
   logger.info('Auto-withdrawal request created', { userId, amount: money(user.balancePi) });

@@ -611,7 +611,22 @@
     "checking": "Checking…",
     "reconciledPaid": "Found on the ledger, the request is closed. Transaction: {{txid}}",
     "reconciledRestored": "Not on the ledger — the balance was restored and the request reopened.",
-    "unconfirmedHint": "The transfer was sent but never confirmed. Press \"Check the transfer\": the server looks it up on the ledger and either closes the request or gives the money back."
+    "unconfirmedHint": "The transfer was sent but never confirmed. Press \"Check the transfer\": the server looks it up on the ledger and either closes the request or gives the money back.",
+    "note": {
+      "cancelled_by_user": "Cancelled by the user",
+      "rejected_by_admin": "Rejected by the admin",
+      "auto_created": "Created automatically: the balance reached the auto-withdrawal threshold",
+      "payout_failed": "Payout failed: {{detail}}. The balance was restored.",
+      "payout_unconfirmed": "Transfer sent but not confirmed (Pi payment {{detail}}). Do not pay again — press \"Check the transfer\".",
+      "reconciled_paid": "Found on the ledger — the request is closed",
+      "reconciled_restored": "Not on the ledger — the balance was restored and the request reopened"
+    },
+    "payoutError": {
+      "kyc_required": "the user has not passed KYC",
+      "payouts_disabled": "payouts are off (no app wallet configured)",
+      "payout_busy": "another payout was running, try again",
+      "amount_not_positive": "the amount must be above zero"
+    }
   },
   "support": {
     "title": "Contact us",

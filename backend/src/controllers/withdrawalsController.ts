@@ -7,6 +7,7 @@ import { badRequest, conflict } from '../lib/errors';
 import { money, toPi } from '../lib/money';
 import { paginate, withdrawalDTO } from '../lib/serializers';
 import { getSettings } from '../services/settings';
+import { adminNote } from '../lib/adminNotes';
 import { payoutsRequireKyc } from '../services/piPayouts';
 
 export const requestWithdrawalSchema = z.object({
@@ -102,7 +103,7 @@ export async function cancelWithdrawal(req: Request, res: Response): Promise<voi
 
   await prisma.withdrawalRequest.update({
     where: { id },
-    data: { status: WithdrawalStatus.REJECTED, adminNote: 'Cancelled by the user', processedAt: new Date() },
+    data: { status: WithdrawalStatus.REJECTED, adminNote: adminNote('cancelled_by_user'), processedAt: new Date() },
   });
 
   res.json({ ok: true });

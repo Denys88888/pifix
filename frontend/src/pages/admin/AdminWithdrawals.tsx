@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { Withdrawal } from '../../api/types';
@@ -7,6 +8,25 @@ import { formatDateTime } from '../../lib/format';
 import styles from '../../styles/Admin.module.css';
 
 const STATUSES = ['REQUESTED', 'APPROVED', 'PAID', 'REJECTED', ''];
+
+/** Payout errors the server reports by code; anything else is shown as sent. */
+const KNOWN_PAYOUT_ERRORS = ['kyc_required', 'payouts_disabled', 'payout_busy', 'amount_not_positive'];
+
+/**
+ * Notes the server writes are stored as `@code` or `@code: detail` (see
+ * backend/src/lib/adminNotes.ts) so they can be shown in the admin's language.
+ * A note an admin typed by hand has no `@` and is shown exactly as written.
+ */
+function formatAdminNote(note: string, t: TFunction): string {
+  const match = /^@([a-z_]+)(?::\s*(.*))?$/s.exec(note);
+  if (!match) return note;
+  const [, code, detail = ''] = match;
+  const reason =
+    code === 'payout_failed' && KNOWN_PAYOUT_ERRORS.includes(detail)
+      ? t(`admin.payoutError.${detail}`)
+      : detail;
+  return t(`admin.note.${code}`, { detail: reason, defaultValue: note });
+}
 
 export default function AdminWithdrawals(): JSX.Element {
   const { t } = useTranslation();
@@ -158,7 +178,9 @@ export default function AdminWithdrawals(): JSX.Element {
                     {withdrawal.status === 'APPROVED' ? (
                       <div className="hint">{t('admin.unconfirmedHint')}</div>
                     ) : null}
-                    {withdrawal.adminNote ? <div className="hint">{withdrawal.adminNote}</div> : null}
+                    {withdrawal.adminNote ? (
+                      <div className="hint">{formatAdminNote(withdrawal.adminNote, t)}</div>
+                    ) : null}
                   </td>
                   <td className="hint">{formatDateTime(withdrawal.createdAt)}</td>
                   <td>

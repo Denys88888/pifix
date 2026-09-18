@@ -19,6 +19,7 @@ import { getSettings, updateSettings } from '../services/settings';
 import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
 import { findOnChainByMemo, sendPayout } from '../services/piPayouts';
+import { adminNote } from '../lib/adminNotes';
 import { cancelPayment, completePayment, getPayment } from '../services/piApi';
 import { env } from '../config/env';
 
@@ -659,7 +660,7 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
       where: { id },
       data: {
         piPaymentId: payout.piPaymentId ?? null,
-        adminNote: `Payout outcome unknown — check Pi payment ${payout.piPaymentId ?? '?'} before retrying`.slice(0, 500),
+        adminNote: adminNote('payout_unconfirmed', payout.piPaymentId),
       },
     });
     await audit(req.admin!.username, 'withdrawal:unconfirmed', id, { piPaymentId: payout.piPaymentId });
@@ -682,7 +683,7 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
         where: { id },
         data: {
           status: WithdrawalStatus.REQUESTED,
-          adminNote: `Payout failed: ${payout.error ?? 'unknown error'}`.slice(0, 500),
+          adminNote: adminNote('payout_failed', payout.error ?? 'unknown error'),
         },
       });
     });
@@ -758,7 +759,7 @@ export async function reconcileWithdrawal(req: Request, res: Response): Promise<
         status: WithdrawalStatus.PAID,
         txid,
         processedAt: new Date(),
-        adminNote: 'Confirmed on the ledger after an unconfirmed transfer',
+        adminNote: adminNote('reconciled_paid'),
       },
       include: { user: { select: { username: true } } },
     });
@@ -780,7 +781,7 @@ export async function reconcileWithdrawal(req: Request, res: Response): Promise<
       data: {
         status: WithdrawalStatus.REQUESTED,
         piPaymentId: null,
-        adminNote: 'Transfer never reached the ledger — balance restored, request reopened',
+        adminNote: adminNote('reconciled_restored'),
       },
     });
     if (claimed.count === 0) throw conflict('already_reconciled', 'This request was just settled by someone else');
@@ -822,7 +823,7 @@ export async function rejectWithdrawal(req: Request, res: Response): Promise<voi
     where: { id },
     data: {
       status: WithdrawalStatus.REJECTED,
-      adminNote: input.note ?? 'Rejected by admin',
+      adminNote: input.note?.trim() ? input.note : adminNote('rejected_by_admin'),
       processedAt: new Date(),
     },
     include: { user: { select: { username: true } } },
