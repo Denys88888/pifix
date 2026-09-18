@@ -406,6 +406,13 @@ export const adminApiClient = {
     const { data } = await adminApi.post<{ withdrawal: Withdrawal }>(`/admin/withdrawals/${id}/reject`, { note });
     return data.withdrawal;
   },
+  /** Settles a payout whose transfer was never confirmed. */
+  async reconcileWithdrawal(id: string) {
+    const { data } = await adminApi.post<{ outcome: 'paid' | 'restored'; withdrawal: Withdrawal }>(
+      `/admin/withdrawals/${id}/reconcile`,
+    );
+    return data;
+  },
 };
 
 // ── Map ──────────────────────────────────────────────────────────────────────

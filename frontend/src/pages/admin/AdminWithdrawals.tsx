@@ -57,6 +57,29 @@ export default function AdminWithdrawals(): JSX.Element {
     }
   };
 
+  /**
+   * Only for a request left APPROVED by a transfer that never reported back.
+   * The server does the checking; this just asks and reports which way it went.
+   */
+  const reconcile = async (withdrawal: Withdrawal) => {
+    setBusyId(withdrawal.id);
+    setError(null);
+    setMessage(null);
+    try {
+      const result = await adminApiClient.reconcileWithdrawal(withdrawal.id);
+      setMessage(
+        result.outcome === 'paid'
+          ? t('admin.reconciledPaid', { txid: result.withdrawal.txid ?? '—' })
+          : t('admin.reconciledRestored'),
+      );
+      await load();
+    } catch (caught) {
+      setError(caught instanceof ApiError ? caught.message : t('admin.actionFailed'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const reject = async (withdrawal: Withdrawal) => {
     const note = window.prompt(t('admin.rejectReason')) ?? undefined;
     setBusyId(withdrawal.id);
@@ -132,18 +155,33 @@ export default function AdminWithdrawals(): JSX.Element {
                     >
                       {t(`withdrawalStatus.${withdrawal.status}`)}
                     </span>
+                    {withdrawal.status === 'APPROVED' ? (
+                      <div className="hint">{t('admin.unconfirmedHint')}</div>
+                    ) : null}
                     {withdrawal.adminNote ? <div className="hint">{withdrawal.adminNote}</div> : null}
                   </td>
                   <td className="hint">{formatDateTime(withdrawal.createdAt)}</td>
                   <td>
                     <div className={styles.actions}>
-                      <button
-                        className={styles.smallBtn}
-                        disabled={busyId === withdrawal.id || withdrawal.status === 'PAID'}
-                        onClick={() => void pay(withdrawal)}
-                      >
-                        {busyId === withdrawal.id ? t('admin.paying') : t('admin.payOut')}
-                      </button>
+                      {withdrawal.status === 'APPROVED' ? (
+                        // Paying again could pay twice, so the only safe move on
+                        // an unconfirmed transfer is to go and look it up.
+                        <button
+                          className={styles.smallBtn}
+                          disabled={busyId === withdrawal.id}
+                          onClick={() => void reconcile(withdrawal)}
+                        >
+                          {busyId === withdrawal.id ? t('admin.checking') : t('admin.checkTransfer')}
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.smallBtn}
+                          disabled={busyId === withdrawal.id || withdrawal.status === 'PAID'}
+                          onClick={() => void pay(withdrawal)}
+                        >
+                          {busyId === withdrawal.id ? t('admin.paying') : t('admin.payOut')}
+                        </button>
+                      )}
                       <button
                         className={`${styles.smallBtn} ${styles.smallBtnDanger}`}
                         disabled={busyId === withdrawal.id || withdrawal.status === 'PAID'}

@@ -294,6 +294,106 @@ async function main() {
   check('wallet-paid purchases recorded as history, outside the balance',
     walletPaid >= 3, `${walletPaid} rows`);
 
+  console.log('\n═══ 4. A transfer that was never confirmed ═══');
+
+  /**
+   * The state payWithdrawal leaves behind when the submit ends without an
+   * answer: the balance is already debited and the request sits APPROVED,
+   * because paying again and refunding are both ways to pay twice. Rebuilt
+   * here by hand — the real path needs a network that drops mid-request.
+   */
+  const stage = async (withTxid: boolean) => {
+    // One open request per user is the rule, and section 3 left one behind.
+    await prisma.withdrawalRequest.updateMany({
+      where: { userId: carol.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+      data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+    });
+    const opened = await api('POST', '/withdrawals', { token: carol.jwt, body: { amountPi: '5' } });
+    const id = opened.body?.withdrawal?.id as string;
+    if (!id) throw new Error(`staging failed: ${opened.status} ${JSON.stringify(opened.body).slice(0, 160)}`);
+    const identifier = nextId();
+    await control('/_control/payment', {
+      identifier,
+      user_uid: carol.uid,
+      amount: 5,
+      memo: 'PiFix withdrawal',
+      metadata: { withdrawalId: id },
+      direction: 'app_to_user',
+      transaction_verified: withTxid,
+      txid: withTxid ? `tx_unconfirmed_${identifier}` : undefined,
+    });
+
+    await prisma.$transaction(async (tx) => {
+      await tx.withdrawalRequest.update({
+        where: { id },
+        data: { status: 'APPROVED', piPaymentId: identifier },
+      });
+      const user = await tx.user.update({
+        where: { id: carol.id },
+        data: { balancePi: { decrement: 5 } },
+        select: { balancePi: true },
+      });
+      await tx.transaction.create({
+        data: {
+          userId: carol.id,
+          type: 'WITHDRAWAL',
+          amountPi: '-5',
+          balanceAfter: user.balancePi,
+          description: 'Withdrawal (staged by the test)',
+        },
+      });
+      await tx.payment.create({
+        data: {
+          piPaymentId: identifier,
+          userId: carol.id,
+          type: 'WITHDRAWAL',
+          direction: 'A2U',
+          status: 'APPROVED',
+          amountPi: '5',
+          memo: 'PiFix withdrawal',
+          approvedAt: new Date(),
+        },
+      });
+    });
+    // The endpoint refuses to judge a transfer that may still be settling.
+    await prisma.$executeRaw`UPDATE payments SET "updatedAt" = NOW() - INTERVAL '10 minutes' WHERE "piPaymentId" = ${identifier}`;
+    return id;
+  };
+
+  const landedId = await stage(true);
+  const balDebited = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  const landed = await api('POST', `/admin/withdrawals/${landedId}/reconcile`, { basic: ADMIN_BASIC });
+  check('a transfer found on the ledger closes the request',
+    landed.status === 200 && landed.body?.outcome === 'paid',
+    `got ${landed.status} ${JSON.stringify(landed.body).slice(0, 140)}`);
+  const landedRow = await prisma.withdrawalRequest.findUniqueOrThrow({ where: { id: landedId } });
+  check('it is PAID and carries the chain txid', landedRow.status === 'PAID' && !!landedRow.txid,
+    `${landedRow.status} / ${landedRow.txid}`);
+  const balStill = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  check('the balance stays debited — the Pi really left', balStill.equals(balDebited),
+    `${balDebited.toString()} → ${balStill.toString()}`);
+
+  const lostId = await stage(false);
+  const balBeforeRestore = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  const lost = await api('POST', `/admin/withdrawals/${lostId}/reconcile`, { basic: ADMIN_BASIC });
+  check('a transfer that is not on the ledger is written off',
+    lost.status === 200 && lost.body?.outcome === 'restored',
+    `got ${lost.status} ${JSON.stringify(lost.body).slice(0, 140)}`);
+  const lostRow = await prisma.withdrawalRequest.findUniqueOrThrow({ where: { id: lostId } });
+  check('the request reopens for a retry', lostRow.status === 'REQUESTED', lostRow.status);
+  const balRestored = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  check('AND THE MONEY COMES BACK', balRestored.equals(balBeforeRestore.add(5)),
+    `${balBeforeRestore.toString()} → ${balRestored.toString()}`);
+
+  const driftAfter: Array<{ username: string }> = await prisma.$queryRaw`
+    SELECT u.username FROM users u
+    LEFT JOIN transactions t ON t."userId" = u.id AND t."affectsBalance"
+    GROUP BY u.id, u.username, u."balancePi"
+    HAVING u."balancePi" <> COALESCE(SUM(t."amountPi"), 0)
+  `;
+  check('ledger still balances after both outcomes', driftAfter.length === 0,
+    JSON.stringify(driftAfter).slice(0, 200));
+
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);
   if (fail > 0) {
     console.log('\nFailures:');

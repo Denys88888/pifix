@@ -331,7 +331,7 @@ class SubmitOutcomeUnknown extends Error {}
  * few times because a transaction Horizon timed out on can still be sitting in
  * the queue and land seconds later.
  */
-async function findOnChainByMemo(memo: string, attempts = 4): Promise<string | null> {
+export async function findOnChainByMemo(memo: string, attempts = 4): Promise<string | null> {
   const account = appKeypair().publicKey();
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 5_000));

@@ -43,5 +43,7 @@ adminRouter.put('/settings', asyncHandler(admin.putAdminSettings));
 adminRouter.get('/withdrawals', asyncHandler(admin.listWithdrawals));
 adminRouter.post('/withdrawals/:id/pay', asyncHandler(admin.payWithdrawal));
 adminRouter.post('/withdrawals/:id/reject', asyncHandler(admin.rejectWithdrawal));
+// Settles a payout whose result was never confirmed, by asking Pi and the ledger.
+adminRouter.post('/withdrawals/:id/reconcile', asyncHandler(admin.reconcileWithdrawal));
 
 adminRouter.get('/audit-log', asyncHandler(admin.listAuditLog));

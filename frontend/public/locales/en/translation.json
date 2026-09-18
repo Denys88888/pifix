@@ -606,7 +606,12 @@
       "REFUNDED": "Refunded to client"
     },
     "enterWithPi": "Enter as the Pi developer",
-    "piEntranceFailed": "The Pi entrance did not open"
+    "piEntranceFailed": "The Pi entrance did not open",
+    "checkTransfer": "Check the transfer",
+    "checking": "Checking…",
+    "reconciledPaid": "Found on the ledger, the request is closed. Transaction: {{txid}}",
+    "reconciledRestored": "Not on the ledger — the balance was restored and the request reopened.",
+    "unconfirmedHint": "The transfer was sent but never confirmed. Press \"Check the transfer\": the server looks it up on the ledger and either closes the request or gives the money back."
   },
   "support": {
     "title": "Contact us",

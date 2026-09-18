@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import {
   EscrowStatus,
   OrderStatus,
+  PaymentStatus,
   Prisma,
   TransactionType,
   VerificationStatus,
@@ -17,7 +18,8 @@ import { isAdminPiUid, signAdminToken, verifyAdminCredentials } from '../middlew
 import { getSettings, updateSettings } from '../services/settings';
 import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
-import { sendPayout } from '../services/piPayouts';
+import { findOnChainByMemo, sendPayout } from '../services/piPayouts';
+import { cancelPayment, completePayment, getPayment } from '../services/piApi';
 import { env } from '../config/env';
 
 async function audit(actor: string, action: string, targetId?: string, details?: unknown): Promise<void> {
@@ -701,6 +703,109 @@ export async function payWithdrawal(req: Request, res: Response): Promise<void> 
 
   await audit(req.admin!.username, 'withdrawal:paid', id, { txid: payout.txid });
   res.json({ withdrawal: withdrawalDTO(updated) });
+}
+
+/** A payout may not be retried or written off until this much time has passed. */
+const RECONCILE_AFTER_MS = 5 * 60 * 1000;
+
+/**
+ * Settles a withdrawal whose transfer ended without an answer.
+ *
+ * `payWithdrawal` debits the balance and only then sends. When the send comes
+ * back unconfirmed the request is left APPROVED on purpose: paying again could
+ * pay twice, and crediting the balance back could pay twice as well, so it
+ * waits for an answer nobody had. This asks Pi and the ledger for that answer
+ * and acts only on a definite one — an unknown state changes nothing.
+ */
+export async function reconcileWithdrawal(req: Request, res: Response): Promise<void> {
+  const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+
+  const withdrawal = await prisma.withdrawalRequest.findUnique({ where: { id } });
+  if (!withdrawal) throw notFound('withdrawal_not_found', 'Withdrawal request not found');
+  if (withdrawal.status === WithdrawalStatus.PAID) {
+    throw conflict('already_paid', 'This withdrawal was already paid');
+  }
+  if (withdrawal.status !== WithdrawalStatus.APPROVED) {
+    throw conflict('nothing_to_reconcile', 'This request is not waiting on an unconfirmed transfer');
+  }
+  if (!withdrawal.piPaymentId) {
+    // Nothing to ask about: the payout failed before Pi ever created one.
+    throw badRequest('no_payment_id', 'This attempt never created a Pi payment — reject and reopen it instead');
+  }
+
+  const payment = await prisma.payment.findUnique({ where: { piPaymentId: withdrawal.piPaymentId } });
+  const age = Date.now() - (payment?.updatedAt ?? withdrawal.createdAt).getTime();
+  if (age < RECONCILE_AFTER_MS) {
+    throw conflict('too_soon', 'The transfer may still be settling — try again in a few minutes');
+  }
+
+  const piPayment = await getPayment(withdrawal.piPaymentId);
+  const txid = piPayment.transaction?.txid ?? (await findOnChainByMemo(withdrawal.piPaymentId, 2));
+
+  if (txid) {
+    // The Pi did leave the wallet. The balance was already debited, so the
+    // only thing left is to finish the paperwork on both sides.
+    await completePayment(withdrawal.piPaymentId, txid).catch((error) =>
+      logger.warn('Pi complete failed while reconciling', { id, error: (error as Error).message }),
+    );
+    await prisma.payment.updateMany({
+      where: { piPaymentId: withdrawal.piPaymentId },
+      data: { status: PaymentStatus.COMPLETED, txid, completedAt: new Date(), errorText: null },
+    });
+    const paid = await prisma.withdrawalRequest.update({
+      where: { id },
+      data: {
+        status: WithdrawalStatus.PAID,
+        txid,
+        processedAt: new Date(),
+        adminNote: 'Confirmed on the ledger after an unconfirmed transfer',
+      },
+      include: { user: { select: { username: true } } },
+    });
+    await audit(req.admin!.username, 'withdrawal:reconciled_paid', id, { txid });
+    res.json({ outcome: 'paid', withdrawal: withdrawalDTO(paid) });
+    return;
+  }
+
+  // Nothing on the ledger under this payment's memo. Cancel it on Pi so the
+  // transfer can never land later, then give the money back.
+  await cancelPayment(withdrawal.piPaymentId).catch((error) =>
+    logger.warn('Pi cancel failed while reconciling', { id, error: (error as Error).message }),
+  );
+
+  await prisma.$transaction(async (tx) => {
+    // Compare-and-swap: two admins pressing this together must not both credit.
+    const claimed = await tx.withdrawalRequest.updateMany({
+      where: { id, status: WithdrawalStatus.APPROVED },
+      data: {
+        status: WithdrawalStatus.REQUESTED,
+        piPaymentId: null,
+        adminNote: 'Transfer never reached the ledger — balance restored, request reopened',
+      },
+    });
+    if (claimed.count === 0) throw conflict('already_reconciled', 'This request was just settled by someone else');
+
+    await postTransaction(tx, {
+      userId: withdrawal.userId,
+      type: TransactionType.ADMIN_ADJUSTMENT,
+      amountPi: toPi(withdrawal.amountPi),
+      description: 'Unconfirmed payout was not on the ledger — balance restored',
+    });
+
+    await tx.payment.updateMany({
+      where: { piPaymentId: withdrawal.piPaymentId! },
+      data: { status: PaymentStatus.CANCELLED, cancelledAt: new Date() },
+    });
+  });
+
+  const reopened = await prisma.withdrawalRequest.findUniqueOrThrow({
+    where: { id },
+    include: { user: { select: { username: true } } },
+  });
+  await audit(req.admin!.username, 'withdrawal:reconciled_restored', id, {
+    piPaymentId: withdrawal.piPaymentId,
+  });
+  res.json({ outcome: 'restored', withdrawal: withdrawalDTO(reopened) });
 }
 
 export async function rejectWithdrawal(req: Request, res: Response): Promise<void> {
