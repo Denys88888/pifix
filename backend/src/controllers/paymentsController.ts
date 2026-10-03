@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
-import { notFound } from '../lib/errors';
+import { AppError, notFound } from '../lib/errors';
 import { money } from '../lib/money';
 import {
   approveIncomingPayment,
@@ -22,15 +22,63 @@ export const completeSchema = z.object({
  */
 export async function approve(req: Request, res: Response): Promise<void> {
   const input = approveSchema.parse(req.body);
-  const result = await approveIncomingPayment(input.paymentId, req.user!);
+  const result = await recordFailure('approve', req, input.paymentId, () =>
+    approveIncomingPayment(input.paymentId, req.user!),
+  );
   res.json(result);
 }
 
 /** Pi SDK callback: onReadyForServerCompletion. Grants the purchase. */
 export async function complete(req: Request, res: Response): Promise<void> {
   const input = completeSchema.parse(req.body);
-  const result = await completeIncomingPayment(input.paymentId, input.txid, req.user!);
+  const result = await recordFailure('complete', req, input.paymentId, () =>
+    completeIncomingPayment(input.paymentId, input.txid, req.user!),
+  );
   res.json(result);
+}
+
+/**
+ * Writes a refused payment step where the operator can read it — the admin
+ * dashboard — and rethrows. When approval fails, Pi only tells the pioneer
+ * "the developer failed to approve the payment"; the reason existed nowhere
+ * but the hosting provider's log, which the operator may not be able to open.
+ *
+ * Pi repeats the approval call about every ten seconds until it gives up, so
+ * one failed payment would fill the list with the same line. One entry per
+ * payment and step is enough.
+ */
+async function recordFailure<T>(
+  step: 'approve' | 'complete',
+  req: Request,
+  paymentId: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    const appError = error instanceof AppError ? error : null;
+    const action = `payment:${step}_failed`;
+    const already = await prisma.adminLog
+      .count({ where: { action, targetId: paymentId } })
+      .catch(() => 1);
+    if (already === 0) {
+      await prisma.adminLog
+        .create({
+          data: {
+            actor: req.user?.username ?? 'unknown',
+            action,
+            targetId: paymentId,
+            details: {
+              step,
+              code: appError?.code ?? 'internal_error',
+              message: (appError?.message ?? (error as Error).message ?? '').slice(0, 300),
+            },
+          },
+        })
+        .catch(() => undefined);
+    }
+    throw error;
+  }
 }
 
 /**

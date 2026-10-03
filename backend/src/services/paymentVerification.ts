@@ -473,13 +473,34 @@ export async function reconcileStuckPayments(limit = 20): Promise<number> {
         await markCancelled(payment.piPaymentId);
         continue;
       }
-      // Not signed yet: nothing has moved, and Pi expires it on its own.
-      if (!piPayment.transaction?.txid) continue;
+      if (!piPayment.transaction?.txid) {
+        // Never signed. Within the hour Pi may still let the pioneer finish it;
+        // after that it has expired on Pi's side, and nothing moved.
+        if (Date.now() - payment.createdAt.getTime() > UNSIGNED_EXPIRY_MS) {
+          await cancelPayment(payment.piPaymentId).catch(() => undefined);
+          await markCancelled(payment.piPaymentId);
+        } else {
+          await touch(payment.id);
+        }
+        continue;
+      }
 
       await completeIncomingPayment(payment.piPaymentId, piPayment.transaction.txid, payment.user);
       finished += 1;
       logger.warn('Recovered a paid payment that was never granted', { piPaymentId: payment.piPaymentId });
     } catch (error) {
+      const code = error instanceof AppError ? error.code : '';
+      if (code === 'pi_payment_not_found') {
+        // Pi has no such payment, so there is nothing to finish — ever.
+        await prisma.payment
+          .updateMany({
+            where: { id: payment.id, completedAt: null },
+            data: { status: PaymentStatus.ERROR, errorText: 'Not found on the Pi Platform' },
+          })
+          .catch(() => undefined);
+      } else {
+        await touch(payment.id);
+      }
       logger.error('Could not reconcile a stuck payment', {
         piPaymentId: payment.piPaymentId,
         error: (error as Error).message,
@@ -487,6 +508,19 @@ export async function reconcileStuckPayments(limit = 20): Promise<number> {
     }
   }
   return finished;
+}
+
+/** Pi lets an approved payment wait for the pioneer's signature; after this it has expired. */
+const UNSIGNED_EXPIRY_MS = 60 * 60 * 1000;
+
+/**
+ * Sends a payment that could not be settled this round to the back of the
+ * queue. The sweep takes the oldest few each time, and without this the same
+ * handful of unsettleable rows would be picked forever while newer payments —
+ * ones that could be recovered — never got a turn.
+ */
+async function touch(id: string): Promise<void> {
+  await prisma.payment.update({ where: { id }, data: { updatedAt: new Date() } }).catch(() => undefined);
 }
 
 /**

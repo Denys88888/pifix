@@ -376,7 +376,9 @@
     "escrow_not_funded": "There is nothing to release for this job.",
     "maintenance": "PiFix is under maintenance. Please try again shortly.",
     "pi_sdk_error": "Pi did not accept the payment: {{detail}}",
-    "pi_no_response": "Pi did not respond. Close and reopen PiFix, then try the payment again."
+    "pi_no_response": "Pi did not respond. Close and reopen PiFix, then try the payment again.",
+    "pi_api_key_invalid": "The PiFix server cannot reach Pi: its API key is wrong. The admin can see this in the panel.",
+    "payment_not_verified": "Pi has not confirmed this transaction on the blockchain yet."
   },
   "privacy": {
     "title": "Privacy policy",
@@ -628,6 +630,18 @@
       "payouts_disabled": "payouts are off (no app wallet configured)",
       "payout_busy": "another payout was running, try again",
       "amount_not_positive": "the amount must be above zero"
+    },
+    "piApiKey": {
+      "ok": "Pi API key works",
+      "invalid": "Pi API key is wrong",
+      "unreachable": "Pi API is not answering"
+    },
+    "piApiKeyFix": "Pi refuses this server's key, so no payment can go through. Open Pi Browser → Develop → PiFix → \"API Key\", copy the key and paste it on Render into the PI_API_KEY variable of the pifix-api service.",
+    "paymentErrors": "Recent payment errors",
+    "paymentErrorsNone": "No errors.",
+    "paymentStep": {
+      "approve": "approval",
+      "complete": "completion"
     }
   },
   "support": {

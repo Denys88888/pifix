@@ -375,7 +375,9 @@
     "escrow_not_funded": "Không có khoản nào để giải ngân cho công việc này.",
     "maintenance": "PiFix đang bảo trì. Vui lòng thử lại sau.",
     "pi_sdk_error": "Pi không chấp nhận thanh toán: {{detail}}",
-    "pi_no_response": "Pi không phản hồi. Hãy đóng và mở lại PiFix, rồi thử thanh toán lại."
+    "pi_no_response": "Pi không phản hồi. Hãy đóng và mở lại PiFix, rồi thử thanh toán lại.",
+    "pi_api_key_invalid": "Máy chủ PiFix không kết nối được với Pi: khóa API không đúng.",
+    "payment_not_verified": "Pi chưa xác nhận giao dịch này trên blockchain."
   },
   "privacy": {
     "title": "Chính sách bảo mật",

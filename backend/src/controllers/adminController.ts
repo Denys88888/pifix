@@ -20,7 +20,7 @@ import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
 import { findOnChainByMemo, sendPayout } from '../services/piPayouts';
 import { adminNote } from '../lib/adminNotes';
-import { cancelPayment, completePayment, getPayment } from '../services/piApi';
+import { cancelPayment, checkServerKey, completePayment, getPayment } from '../services/piApi';
 import { env } from '../config/env';
 
 async function audit(actor: string, action: string, targetId?: string, details?: unknown): Promise<void> {
@@ -64,6 +64,25 @@ export async function adminLoginWithPi(req: Request, res: Response): Promise<voi
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
+
+/** The last few payment steps the server refused, newest first — see paymentsController. */
+async function recentPaymentErrors() {
+  const rows = await prisma.adminLog.findMany({
+    where: { action: { startsWith: 'payment:' } },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
+  return rows.map((row) => {
+    const details = (row.details ?? {}) as { code?: string; message?: string; step?: string };
+    return {
+      at: row.createdAt.toISOString(),
+      username: row.actor,
+      step: details.step ?? row.action.replace('payment:', ''),
+      code: details.code ?? 'unknown',
+      message: details.message ?? '',
+    };
+  });
+}
 
 export async function dashboard(_req: Request, res: Response): Promise<void> {
   const settings = await getSettings();
@@ -155,6 +174,8 @@ export async function dashboard(_req: Request, res: Response): Promise<void> {
       userBalancesPi: money(payoutsOwed._sum.balancePi ?? 0),
     },
     system: {
+      piApiKey: await checkServerKey(),
+      recentPaymentErrors: await recentPaymentErrors(),
       sandbox: env.PI_SANDBOX,
       payoutsConfigured: env.payoutsConfigured,
       cloudinaryConfigured: env.cloudinaryConfigured,

@@ -380,7 +380,9 @@
     "escrow_not_funded": "لا يوجد مبلغ لتحويله في هذا الطلب.",
     "maintenance": "PiFix قيد الصيانة. حاول لاحقًا.",
     "pi_sdk_error": "لم يقبل Pi الدفع: {{detail}}",
-    "pi_no_response": "لم يستجب Pi. أغلق PiFix وافتحه من جديد، ثم أعد محاولة الدفع."
+    "pi_no_response": "لم يستجب Pi. أغلق PiFix وافتحه من جديد، ثم أعد محاولة الدفع.",
+    "pi_api_key_invalid": "لا يستطيع خادم PiFix الاتصال بـ Pi: مفتاح API غير صحيح.",
+    "payment_not_verified": "لم يؤكد Pi هذه المعاملة على البلوكشين بعد."
   },
   "privacy": {
     "title": "سياسة الخصوصية",

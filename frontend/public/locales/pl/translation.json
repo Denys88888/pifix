@@ -378,7 +378,9 @@
     "escrow_not_funded": "Nie ma czego wypłacić dla tego zlecenia.",
     "maintenance": "PiFix jest w trakcie prac serwisowych. Spróbuj później.",
     "pi_sdk_error": "Pi nie przyjął płatności: {{detail}}",
-    "pi_no_response": "Pi nie odpowiada. Zamknij i ponownie otwórz PiFix, a potem spróbuj zapłacić jeszcze raz."
+    "pi_no_response": "Pi nie odpowiada. Zamknij i ponownie otwórz PiFix, a potem spróbuj zapłacić jeszcze raz.",
+    "pi_api_key_invalid": "Serwer PiFix nie może połączyć się z Pi: nieprawidłowy klucz API.",
+    "payment_not_verified": "Pi jeszcze nie potwierdził tej transakcji w blockchainie."
   },
   "privacy": {
     "title": "Polityka prywatności",

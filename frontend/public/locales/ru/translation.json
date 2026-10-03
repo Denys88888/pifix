@@ -378,7 +378,9 @@
     "escrow_not_funded": "По этому заказу нечего переводить.",
     "maintenance": "PiFix на техобслуживании. Попробуйте позже.",
     "pi_sdk_error": "Pi не принял платёж: {{detail}}",
-    "pi_no_response": "Pi не ответил. Закройте и снова откройте PiFix, затем повторите оплату."
+    "pi_no_response": "Pi не ответил. Закройте и снова откройте PiFix, затем повторите оплату.",
+    "pi_api_key_invalid": "Сервер PiFix не может связаться с Pi: неверный ключ API. Администратор уже видит это в админке.",
+    "payment_not_verified": "Pi ещё не подтвердил этот перевод в блокчейне."
   },
   "privacy": {
     "title": "Политика конфиденциальности",
@@ -632,6 +634,18 @@
       "payouts_disabled": "выплаты выключены (нет кошелька приложения)",
       "payout_busy": "шла другая выплата, попробуйте ещё раз",
       "amount_not_positive": "сумма должна быть больше нуля"
+    },
+    "piApiKey": {
+      "ok": "Ключ Pi API работает",
+      "invalid": "Ключ Pi API неверный",
+      "unreachable": "Pi API не отвечает"
+    },
+    "piApiKeyFix": "Pi отклоняет ключ сервера, поэтому ни один платёж не пройдёт. Откройте Pi Browser → Develop → PiFix → «API Key», скопируйте ключ и вставьте его на Render в переменную PI_API_KEY сервиса pifix-api.",
+    "paymentErrors": "Последние ошибки платежей",
+    "paymentErrorsNone": "Ошибок нет.",
+    "paymentStep": {
+      "approve": "одобрение",
+      "complete": "завершение"
     }
   },
   "support": {

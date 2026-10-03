@@ -375,7 +375,9 @@
     "escrow_not_funded": "Tidak ada dana yang perlu dilepas untuk pekerjaan ini.",
     "maintenance": "PiFix sedang dalam pemeliharaan. Coba lagi nanti.",
     "pi_sdk_error": "Pi tidak menerima pembayaran: {{detail}}",
-    "pi_no_response": "Pi tidak merespons. Tutup lalu buka lagi PiFix, kemudian coba bayar lagi."
+    "pi_no_response": "Pi tidak merespons. Tutup lalu buka lagi PiFix, kemudian coba bayar lagi.",
+    "pi_api_key_invalid": "Server PiFix tidak dapat terhubung ke Pi: kunci API salah.",
+    "payment_not_verified": "Pi belum mengonfirmasi transaksi ini di blockchain."
   },
   "privacy": {
     "title": "Kebijakan privasi",

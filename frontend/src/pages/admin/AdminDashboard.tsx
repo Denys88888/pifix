@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { AdminDashboard as Dashboard } from '../../api/types';
+import { formatDateTime } from '../../lib/format';
 import styles from '../../styles/Admin.module.css';
 
 export default function AdminDashboard(): JSX.Element {
@@ -109,6 +110,17 @@ export default function AdminDashboard(): JSX.Element {
       <div className={styles.panel}>
         <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.system')}</h2>
         <div className={styles.actions}>
+          <span
+            className={`${styles.pill} ${
+              data.system.piApiKey === 'ok'
+                ? styles.pillGood
+                : data.system.piApiKey === 'invalid'
+                  ? styles.pillBad
+                  : styles.pillWarn
+            }`}
+          >
+            {t(`admin.piApiKey.${data.system.piApiKey}`)}
+          </span>
           <span className={`${styles.pill} ${data.system.sandbox ? styles.pillWarn : styles.pillGood}`}>
             {data.system.sandbox ? t('admin.netTestnet') : t('admin.netMainnet')}
           </span>
@@ -125,6 +137,26 @@ export default function AdminDashboard(): JSX.Element {
             <span className={`${styles.pill} ${styles.pillBad}`}>{t('admin.maintenanceOn')}</span>
           ) : null}
         </div>
+        {data.system.piApiKey === 'invalid' ? (
+          <div className="alert alert--error">{t('admin.piApiKeyFix')}</div>
+        ) : null}
+      </div>
+
+      <div className={styles.panel}>
+        <h2 style={{ margin: 0, fontSize: 17 }}>{t('admin.paymentErrors')}</h2>
+        {data.system.recentPaymentErrors.length === 0 ? (
+          <p className="hint" style={{ margin: 0 }}>
+            {t('admin.paymentErrorsNone')}
+          </p>
+        ) : (
+          data.system.recentPaymentErrors.map((row) => (
+            <div key={`${row.at}-${row.step}`} className="hint" style={{ fontSize: 13 }}>
+              <strong>{formatDateTime(row.at)}</strong> · @{row.username} ·{' '}
+              {t(`admin.paymentStep.${row.step}`, { defaultValue: row.step })}:{' '}
+              {t(`errors.${row.code}`, { defaultValue: row.message || row.code })}
+            </div>
+          ))
+        )}
       </div>
     </>
   );

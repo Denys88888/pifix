@@ -58,7 +58,10 @@ function wrap(error: unknown, code: string, fallback: string): AppError {
   const detail = body?.error_message ?? body?.error ?? body?.message ?? axiosError.message;
   logger.error(`Pi API call failed: ${code}`, { status, detail });
   if (status === 401 || status === 403) {
-    return unauthorized('pi_api_unauthorized', 'Pi API rejected the server credentials');
+    // The SERVER's key was refused — a configuration fault, not the pioneer's
+    // session. As a 401 it reached the client's "session expired" handler and
+    // signed the pioneer out of the app because PI_API_KEY was wrong.
+    return new AppError(503, 'pi_api_key_invalid', 'The Pi API rejected this server\'s API key');
   }
   if (status === 404) {
     return badRequest('pi_payment_not_found', 'Payment not found on the Pi Platform');
@@ -176,6 +179,33 @@ export async function createA2UPayment(input: {
   } catch (error) {
     throw wrap(error, 'pi_a2u_create_failed', 'Could not create the payout on the Pi Platform');
   }
+}
+
+export type ServerKeyStatus = 'ok' | 'invalid' | 'unreachable';
+
+let keyCheck: { status: ServerKeyStatus; at: number } | null = null;
+
+/**
+ * Whether Pi accepts this server's PI_API_KEY, for the admin dashboard.
+ *
+ * A wrong key fails every payment in the same way — Pi asks for approval every
+ * ten seconds, the server cannot read the payment, and the pioneer finally sees
+ * "the developer failed to approve" — and the only other place to see why is
+ * the hosting provider's log. A read-only call answers it; cached for a minute
+ * so opening the dashboard does not hammer the Pi API.
+ */
+export async function checkServerKey(): Promise<ServerKeyStatus> {
+  if (keyCheck && Date.now() - keyCheck.at < 60_000) return keyCheck.status;
+  let status: ServerKeyStatus;
+  try {
+    await serverClient.get('/payments/incomplete_server_payments');
+    status = 'ok';
+  } catch (error) {
+    const code = (error as AxiosError).response?.status;
+    status = code === 401 || code === 403 ? 'invalid' : 'unreachable';
+  }
+  keyCheck = { status, at: Date.now() };
+  return status;
 }
 
 /** App→User payments left dangling by a previous crash; must be cleared before a new one. */

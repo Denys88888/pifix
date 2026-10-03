@@ -246,6 +246,15 @@ export interface AdminDashboard {
   };
   liabilities: { escrowHeldPi: string; userBalancesPi: string };
   system: {
+    /** Whether Pi accepts this server's API key — every payment fails when it does not. */
+    piApiKey: 'ok' | 'invalid' | 'unreachable';
+    recentPaymentErrors: Array<{
+      at: string;
+      username: string;
+      step: string;
+      code: string;
+      message: string;
+    }>;
     sandbox: boolean;
     payoutsConfigured: boolean;
     cloudinaryConfigured: boolean;
