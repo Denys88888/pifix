@@ -101,3 +101,33 @@
   background: var(--surface-2, rgba(255, 107, 107, 0.08));
   text-align: center;
 }
+
+/* Notification bell. Big enough to hit with a thumb; the counter sits on its
+   corner the way people expect from every messenger. */
+.bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.bellCount {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--error);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}

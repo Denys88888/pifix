@@ -19,16 +19,14 @@ import { isAdminPiUid, signAdminToken, verifyAdminCredentials } from '../middlew
 import { getSettings, updateSettings } from '../services/settings';
 import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
-import { findOnChainByMemo, sendPayout } from '../services/piPayouts';
+import { findOnChainByMemo } from '../services/piPayouts';
 import { adminNote } from '../lib/adminNotes';
+import { audit } from '../lib/audit';
+import { executeWithdrawal } from '../services/withdrawals';
+import { notify } from '../services/notifications';
 import { cancelPayment, checkServerKey, completePayment, getPayment } from '../services/piApi';
 import { env } from '../config/env';
 
-async function audit(actor: string, action: string, targetId?: string, details?: unknown): Promise<void> {
-  await prisma.adminLog
-    .create({ data: { actor, action, targetId: targetId ?? null, details: (details ?? {}) as object } })
-    .catch((error) => logger.warn('Audit log failed', { error: (error as Error).message }));
-}
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -65,6 +63,20 @@ export async function adminLoginWithPi(req: Request, res: Response): Promise<voi
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
+
+/**
+ * The numbers behind the admin menu's badges, polled every minute. Kept apart
+ * from the dashboard, which also checks the Pi API key and sums revenue.
+ */
+export async function badges(_req: Request, res: Response): Promise<void> {
+  const [disputes, verifications, withdrawals, unconfirmed] = await Promise.all([
+    prisma.order.count({ where: { status: OrderStatus.DISPUTED } }),
+    prisma.masterProfile.count({ where: { verificationStatus: VerificationStatus.PENDING } }),
+    prisma.withdrawalRequest.count({ where: { status: WithdrawalStatus.REQUESTED } }),
+    prisma.withdrawalRequest.count({ where: { status: WithdrawalStatus.APPROVED } }),
+  ]);
+  res.json({ disputes, verifications, withdrawals: withdrawals + unconfirmed });
+}
 
 /** The last few payment steps the server refused, newest first — see paymentsController. */
 async function recentPaymentErrors() {
@@ -346,6 +358,9 @@ export async function resolveOrder(req: Request, res: Response): Promise<void> {
       .catch((error) => logger.warn('Could not post the resolution to the chat', { error: (error as Error).message }));
   }
 
+  await notify(order.clientId, 'dispute_resolved', order.id, { publicId: order.publicId, action: input.action });
+  await notify(order.masterId, 'dispute_resolved', order.id, { publicId: order.publicId, action: input.action });
+
   const fresh = await prisma.order.findUniqueOrThrow({
     where: { id: order.id },
     include: { category: true, client: true, master: true },
@@ -549,9 +564,25 @@ export const settingsSchema = z.object({
   autoWithdrawalPi: decimalField.optional(),
   piUsdRate: decimalField.optional(),
   maintenanceMode: z.boolean().optional(),
+  autoPayoutOnRelease: z.boolean().optional(),
   supportContact: z.string().trim().max(200).optional(),
   orderExpiryDays: z.coerce.number().int().min(0).max(365).optional(),
 });
+
+const DECIMAL_SETTINGS = new Set([
+  'connectPricePi',
+  'clientFeePercent',
+  'masterFeePercent',
+  'proSubscriptionPricePi',
+  'expressFeePi',
+  'profileBoostPricePi',
+  'referralBonusDirectPi',
+  'referralBonusIndirectPi',
+  'minBudgetPi',
+  'minWithdrawalPi',
+  'autoWithdrawalPi',
+  'piUsdRate',
+]);
 
 export async function getAdminSettings(_req: Request, res: Response): Promise<void> {
   const settings = await getSettings();
@@ -574,6 +605,7 @@ export async function getAdminSettings(_req: Request, res: Response): Promise<vo
       autoWithdrawalPi: settings.autoWithdrawalPi.toString(),
       piUsdRate: settings.piUsdRate.toString(),
       maintenanceMode: settings.maintenanceMode,
+      autoPayoutOnRelease: settings.autoPayoutOnRelease,
       supportContact: settings.supportContact,
       orderExpiryDays: settings.orderExpiryDays,
       updatedAt: settings.updatedAt.toISOString(),
@@ -588,7 +620,11 @@ export async function putAdminSettings(req: Request, res: Response): Promise<voi
   const patch: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined) continue;
-    patch[key] = typeof value === 'string' ? new Prisma.Decimal(value) : value;
+    // Only the money and percent fields become Decimals. Converting every
+    // string turned supportContact — which the settings page always sends —
+    // into `new Decimal("…")`, which throws, so no save from the panel ever
+    // went through.
+    patch[key] = DECIMAL_SETTINGS.has(key) && typeof value === 'string' ? new Prisma.Decimal(value) : value;
   }
 
   const saved = await updateSettings(patch as never);
@@ -629,122 +665,27 @@ export async function listWithdrawals(req: Request, res: Response): Promise<void
 }
 
 /**
- * Pays a withdrawal out on-chain.
- * The balance is debited first (inside a transaction, with a funds check) and
- * refunded if the on-chain send fails — the user is never debited for a payout
- * that did not happen.
+ * Pays a withdrawal out on-chain — see executeWithdrawal for the rules, which
+ * the automatic payout after a confirmed job shares.
  */
 export async function payWithdrawal(req: Request, res: Response): Promise<void> {
   const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+  const result = await executeWithdrawal(id, req.admin!.username);
 
-  const withdrawal = await prisma.withdrawalRequest.findUnique({
-    where: { id },
-    include: { user: true },
-  });
-  if (!withdrawal) throw notFound('withdrawal_not_found', 'Withdrawal request not found');
-  if (withdrawal.status === WithdrawalStatus.PAID) {
-    throw conflict('already_paid', 'This withdrawal was already paid');
-  }
-  if (withdrawal.status === WithdrawalStatus.REJECTED) {
-    throw conflict('already_rejected', 'This withdrawal was rejected');
-  }
-  if (!env.payoutsConfigured) {
-    throw badRequest('payouts_disabled', 'Set PI_WALLET_PRIVATE_SEED and PAYOUTS_ENABLED to pay out');
-  }
-  if (withdrawal.txid) {
-    throw conflict('already_paid', 'This withdrawal already has a chain transaction');
-  }
-  // Debited and claimed by an attempt that never reported back — a crash between
-  // the debit and the payout leaves this state. Sending again could pay twice,
-  // so it takes a human checking the payment against Pi before it moves.
-  if (withdrawal.status === WithdrawalStatus.APPROVED) {
-    throw conflict(
-      'needs_reconciliation',
-      'An earlier attempt already claimed this withdrawal — verify it on the Pi API before retrying',
-    );
-  }
-
-  await prisma.$transaction(async (tx) => {
-    // Compare-and-swap on the status. Two admins pressing Pay at the same moment
-    // both clear the checks above; only the one that actually flips
-    // REQUESTED → APPROVED gets to debit the balance and send.
-    const claimed = await tx.withdrawalRequest.updateMany({
-      where: { id, status: WithdrawalStatus.REQUESTED },
-      data: { status: WithdrawalStatus.APPROVED },
-    });
-    if (claimed.count === 0) {
-      throw conflict('already_processing', 'This withdrawal is already being paid');
-    }
-
-    await postTransaction(tx, {
-      userId: withdrawal.userId,
-      type: TransactionType.WITHDRAWAL,
-      amountPi: toPi(withdrawal.amountPi).negated(),
-      description: `Withdrawal to ${withdrawal.walletAddress.slice(0, 8)}…`,
-      requireFunds: true,
-    });
-  });
-
-  const payout = await sendPayout({
-    userId: withdrawal.userId,
-    piUid: withdrawal.user.piUid,
-    amount: money(withdrawal.amountPi),
-    memo: 'PiFix withdrawal',
-    type: 'WITHDRAWAL',
-    metadata: { withdrawalId: withdrawal.id },
-  });
-
-  if (!payout.ok && payout.uncertain) {
-    // The Pi may already be in the wallet. The balance stays debited and the
-    // request stays APPROVED, which the check above refuses to pay again until
-    // someone has looked the payment up on the Pi side.
-    await prisma.withdrawalRequest.update({
-      where: { id },
-      data: {
-        piPaymentId: payout.piPaymentId ?? null,
-        adminNote: adminNote('payout_unconfirmed', payout.piPaymentId),
-      },
-    });
-    await audit(req.admin!.username, 'withdrawal:unconfirmed', id, { piPaymentId: payout.piPaymentId });
+  if (result.outcome === 'uncertain') {
     throw conflict(
       'needs_reconciliation',
       'The transfer was sent but not confirmed — check it on the Pi side before retrying',
     );
   }
-
-  if (!payout.ok) {
-    // Give the money back and reopen the request so it can be retried.
-    await prisma.$transaction(async (tx) => {
-      await postTransaction(tx, {
-        userId: withdrawal.userId,
-        type: TransactionType.ADMIN_ADJUSTMENT,
-        amountPi: toPi(withdrawal.amountPi),
-        description: 'Withdrawal payout failed — balance restored',
-      });
-      await tx.withdrawalRequest.update({
-        where: { id },
-        data: {
-          status: WithdrawalStatus.REQUESTED,
-          adminNote: adminNote('payout_failed', payout.error ?? 'unknown error'),
-        },
-      });
-    });
-    await audit(req.admin!.username, 'withdrawal:failed', id, { error: payout.error });
-    throw badRequest('payout_failed', `Payout failed: ${payout.error ?? 'unknown error'}`);
+  if (result.outcome === 'failed') {
+    throw badRequest('payout_failed', `Payout failed: ${result.error}`);
   }
 
-  const updated = await prisma.withdrawalRequest.update({
+  const updated = await prisma.withdrawalRequest.findUniqueOrThrow({
     where: { id },
-    data: {
-      status: WithdrawalStatus.PAID,
-      txid: payout.txid,
-      piPaymentId: payout.piPaymentId,
-      processedAt: new Date(),
-    },
     include: { user: { select: { username: true } } },
   });
-
-  await audit(req.admin!.username, 'withdrawal:paid', id, { txid: payout.txid });
   res.json({ withdrawal: withdrawalDTO(updated) });
 }
 

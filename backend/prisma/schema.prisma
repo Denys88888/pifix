@@ -136,6 +136,7 @@ model User {
   reviewsAuthored Review[]            @relation("ReviewAuthor")
   reviewsReceived Review[]            @relation("ReviewTarget")
   orderMessages   OrderMessage[]
+  notifications   Notification[]
 
   @@index([referrerId])
   @@index([isMaster, isBlocked])
@@ -270,11 +271,12 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  responses    Response[]
-  reviews      Review[]
-  payments     Payment[]
-  transactions Transaction[]
-  messages     OrderMessage[]
+  responses     Response[]
+  reviews       Review[]
+  payments      Payment[]
+  transactions  Transaction[]
+  messages      OrderMessage[]
+  notifications Notification[]
 
   @@index([status, categoryId])
   @@index([status, createdAt])
@@ -468,12 +470,15 @@ model PlatformSettings {
   connectRefundWindowMinutes  Int     @default(60) @map("connect_refund_window_minutes")
 
   /// Withdrawals below this are rejected.
-  minWithdrawalPi  Decimal @default(5.0) @map("min_withdrawal_pi") @db.Decimal(15, 7)
+  minWithdrawalPi     Decimal @default(5.0) @map("min_withdrawal_pi") @db.Decimal(15, 7)
   /// Balance at which a withdrawal is paid out without admin approval (0 = always manual).
-  autoWithdrawalPi Decimal @default(0) @map("auto_withdrawal_pi") @db.Decimal(15, 7)
+  autoWithdrawalPi    Decimal @default(0) @map("auto_withdrawal_pi") @db.Decimal(15, 7)
+  /// Send the master's balance to their Pi wallet as soon as a job is
+  /// confirmed (or auto-released), instead of waiting for a withdrawal.
+  autoPayoutOnRelease Boolean @default(true) @map("auto_payout_on_release")
   /// Pi→USD rate used by the admin dashboard only. Never used for on-chain math.
-  piUsdRate        Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
-  maintenanceMode  Boolean @default(false) @map("maintenance_mode")
+  piUsdRate           Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
+  maintenanceMode     Boolean @default(false) @map("maintenance_mode")
 
   /// Days an unanswered OPEN order stays on the board before it is closed
   /// automatically. 0 disables it. Orders holding escrow are never touched —
@@ -488,6 +493,36 @@ model PlatformSettings {
   updatedAt DateTime @updatedAt
 
   @@map("platform_settings")
+}
+
+/// What happened on someone's orders while they were not looking — a new
+/// response, a message, a dispute, a payout. Pi Browser has no push, so these
+/// are shown in the app: a counter, "new" badges and a list.
+model Notification {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// response_new | hired | message | dispute_opened | dispute_resolved |
+  /// job_done | job_confirmed | auto_released | payout_sent | order_cancelled
+  type    String  @db.VarChar(40)
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Values the text needs (amount, public id) — the text itself is translated
+  /// on the device, in the reader's language.
+  data    Json?
+
+  /// For chat messages one unread line per order is kept and counted up,
+  /// rather than one line per message.
+  count Int @default(1)
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, readAt, updatedAt])
+  @@index([userId, orderId, readAt])
+  @@map("notifications")
 }
 
 model AdminLog {

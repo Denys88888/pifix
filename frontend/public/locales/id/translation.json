@@ -17,7 +17,8 @@
     "releaseToRefresh": "Lepas untuk menyegarkan",
     "privacy": "Kebijakan privasi",
     "maintenance": "PiFix sedang dalam pemeliharaan. Beberapa fitur sementara tidak tersedia.",
-    "truncated": "Menampilkan {{shown}} terdekat. Perkecil radius untuk mempersempit pencarian."
+    "truncated": "Menampilkan {{shown}} terdekat. Perkecil radius untuk mempersempit pencarian.",
+    "close": "Tutup"
   },
   "nav": {
     "label": "Navigasi utama",
@@ -446,6 +447,28 @@
       "refund": "anggaran dikembalikan ke klien",
       "refund_with_fees": "seluruh jumlah dengan biaya dikembalikan ke klien",
       "cancel": "pekerjaan dibatalkan"
+    }
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "empty": "Belum ada yang baru.",
+    "readAll": "Tandai semua dibaca",
+    "new": "baru",
+    "toast": "Ada yang baru — ketuk untuk melihat",
+    "unreadAria": "Notifikasi: {{count}} baru",
+    "newCount_other": "{{count}} baru",
+    "type": {
+      "response_new": "Tanggapan baru untuk pekerjaan Anda #{{publicId}} dari @{{username}}",
+      "hired": "Anda disewa untuk pekerjaan #{{publicId}}. Sepakati detailnya di obrolan.",
+      "message": "Pesan baru di obrolan pekerjaan #{{publicId}}: {{count}}",
+      "message_admin": "Administrasi menulis di obrolan pekerjaan #{{publicId}}",
+      "dispute_opened": "Sengketa dibuka untuk pekerjaan #{{publicId}}. Uang dibekukan sampai ada keputusan.",
+      "dispute_resolved": "Sengketa pekerjaan #{{publicId}} diselesaikan: {{decision}}",
+      "job_done": "Tukang menandai pekerjaan #{{publicId}} selesai. Periksa dan konfirmasi.",
+      "job_confirmed": "Klien mengonfirmasi pekerjaan #{{publicId}}. {{amount}} π dikreditkan kepada Anda.",
+      "auto_released": "Pekerjaan #{{publicId}} ditutup otomatis dan dibayarkan ke tukang.",
+      "payout_sent": "Pembayaran {{amount}} π dikirim ke dompet Pi Anda.",
+      "order_cancelled": "Klien membatalkan pekerjaan #{{publicId}} yang Anda tanggapi."
     }
   }
 }

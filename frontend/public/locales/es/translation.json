@@ -17,7 +17,8 @@
     "releaseToRefresh": "Suelta para actualizar",
     "privacy": "Política de privacidad",
     "maintenance": "PiFix está en mantenimiento. Algunas acciones no están disponibles temporalmente.",
-    "truncated": "Mostrando los {{shown}} más cercanos. Reduce el radio para acotar la búsqueda."
+    "truncated": "Mostrando los {{shown}} más cercanos. Reduce el radio para acotar la búsqueda.",
+    "close": "Cerrar"
   },
   "nav": {
     "label": "Navegación principal",
@@ -447,6 +448,29 @@
       "refund": "presupuesto devuelto al cliente",
       "refund_with_fees": "importe total con comisiones devuelto al cliente",
       "cancel": "trabajo cancelado"
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Nada nuevo todavía.",
+    "readAll": "Marcar todo leído",
+    "new": "nuevo",
+    "toast": "Hay novedades — toca para ver",
+    "unreadAria": "Notificaciones: {{count}} nuevas",
+    "newCount_one": "{{count}} nueva",
+    "newCount_other": "{{count}} nuevas",
+    "type": {
+      "response_new": "Nueva respuesta a tu trabajo #{{publicId}} de @{{username}}",
+      "hired": "Te contrataron para el trabajo #{{publicId}}. Acordad los detalles en el chat.",
+      "message": "Mensajes nuevos en el chat del trabajo #{{publicId}}: {{count}}",
+      "message_admin": "La administración escribió en el chat del trabajo #{{publicId}}",
+      "dispute_opened": "Se abrió una disputa en el trabajo #{{publicId}}. El dinero queda congelado hasta la decisión.",
+      "dispute_resolved": "La disputa del trabajo #{{publicId}} se resolvió: {{decision}}",
+      "job_done": "El profesional marcó el trabajo #{{publicId}} como hecho. Revísalo y confírmalo.",
+      "job_confirmed": "El cliente confirmó el trabajo #{{publicId}}. Se te acreditaron {{amount}} π.",
+      "auto_released": "El trabajo #{{publicId}} se cerró automáticamente y se pagó al profesional.",
+      "payout_sent": "Se envió un pago de {{amount}} π a tu billetera Pi.",
+      "order_cancelled": "El cliente canceló el trabajo #{{publicId}} al que respondiste."
     }
   }
 }

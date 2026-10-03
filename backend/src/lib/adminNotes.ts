@@ -9,6 +9,7 @@ export type AdminNoteCode =
   | 'cancelled_by_user'
   | 'rejected_by_admin'
   | 'auto_created'
+  | 'auto_paid'
   | 'payout_failed'
   | 'payout_unconfirmed'
   | 'reconciled_paid'

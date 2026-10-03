@@ -1,6 +1,8 @@
 import { adminApi, api } from './client';
 import type {
+  AppNotification,
   ChatMessage,
+  NotificationSummary,
   ChatPage,
   AdminDashboard,
   AdminSettings,
@@ -341,6 +343,23 @@ export const withdrawalsApi = {
 
 // ── Admin ────────────────────────────────────────────────────────────────────
 
+// ── Notifications (in-app: Pi Browser has no push) ───────────────────────────
+
+export const notificationsApi = {
+  async summary() {
+    const { data } = await api.get<NotificationSummary>('/notifications/summary');
+    return data;
+  },
+  async list() {
+    const { data } = await api.get<{ items: AppNotification[] }>('/notifications');
+    return data.items;
+  },
+  /** Marks everything read, or only what belongs to one order. */
+  async read(orderId?: string) {
+    await api.post('/notifications/read', orderId ? { orderId } : {});
+  },
+};
+
 export const adminApiClient = {
   async login(username: string, password: string) {
     const { data } = await adminApi.post<{ token: string; username: string }>('/admin/login', {
@@ -360,6 +379,13 @@ export const adminApiClient = {
   },
   async dashboard() {
     const { data } = await adminApi.get<AdminDashboard>('/admin/dashboard');
+    return data;
+  },
+  /** Counts for the admin menu's badges. */
+  async badges() {
+    const { data } = await adminApi.get<{ disputes: number; verifications: number; withdrawals: number }>(
+      '/admin/badges',
+    );
     return data;
   },
   async orders(params: Record<string, string | number | undefined>) {

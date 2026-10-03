@@ -18,6 +18,7 @@ import { approvePayment, cancelPayment, completePayment, getPayment, type PiPaym
 import { getSettings } from './settings';
 import { computeOrderCharges, fundEscrow } from './escrow';
 import { postTransaction } from './ledger';
+import { notify } from './notifications';
 
 /**
  * Payment metadata is written by the client, so it is treated as UNTRUSTED
@@ -383,6 +384,14 @@ async function executeIntent(
         await tx.payment.update({ where: { piPaymentId }, data: { responseId: created.id } });
         return created;
       });
+      const target = await prisma.order.findUnique({
+        where: { id: intent.orderId },
+        select: { clientId: true, publicId: true },
+      });
+      await notify(target?.clientId, 'response_new', intent.orderId, {
+        publicId: target?.publicId ?? '',
+        username: user.username,
+      });
       return { responseId: response.id };
     }
 
@@ -395,6 +404,7 @@ async function executeIntent(
         paidAmountPi: amount,
         claim,
       });
+      await notify(order.masterId, 'hired', order.id, { publicId: order.publicId });
       return { orderId: order.id, orderStatus: order.status };
     }
 

@@ -16,6 +16,8 @@ import { getSettings } from './settings';
 import { postTransaction } from './ledger';
 import { payReferralBonuses } from './referral';
 import { adminNote } from '../lib/adminNotes';
+import { notify } from './notifications';
+import { autoPayoutAfterRelease } from './withdrawals';
 // Circular with paymentVerification, which is safe: each side only calls the
 // other inside function bodies, never while the module is loading.
 import { reconcileStuckPayments } from './paymentVerification';
@@ -224,9 +226,28 @@ export async function releaseEscrow(orderId: string, reason: ReleaseReason): Pro
   await payReferralBonuses(result.clientId).catch((error) =>
     logger.error('Referral bonus failed', { orderId, error: (error as Error).message }),
   );
-  await maybeAutoWithdraw(result.masterId!, settings).catch((error) =>
-    logger.error('Auto-withdrawal failed', { orderId, error: (error as Error).message }),
-  );
+  if (reason === 'auto_release') {
+    await notify(result.masterId, 'auto_released', result.id, { publicId: result.publicId });
+    await notify(result.clientId, 'auto_released', result.id, { publicId: result.publicId });
+  } else {
+    await notify(result.masterId, 'job_confirmed', result.id, {
+      publicId: result.publicId,
+      amount: money(result.masterPayoutPi),
+    });
+  }
+
+  if (settings.autoPayoutOnRelease) {
+    // Not awaited: the transfer takes seconds on the Stellar network, and the
+    // client pressing "confirm" should not wait for the master's payout. The
+    // money is already on the master's balance, so a failure loses nothing.
+    void autoPayoutAfterRelease(result.masterId!, result.id).catch((error) =>
+      logger.error('Automatic payout failed', { orderId, error: (error as Error).message }),
+    );
+  } else {
+    await maybeAutoWithdraw(result.masterId!, settings).catch((error) =>
+      logger.error('Auto-withdrawal failed', { orderId, error: (error as Error).message }),
+    );
+  }
 
   return result;
 }

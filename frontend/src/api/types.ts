@@ -109,7 +109,23 @@ export interface Order {
   isOwner?: boolean;
 }
 
-export type ResolutionAction = 'release' | 'refund' | 'refund_with_fees' | 'cancel';
+export interface NotificationSummary {
+  unread: number;
+  /** Unread count per order — drives the "new" badges on order cards. */
+  byOrder: Record<string, number>;
+}
+
+export interface AppNotification {
+  id: string;
+  type: string;
+  count: number;
+  data: Record<string, string>;
+  order: { id: string; publicId: string; title: string } | null;
+  read: boolean;
+  at: string;
+}
+
+export type ResolutionAction ='release' | 'refund' | 'refund_with_fees' | 'cancel';
 
 export interface ChatMessage {
   id: string;
@@ -286,6 +302,8 @@ export interface AdminDashboard {
 }
 
 export interface AdminSettings extends PlatformSettings {
+  /** Pay the master out on-chain as soon as a job is confirmed. */
+  autoPayoutOnRelease: boolean;
   masterFeePercent: string;
   orderExpiryDays: number;
   autoWithdrawalPi: string;

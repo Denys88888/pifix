@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/validate';
 import { optionalAuth, requireAuth, requireKyc } from '../middleware/auth';
-import { chatLimiter, createOrderLimiter, writeLimiter } from '../middleware/rateLimit';
+import { chatLimiter, createOrderLimiter, pollLimiter, writeLimiter } from '../middleware/rateLimit';
 import * as orders from '../controllers/ordersController';
 import * as messages from '../controllers/messagesController';
 import * as responses from '../controllers/responsesController';
@@ -21,7 +21,7 @@ ordersRouter.post('/:id/confirm', requireAuth, asyncHandler(orders.confirmOrder)
 ordersRouter.post('/:id/dispute', requireAuth, writeLimiter, asyncHandler(orders.openDispute));
 
 // Chat between the client and the hired master.
-ordersRouter.get('/:id/messages', requireAuth, asyncHandler(messages.listMessages));
+ordersRouter.get('/:id/messages', requireAuth, pollLimiter, asyncHandler(messages.listMessages));
 ordersRouter.post('/:id/messages', requireAuth, chatLimiter, asyncHandler(messages.postMessage));
 
 // Responses live under their order.

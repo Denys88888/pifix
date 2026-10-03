@@ -24,7 +24,31 @@ export const globalLimiter = rateLimit({
   ...base,
   windowMs: 15 * 60 * 1000,
   limit: 300,
-  skip: (req) => req.method === 'OPTIONS' || req.path === '/api/health',
+  skip: (req) => req.method === 'OPTIONS' || req.path === '/api/health' || isPoll(req),
+});
+
+/**
+ * The app's background polls — the notification counter, an open chat, a
+ * payment in flight. One open chat alone is ~110 requests per 15 minutes, so
+ * under the shared-IP global limit a single pioneer chatting could lock out a
+ * whole carrier NAT. These are cheap authenticated reads; they get their own
+ * per-user budget instead (pollLimiter, applied after requireAuth).
+ */
+function isPoll(req: Request): boolean {
+  if (req.method !== 'GET') return false;
+  return (
+    req.path === '/api/notifications/summary' ||
+    /^\/api\/orders\/[0-9a-f-]{36}\/messages$/.test(req.path) ||
+    /^\/api\/payments\/[^/]+\/status$/.test(req.path)
+  );
+}
+
+/** 600 / 15 min / user — about one poll every 1.5 s, far above what the app sends. */
+export const pollLimiter = rateLimit({
+  ...base,
+  windowMs: 15 * 60 * 1000,
+  limit: 600,
+  keyGenerator: userKey,
 });
 
 /** Payments: 20 requests / 15 min. */

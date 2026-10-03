@@ -3,6 +3,7 @@ import { MessageRole, OrderStatus, type Order, type OrderMessage } from '@prisma
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { conflict, forbidden, notFound } from '../lib/errors';
+import { notify } from '../services/notifications';
 
 /**
  * Chat on an order, between the client and the master they hired.
@@ -105,6 +106,9 @@ export async function postMessage(req: Request, res: Response): Promise<void> {
     include: { author: { select: { username: true } } },
   });
 
+  const recipient = party === 'client' ? order.masterId : order.clientId;
+  await notify(recipient, 'message', order.id, { publicId: order.publicId, from: party });
+
   res.status(201).json({ message: messageDTO(created, req.user!.id) });
 }
 
@@ -130,5 +134,7 @@ export async function adminPostMessage(req: Request, res: Response): Promise<voi
   const created = await prisma.orderMessage.create({
     data: { orderId: order.id, authorId: null, authorRole: MessageRole.ADMIN, text: input.text },
   });
+  await notify(order.clientId, 'message', order.id, { publicId: order.publicId, from: 'admin' });
+  await notify(order.masterId, 'message', order.id, { publicId: order.publicId, from: 'admin' });
   res.status(201).json({ message: messageDTO(created) });
 }

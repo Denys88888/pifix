@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { OfflineBanner } from './components/OfflineBanner';
+import { NotificationToast } from './components/NotificationToast';
 import { BootScreen } from './components/BootScreen';
 import { OpenInPiBrowser } from './components/OpenInPiBrowser';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -24,6 +25,7 @@ const MasterDashboard = lazy(() => import('./pages/MasterDashboard'));
 const MasterProfileEdit = lazy(() => import('./pages/MasterProfileEdit'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Notifications = lazy(() => import('./pages/Notifications'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -109,6 +111,7 @@ export default function App(): JSX.Element {
       <ScrollToTop />
       <OfflineBanner />
       {!isAdminArea && <Header />}
+      {!isAdminArea && <NotificationToast />}
       {settings?.maintenanceMode && !isAdminArea ? <MaintenanceNotice /> : null}
 
       <Suspense fallback={<BootScreen inline />}>
@@ -123,6 +126,7 @@ export default function App(): JSX.Element {
           <Route path="/dashboard/profile" element={<RequireAuth><MasterProfileEdit /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>

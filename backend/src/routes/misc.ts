@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { asyncHandler } from '../middleware/validate';
 import { requireAuth } from '../middleware/auth';
-import { uploadLimiter, writeLimiter } from '../middleware/rateLimit';
+import { pollLimiter, uploadLimiter, writeLimiter } from '../middleware/rateLimit';
 import { upload } from '../middleware/upload';
 import { categoryDTO } from '../lib/serializers';
 import { getSettings, publicSettings } from '../services/settings';
@@ -10,6 +10,7 @@ import * as nearby from '../controllers/nearbyController';
 import * as reviews from '../controllers/reviewsController';
 import * as uploads from '../controllers/uploadsController';
 import * as withdrawals from '../controllers/withdrawalsController';
+import * as notifications from '../controllers/notificationsController';
 
 // ── Public settings & categories ─────────────────────────────────────────────
 export const settingsRouter = Router();
@@ -65,3 +66,11 @@ withdrawalsRouter.delete('/:id', asyncHandler(withdrawals.cancelWithdrawal));
 export const nearbyRouter = Router();
 
 nearbyRouter.get('/', asyncHandler(nearby.listNearby));
+
+// ── Notifications (in-app: Pi Browser has no push) ──────────────────────────
+export const notificationsRouter = Router();
+
+notificationsRouter.use(requireAuth);
+notificationsRouter.get('/summary', pollLimiter, asyncHandler(notifications.notificationSummary));
+notificationsRouter.get('/', asyncHandler(notifications.listNotifications));
+notificationsRouter.post('/read', asyncHandler(notifications.readNotifications));

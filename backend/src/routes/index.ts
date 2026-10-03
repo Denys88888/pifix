@@ -10,6 +10,7 @@ import { cronRouter } from './cron';
 import {
   categoriesRouter,
   nearbyRouter,
+  notificationsRouter,
   reviewsRouter,
   settingsRouter,
   uploadsRouter,
@@ -47,5 +48,6 @@ apiRouter.use('/payments', paymentsRouter);
 apiRouter.use('/reviews', reviewsRouter);
 apiRouter.use('/uploads', uploadsRouter);
 apiRouter.use('/withdrawals', withdrawalsRouter);
+apiRouter.use('/notifications', notificationsRouter);
 apiRouter.use('/admin', adminRouter);
 apiRouter.use('/cron', cronRouter);

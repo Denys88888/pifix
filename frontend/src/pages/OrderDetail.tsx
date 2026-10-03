@@ -15,6 +15,7 @@ import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import { usePolling } from '../hooks/usePolling';
 import { formatDateTime, timeLeft } from '../lib/format';
 import { OrderChat } from '../components/OrderChat';
+import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/Pages.module.css';
 import detail from '../styles/OrderDetail.module.css';
 
@@ -59,6 +60,15 @@ export default function OrderDetail(): JSX.Element {
 
   const isOwner = Boolean(order && user && order.client?.id === user.id);
   const isAssignedMaster = Boolean(order && user && order.master?.id === user.id);
+
+  // Opening the order is reading what happened on it. Re-runs when the counter
+  // for this order goes up while the page is open — a message arriving in the
+  // chat the pioneer is looking at is not "new" to them.
+  const { byOrder, markOrderRead } = useNotifications();
+  const freshHere = order ? (byOrder[order.id] ?? 0) : 0;
+  useEffect(() => {
+    if (order && freshHere > 0) void markOrderRead(order.id);
+  }, [order, freshHere, markOrderRead]);
 
   const loadOrder = useCallback(async () => {
     try {

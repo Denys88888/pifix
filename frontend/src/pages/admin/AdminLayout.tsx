@@ -4,13 +4,14 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { adminTokenUsableFor, getAdminToken, setAdminToken } from '../../api/client';
 import { adminApiClient } from '../../api/endpoints';
 import { useAuth } from '../../hooks/useAuth';
+import { usePolling } from '../../hooks/usePolling';
 import styles from '../../styles/Admin.module.css';
 
-const LINKS = [
+const LINKS: Array<{ to: string; labelKey: string; end?: boolean; badge?: 'disputes' | 'verifications' | 'withdrawals' }> = [
   { to: '/admin', labelKey: 'admin.nav.dashboard', end: true },
-  { to: '/admin/orders', labelKey: 'admin.nav.orders' },
-  { to: '/admin/verifications', labelKey: 'admin.nav.verifications' },
-  { to: '/admin/withdrawals', labelKey: 'admin.nav.withdrawals' },
+  { to: '/admin/orders', labelKey: 'admin.nav.orders', badge: 'disputes' },
+  { to: '/admin/verifications', labelKey: 'admin.nav.verifications', badge: 'verifications' },
+  { to: '/admin/withdrawals', labelKey: 'admin.nav.withdrawals', badge: 'withdrawals' },
   { to: '/admin/reviews', labelKey: 'admin.nav.reviews' },
   { to: '/admin/settings', labelKey: 'admin.nav.settings' },
 ];
@@ -20,6 +21,12 @@ export default function AdminLayout(): JSX.Element {
   const navigate = useNavigate();
   const { status, user } = useAuth();
   const [checking, setChecking] = useState(!getAdminToken());
+
+  // What is waiting for the admin: open disputes, masters to verify, payouts.
+  const { data: badges } = usePolling(() => adminApiClient.badges(), {
+    intervalMs: 60_000,
+    enabled: !checking,
+  });
 
   /**
    * Opened from the developer's own phone there is nothing to type: the Pi
@@ -102,6 +109,9 @@ export default function AdminLayout(): JSX.Element {
               }
             >
               {t(link.labelKey)}
+              {link.badge && badges && badges[link.badge] > 0 ? (
+                <span className={styles.navBadge}>{badges[link.badge]}</span>
+              ) : null}
             </NavLink>
           ))}
           <button className={`${styles.navLink} ${styles.smallBtnGhost}`} onClick={signOut}>{t('admin.signOut')}</button>

@@ -35,6 +35,7 @@ export default function AdminSettings(): JSX.Element {
   const { t } = useTranslation();
   const [values, setValues] = useState<Record<string, string>>({});
   const [maintenance, setMaintenance] = useState(false);
+  const [autoPayout, setAutoPayout] = useState(true);
   const [supportContact, setSupportContact] = useState('');
   const [updatedAt, setUpdatedAt] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -50,6 +51,7 @@ export default function AdminSettings(): JSX.Element {
         for (const field of FIELDS) next[field.key] = String(settings[field.key] ?? '');
         setValues(next);
         setMaintenance(settings.maintenanceMode);
+        setAutoPayout(settings.autoPayoutOnRelease);
         setSupportContact(settings.supportContact ?? '');
         setUpdatedAt(settings.updatedAt);
       })
@@ -66,6 +68,7 @@ export default function AdminSettings(): JSX.Element {
       // takes the channel down, so a blank must reach the server.
       const patch: Record<string, string | number | boolean> = {
         maintenanceMode: maintenance,
+        autoPayoutOnRelease: autoPayout,
         supportContact: supportContact.trim(),
       };
       for (const field of FIELDS) {
@@ -123,6 +126,21 @@ export default function AdminSettings(): JSX.Element {
           />
           <small>{t('admin.supportContact.hint')}</small>
         </div>
+
+        <label className="row" style={{ gap: 10, alignItems: 'flex-start' }}>
+          <input
+            type="checkbox"
+            checked={autoPayout}
+            onChange={(event) => setAutoPayout(event.target.checked)}
+            style={{ width: 20, minHeight: 20, marginTop: 2 }}
+          />
+          <span>
+            {t('admin.autoPayoutLabel')}
+            <small className="hint" style={{ display: 'block' }}>
+              {t('admin.autoPayoutHint')}
+            </small>
+          </span>
+        </label>
 
         <label className="row" style={{ gap: 10 }}>
           <input

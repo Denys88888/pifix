@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
+import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/Header.module.css';
 
 const ROOT_PATHS = ['/', '/orders', '/masters', '/profile', '/dashboard'];
@@ -9,6 +10,7 @@ const ROOT_PATHS = ['/', '/orders', '/masters', '/profile', '/dashboard'];
 export function Header(): JSX.Element {
   const { t } = useTranslation();
   const { user, status, signIn, error } = useAuth();
+  const { unread } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,6 +36,16 @@ export function Header(): JSX.Element {
         </Link>
 
         <div className={styles.right}>
+          {status === 'signed_in' && user ? (
+            <Link
+              to="/notifications"
+              className={styles.bell}
+              aria-label={unread > 0 ? t('notifications.unreadAria', { count: unread }) : t('notifications.title')}
+            >
+              🔔
+              {unread > 0 ? <span className={styles.bellCount}>{unread > 99 ? '99+' : unread}</span> : null}
+            </Link>
+          ) : null}
           <LanguageSwitcher compact />
           {status === 'signed_in' && user ? (
             <Link to="/profile" className={styles.user}>

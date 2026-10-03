@@ -10,6 +10,7 @@ import { GEO_CANDIDATE_CAP, orderDTO, paginate } from '../lib/serializers';
 import { getSettings } from '../services/settings';
 import { computeOrderCharges, releaseEscrow } from '../services/escrow';
 import { refundConnect } from '../services/paymentVerification';
+import { notify } from '../services/notifications';
 import { boundingBox, haversineKm, roundDistance } from '../services/geolocation';
 
 const decimalString = z
@@ -320,6 +321,11 @@ export async function cancelOrder(req: Request, res: Response): Promise<void> {
     });
   }
 
+  for (const response of order.responses) {
+    if (response.status === ResponseStatus.ACTIVE) {
+      await notify(response.masterId, 'order_cancelled', order.id, { publicId: order.publicId });
+    }
+  }
   logger.info('Order cancelled', { orderId: order.id, refundedConnects: refunded });
   res.json({ ok: true, refundedConnects: refunded, withinRefundWindow });
 }
@@ -343,6 +349,7 @@ export async function markCompleted(req: Request, res: Response): Promise<void> 
     data: { status: OrderStatus.AWAITING_CONFIRMATION, completedAt: new Date(), autoReleaseAt },
     include: { category: true, client: true, master: true },
   });
+  await notify(order.clientId, 'job_done', order.id, { publicId: order.publicId });
 
   res.json({ order: orderDTO(updated, { viewerIsParty: true }) });
 }
@@ -405,5 +412,7 @@ export async function openDispute(req: Request, res: Response): Promise<void> {
   });
 
   logger.warn('Dispute opened', { orderId: order.id, by: req.user!.username });
+  const other = order.clientId === req.user!.id ? order.masterId : order.clientId;
+  await notify(other, 'dispute_opened', order.id, { publicId: order.publicId });
   res.json({ order: orderDTO(updated, { viewerIsParty: true }) });
 }

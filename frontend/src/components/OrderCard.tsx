@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Order } from '../api/types';
 import { formatRelative } from '../lib/format';
+import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/OrderCard.module.css';
 
 interface Props {
@@ -21,6 +22,8 @@ const STATUS_TONE: Record<Order['status'], string> = {
 
 export function OrderCard({ order, showResponses = true }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
+  const { byOrder } = useNotifications();
+  const fresh = byOrder[order.id] ?? 0;
 
   return (
     <Link to={`/orders/${order.id}`} className={styles.card}>
@@ -29,8 +32,13 @@ export function OrderCard({ order, showResponses = true }: Props): JSX.Element {
           <span aria-hidden="true">{order.categoryIcon ?? '🛠️'}</span>
           {order.category ? t(`categories.${order.category}`) : ''}
         </span>
-        <span className={`${styles.status} ${styles[STATUS_TONE[order.status]]}`}>
-          {t(`orderStatus.${order.status}`)}
+        <span className={styles.statusGroup}>
+          {fresh > 0 ? (
+            <span className={styles.fresh}>{t('notifications.newCount', { count: fresh })}</span>
+          ) : null}
+          <span className={`${styles.status} ${styles[STATUS_TONE[order.status]]}`}>
+            {t(`orderStatus.${order.status}`)}
+          </span>
         </span>
       </div>
 

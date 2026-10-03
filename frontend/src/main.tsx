@@ -6,6 +6,7 @@ import './styles/global.css';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
 import { BootScreen } from './components/BootScreen';
 
 // Dev-only: lets the UI render in a normal browser. `import.meta.env.DEV` is
@@ -24,7 +25,9 @@ createRoot(container).render(
       <BrowserRouter>
         <SettingsProvider>
           <AuthProvider>
-            <App />
+            <NotificationsProvider>
+              <App />
+            </NotificationsProvider>
           </AuthProvider>
         </SettingsProvider>
       </BrowserRouter>

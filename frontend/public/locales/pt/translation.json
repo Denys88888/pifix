@@ -17,7 +17,8 @@
     "releaseToRefresh": "Solte para atualizar",
     "privacy": "Política de privacidade",
     "maintenance": "O PiFix está em manutenção. Algumas ações estão temporariamente indisponíveis.",
-    "truncated": "Mostrando os {{shown}} mais próximos. Reduza o raio para refinar a busca."
+    "truncated": "Mostrando os {{shown}} mais próximos. Reduza o raio para refinar a busca.",
+    "close": "Fechar"
   },
   "nav": {
     "label": "Navegação principal",
@@ -447,6 +448,29 @@
       "refund": "orçamento devolvido ao cliente",
       "refund_with_fees": "valor total com taxas devolvido ao cliente",
       "cancel": "serviço cancelado"
+    }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "empty": "Nada de novo ainda.",
+    "readAll": "Marcar tudo como lido",
+    "new": "novo",
+    "toast": "Há novidades — toque para ver",
+    "unreadAria": "Notificações: {{count}} novas",
+    "newCount_one": "{{count}} nova",
+    "newCount_other": "{{count}} novas",
+    "type": {
+      "response_new": "Nova resposta ao seu serviço #{{publicId}} de @{{username}}",
+      "hired": "Você foi contratado para o serviço #{{publicId}}. Combine os detalhes no chat.",
+      "message": "Novas mensagens no chat do serviço #{{publicId}}: {{count}}",
+      "message_admin": "A administração escreveu no chat do serviço #{{publicId}}",
+      "dispute_opened": "Foi aberta uma disputa no serviço #{{publicId}}. O dinheiro fica congelado até a decisão.",
+      "dispute_resolved": "A disputa do serviço #{{publicId}} foi resolvida: {{decision}}",
+      "job_done": "O profissional marcou o serviço #{{publicId}} como concluído. Verifique e confirme.",
+      "job_confirmed": "O cliente confirmou o serviço #{{publicId}}. {{amount}} π foram creditados a você.",
+      "auto_released": "O serviço #{{publicId}} foi fechado automaticamente e pago ao profissional.",
+      "payout_sent": "Um pagamento de {{amount}} π foi enviado para sua carteira Pi.",
+      "order_cancelled": "O cliente cancelou o serviço #{{publicId}} ao qual você respondeu."
     }
   }
 }

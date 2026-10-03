@@ -232,7 +232,58 @@ async function main() {
   const decisionLine = (chatAfter.body?.items ?? []).find((m: any) => m.role === 'ADMIN' && m.text.startsWith('@resolution:refund'));
   check('the decision is posted into the chat as well', Boolean(decisionLine), JSON.stringify(chatAfter.body?.items?.slice(-1)));
 
-  console.log('\n═══ 4. A cancelled order closes the chat ═══');
+  console.log('\n═══ 4. Notifications follow what happened ═══');
+
+  const sum = async (t: string) => (await call('GET', '/notifications/summary', { token: t })).body;
+  const clientSum = await sum(clientT);
+  const masterSum = await sum(masterT);
+  const strangerSum = await sum(strangerT);
+  check('the client has unread news on this order', (clientSum?.byOrder?.[hired.id] ?? 0) > 0, JSON.stringify(clientSum));
+  check('the master has unread news on this order', (masterSum?.byOrder?.[hired.id] ?? 0) > 0, JSON.stringify(masterSum));
+  check('a stranger has nothing about it', !strangerSum?.byOrder?.[hired.id], JSON.stringify(strangerSum));
+
+  const clientList = await call('GET', '/notifications', { token: clientT });
+  const types = new Set((clientList.body?.items ?? []).filter((n: any) => n.order?.id === hired.id).map((n: any) => n.type));
+  check('the client was told about the messages, the dispute and the decision',
+    types.has('message') && types.has('dispute_opened') && types.has('dispute_resolved'), JSON.stringify([...types]));
+  const msgLine = (clientList.body?.items ?? []).find((n: any) => n.order?.id === hired.id && n.type === 'message');
+  check('several messages collapse into one counted line', (msgLine?.count ?? 0) >= 2, String(msgLine?.count));
+
+  const masterList = await call('GET', '/notifications', { token: masterT });
+  const masterTypes = new Set((masterList.body?.items ?? []).filter((n: any) => n.order?.id === hired.id).map((n: any) => n.type));
+  check('the master opened the dispute, so is not told it was opened', !masterTypes.has('dispute_opened'),
+    JSON.stringify([...masterTypes]));
+  check('but the master is told the decision', masterTypes.has('dispute_resolved'), JSON.stringify([...masterTypes]));
+
+  const read = await call('POST', '/notifications/read', { token: clientT, body: { orderId: hired.id } });
+  check('opening the order marks its news read', read.status === 200 && read.body?.marked > 0, JSON.stringify(read.body));
+  const afterRead = await sum(clientT);
+  check('and the badge for it is gone', !afterRead?.byOrder?.[hired.id], JSON.stringify(afterRead));
+  const spyRead2 = await call('POST', '/notifications/read', { token: strangerT, body: { orderId: hired.id } });
+  check('a stranger marking it read touches nothing of the parties', spyRead2.body?.marked === 0,
+    JSON.stringify(spyRead2.body));
+
+  console.log('\n═══ 5. The settings page can save (support contact, auto-payout switch) ═══');
+
+  const before = await call('GET', '/admin/settings', { basic: ADMIN_BASIC });
+  const saved = await call('PUT', '/admin/settings', {
+    basic: ADMIN_BASIC,
+    body: { supportContact: 'support@example.com', autoPayoutOnRelease: false, minBudgetPi: '1' },
+  });
+  check('saving text and a switch together works', saved.status === 200, `got ${saved.status} ${JSON.stringify(saved.body).slice(0, 140)}`);
+  const reread = await call('GET', '/admin/settings', { basic: ADMIN_BASIC });
+  check('both were stored',
+    reread.body?.settings?.supportContact === 'support@example.com' && reread.body?.settings?.autoPayoutOnRelease === false,
+    JSON.stringify({ c: reread.body?.settings?.supportContact, a: reread.body?.settings?.autoPayoutOnRelease }));
+  await call('PUT', '/admin/settings', {
+    basic: ADMIN_BASIC,
+    body: {
+      supportContact: before.body?.settings?.supportContact ?? '',
+      autoPayoutOnRelease: before.body?.settings?.autoPayoutOnRelease ?? true,
+    },
+  });
+
+  console.log('\n═══ 6. A cancelled order closes the chat ═══');
 
   await prisma.order.update({ where: { id: hired.id }, data: { status: OrderStatus.CANCELLED } });
   const closed = await call('POST', `/orders/${hired.id}/messages`, { token: clientT, body: { text: 'still there?' } });

@@ -17,7 +17,8 @@
     "releaseToRefresh": "Thả để làm mới",
     "privacy": "Chính sách bảo mật",
     "maintenance": "PiFix đang bảo trì. Một số thao tác tạm thời không dùng được.",
-    "truncated": "Đang hiển thị {{shown}} kết quả gần nhất. Thu nhỏ bán kính để tìm chính xác hơn."
+    "truncated": "Đang hiển thị {{shown}} kết quả gần nhất. Thu nhỏ bán kính để tìm chính xác hơn.",
+    "close": "Đóng"
   },
   "nav": {
     "label": "Điều hướng chính",
@@ -446,6 +447,28 @@
       "refund": "đã hoàn ngân sách cho khách",
       "refund_with_fees": "đã hoàn toàn bộ số tiền kèm phí cho khách",
       "cancel": "việc đã bị hủy"
+    }
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "empty": "Chưa có gì mới.",
+    "readAll": "Đánh dấu đã đọc",
+    "new": "mới",
+    "toast": "Có điều mới — chạm để xem",
+    "unreadAria": "Thông báo: {{count}} mới",
+    "newCount_other": "{{count}} mới",
+    "type": {
+      "response_new": "Phản hồi mới cho việc #{{publicId}} của bạn từ @{{username}}",
+      "hired": "Bạn được thuê cho việc #{{publicId}}. Hãy thống nhất chi tiết trong trò chuyện.",
+      "message": "Tin nhắn mới trong trò chuyện việc #{{publicId}}: {{count}}",
+      "message_admin": "Ban quản trị đã viết trong trò chuyện việc #{{publicId}}",
+      "dispute_opened": "Đã mở tranh chấp cho việc #{{publicId}}. Tiền bị giữ lại đến khi có quyết định.",
+      "dispute_resolved": "Tranh chấp việc #{{publicId}} đã được giải quyết: {{decision}}",
+      "job_done": "Thợ đã đánh dấu việc #{{publicId}} hoàn thành. Hãy kiểm tra và xác nhận.",
+      "job_confirmed": "Khách đã xác nhận việc #{{publicId}}. Bạn được cộng {{amount}} π.",
+      "auto_released": "Việc #{{publicId}} đã tự động đóng và trả cho thợ.",
+      "payout_sent": "Đã gửi {{amount}} π vào ví Pi của bạn.",
+      "order_cancelled": "Khách đã hủy việc #{{publicId}} mà bạn đã phản hồi."
     }
   }
 }

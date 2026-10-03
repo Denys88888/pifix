@@ -17,7 +17,8 @@
     "releaseToRefresh": "Release to refresh",
     "privacy": "Privacy policy",
     "maintenance": "PiFix is under maintenance. Some actions are temporarily unavailable.",
-    "truncated": "Showing the {{shown}} nearest matches. Reduce the radius to narrow the search."
+    "truncated": "Showing the {{shown}} nearest matches. Reduce the radius to narrow the search.",
+    "close": "Close"
   },
   "nav": {
     "label": "Main navigation",
@@ -630,7 +631,8 @@
       "payout_failed": "Payout failed: {{detail}}. The balance was restored.",
       "payout_unconfirmed": "Transfer sent but not confirmed (Pi payment {{detail}}). Do not pay again — press \"Check the transfer\".",
       "reconciled_paid": "Found on the ledger — the request is closed",
-      "reconciled_restored": "Not on the ledger — the balance was restored and the request reopened"
+      "reconciled_restored": "Not on the ledger — the balance was restored and the request reopened",
+      "auto_paid": "Automatic payout after a confirmed job"
     },
     "payoutError": {
       "kyc_required": "the user has not passed KYC",
@@ -652,7 +654,9 @@
     },
     "disputeReason": "Dispute reason",
     "openChat": "Chat",
-    "chatTitle": "Chat for job #{{id}}"
+    "chatTitle": "Chat for job #{{id}}",
+    "autoPayoutLabel": "Pay the master automatically once a job is confirmed",
+    "autoPayoutHint": "As soon as the client confirms (or the auto-release time passes), the master's whole balance is sent to their Pi wallet. Works when payouts are configured and the master has a wallet on file."
   },
   "support": {
     "title": "Contact us",
@@ -686,6 +690,29 @@
       "refund": "budget refunded to the client",
       "refund_with_fees": "full amount with fees refunded to the client",
       "cancel": "order cancelled"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Nothing new yet.",
+    "readAll": "Mark all read",
+    "new": "new",
+    "toast": "Something new — tap to see",
+    "unreadAria": "Notifications: {{count}} new",
+    "newCount_one": "{{count}} new",
+    "newCount_other": "{{count}} new",
+    "type": {
+      "response_new": "New response to your job #{{publicId}} from @{{username}}",
+      "hired": "You were hired for job #{{publicId}}. Agree on the details in the chat.",
+      "message": "New messages in the chat of job #{{publicId}}: {{count}}",
+      "message_admin": "The administration wrote in the chat of job #{{publicId}}",
+      "dispute_opened": "A dispute was opened on job #{{publicId}}. The money is frozen until a decision.",
+      "dispute_resolved": "The dispute on job #{{publicId}} was settled: {{decision}}",
+      "job_done": "The master marked job #{{publicId}} as done. Check it and confirm.",
+      "job_confirmed": "The client confirmed job #{{publicId}}. {{amount}} π was credited to you.",
+      "auto_released": "Job #{{publicId}} was closed automatically and paid to the master.",
+      "payout_sent": "A payout of {{amount}} π was sent to your Pi wallet.",
+      "order_cancelled": "The client cancelled job #{{publicId}} that you responded to."
     }
   }
 }

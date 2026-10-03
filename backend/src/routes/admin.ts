@@ -26,6 +26,7 @@ adminRouter.post('/login-pi', requireAuth, piAdminLimiter, asyncHandler(admin.ad
 adminRouter.use(requireAdmin);
 
 adminRouter.get('/dashboard', asyncHandler(admin.dashboard));
+adminRouter.get('/badges', asyncHandler(admin.badges));
 
 adminRouter.get('/orders', asyncHandler(admin.listOrders));
 adminRouter.get('/orders/:id', asyncHandler(admin.getOrder));

@@ -17,7 +17,8 @@
     "releaseToRefresh": "Puść, aby odświeżyć",
     "privacy": "Polityka prywatności",
     "maintenance": "PiFix jest w trakcie prac serwisowych. Część funkcji jest chwilowo niedostępna.",
-    "truncated": "Pokazano {{shown}} najbliższych. Zmniejsz promień, aby zawęzić wyszukiwanie."
+    "truncated": "Pokazano {{shown}} najbliższych. Zmniejsz promień, aby zawęzić wyszukiwanie.",
+    "close": "Zamknij"
   },
   "nav": {
     "label": "Nawigacja główna",
@@ -449,6 +450,31 @@
       "refund": "budżet zwrócony klientowi",
       "refund_with_fees": "cała kwota z prowizją zwrócona klientowi",
       "cancel": "zlecenie anulowane"
+    }
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "empty": "Na razie nic nowego.",
+    "readAll": "Oznacz wszystkie",
+    "new": "nowe",
+    "toast": "Jest coś nowego — dotknij, aby zobaczyć",
+    "unreadAria": "Powiadomienia: {{count}} nowych",
+    "newCount_one": "{{count}} nowe",
+    "newCount_few": "{{count}} nowe",
+    "newCount_many": "{{count}} nowych",
+    "newCount_other": "{{count}} nowych",
+    "type": {
+      "response_new": "Nowa odpowiedź na twoje zlecenie #{{publicId}} od @{{username}}",
+      "hired": "Zatrudniono cię do zlecenia #{{publicId}}. Ustal szczegóły na czacie.",
+      "message": "Nowe wiadomości w czacie zlecenia #{{publicId}}: {{count}}",
+      "message_admin": "Administracja napisała w czacie zlecenia #{{publicId}}",
+      "dispute_opened": "Otwarto spór w zleceniu #{{publicId}}. Pieniądze są zamrożone do decyzji.",
+      "dispute_resolved": "Spór w zleceniu #{{publicId}} rozstrzygnięty: {{decision}}",
+      "job_done": "Fachowiec oznaczył zlecenie #{{publicId}} jako wykonane. Sprawdź i potwierdź.",
+      "job_confirmed": "Klient potwierdził zlecenie #{{publicId}}. Naliczono ci {{amount}} π.",
+      "auto_released": "Zlecenie #{{publicId}} zamknięto automatycznie, zapłata trafiła do fachowca.",
+      "payout_sent": "Wypłata {{amount}} π została wysłana do twojego portfela Pi.",
+      "order_cancelled": "Klient anulował zlecenie #{{publicId}}, na które odpowiedziałeś."
     }
   }
 }

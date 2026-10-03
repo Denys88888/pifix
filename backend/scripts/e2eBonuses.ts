@@ -112,6 +112,11 @@ async function main() {
   const direct = settings.referralBonusDirectPi;
   const indirect = settings.referralBonusIndirectPi;
 
+  // These sections exercise the MANUAL withdrawal path. With automatic payout
+  // on, every confirmed job opens its own payout request and the manual
+  // request below is refused as "already pending". Restored at the end.
+  await prisma.platformSettings.update({ where: { id: 1 }, data: { autoPayoutOnRelease: false } });
+
   console.log('\n═══ 1. Two-level referral bonuses ═══');
 
   const alice = await register('alice', stamp);                       // level 2
@@ -393,6 +398,67 @@ async function main() {
   `;
   check('ledger still balances after both outcomes', driftAfter.length === 0,
     JSON.stringify(driftAfter).slice(0, 200));
+
+  console.log('\n═══ 5. Automatic payout after the client confirms ═══');
+
+  /**
+   * With the switch on, confirming a job sends the master's balance to their
+   * wallet without anyone pressing "Pay". This backend's wallet cannot sign,
+   * so the transfer fails — which is the path that must not lose money: the
+   * request is created, the balance is debited, the transfer fails, the
+   * balance comes back and the request waits for the admin.
+   */
+  await prisma.platformSettings.update({ where: { id: 1 }, data: { autoPayoutOnRelease: true } });
+  await prisma.withdrawalRequest.updateMany({
+    where: { userId: carol.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+    data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+  });
+  const autoOrder = await prisma.order.create({
+    data: {
+      publicId: publicId(), clientId: client.id, categoryId: category.id,
+      title: 'Carol auto-payout job', description: 'Confirmed to trigger the automatic payout.',
+      budgetPi: '7', address: 'Warsaw', lat: 52.23, lng: 21.01,
+      status: OrderStatus.AWAITING_CONFIRMATION, masterId: carol.id,
+      escrowStatus: EscrowStatus.FUNDED, escrowAmountPi: '7',
+      masterPayoutPi: '7', totalPaidPi: '7.7', clientFeePi: '0.7',
+      autoReleaseAt: new Date(Date.now() + 86400_000),
+    },
+  });
+  const carolBefore = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  const confirmAuto = await api('POST', `/orders/${autoOrder.id}/confirm`, { token: client.jwt });
+  check('client confirms the job', confirmAuto.status === 200, `got ${confirmAuto.status}`);
+
+  // The payout runs after the response, so give it a moment to finish.
+  let autoRequest = null as Awaited<ReturnType<typeof prisma.withdrawalRequest.findFirst>>;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((r) => setTimeout(r, 500));
+    autoRequest = await prisma.withdrawalRequest.findFirst({
+      where: { userId: carol.id, createdAt: { gte: autoOrder.createdAt } },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (autoRequest && autoRequest.status !== 'APPROVED') break;
+  }
+  check('a payout was started without anyone pressing "Pay"', autoRequest !== null, 'no request was created');
+  check('it was for the whole balance, job included',
+    !!autoRequest && autoRequest.amountPi.equals(carolBefore.add(7)),
+    `${autoRequest?.amountPi?.toString()} vs ${carolBefore.add(7).toString()}`);
+  check('the failed transfer reopened it for the admin',
+    autoRequest?.status === 'REQUESTED' && String(autoRequest?.adminNote).startsWith('@payout_failed'),
+    `${autoRequest?.status} ${autoRequest?.adminNote}`);
+  const carolAfter = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  check('AND THE MASTER KEEPS THE MONEY: earned, debited, restored', carolAfter.equals(carolBefore.add(7)),
+    `${carolBefore.toString()} → ${carolAfter.toString()}`);
+  const told = await prisma.notification.findFirst({ where: { userId: carol.id, orderId: autoOrder.id, type: 'job_confirmed' } });
+  check('the master was told the job was confirmed', told !== null);
+  const driftAuto: Array<{ username: string }> = await prisma.$queryRaw`
+    SELECT u.username FROM users u
+    LEFT JOIN transactions t ON t."userId" = u.id AND t."affectsBalance"
+    GROUP BY u.id, u.username, u."balancePi"
+    HAVING u."balancePi" <> COALESCE(SUM(t."amountPi"), 0)
+  `;
+  check('ledger still balances after the automatic attempt', driftAuto.length === 0, JSON.stringify(driftAuto).slice(0, 200));
+
+  await prisma.platformSettings.update({ where: { id: 1 }, data: { autoPayoutOnRelease: settings.autoPayoutOnRelease } });
 
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);
   if (fail > 0) {

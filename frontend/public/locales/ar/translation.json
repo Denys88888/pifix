@@ -17,7 +17,8 @@
     "releaseToRefresh": "أفلت للتحديث",
     "privacy": "سياسة الخصوصية",
     "maintenance": "PiFix قيد الصيانة. بعض الإجراءات غير متاحة مؤقتًا.",
-    "truncated": "يتم عرض أقرب {{shown}} نتيجة. قلّل النطاق لتضييق البحث."
+    "truncated": "يتم عرض أقرب {{shown}} نتيجة. قلّل النطاق لتضييق البحث.",
+    "close": "إغلاق"
   },
   "nav": {
     "label": "التنقل الرئيسي",
@@ -451,6 +452,33 @@
       "refund": "أُعيدت الميزانية إلى العميل",
       "refund_with_fees": "أُعيد المبلغ كاملًا مع الرسوم إلى العميل",
       "cancel": "أُلغي الطلب"
+    }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا جديد بعد.",
+    "readAll": "تعليم الكل كمقروء",
+    "new": "جديد",
+    "toast": "هناك جديد — اضغط للعرض",
+    "unreadAria": "الإشعارات: {{count}} جديدة",
+    "newCount_zero": "{{count}} جديدة",
+    "newCount_one": "{{count}} جديد",
+    "newCount_two": "{{count}} جديدان",
+    "newCount_few": "{{count}} جديدة",
+    "newCount_many": "{{count}} جديدًا",
+    "newCount_other": "{{count}} جديد",
+    "type": {
+      "response_new": "رد جديد على طلبك #{{publicId}} من @{{username}}",
+      "hired": "تم توظيفك للطلب #{{publicId}}. اتفق على التفاصيل في المحادثة.",
+      "message": "رسائل جديدة في محادثة الطلب #{{publicId}}: {{count}}",
+      "message_admin": "كتبت الإدارة في محادثة الطلب #{{publicId}}",
+      "dispute_opened": "فُتح نزاع على الطلب #{{publicId}}. المال مجمّد حتى القرار.",
+      "dispute_resolved": "تمت تسوية نزاع الطلب #{{publicId}}: {{decision}}",
+      "job_done": "أشار الحرفي إلى أن الطلب #{{publicId}} مكتمل. تحقّق وأكّد.",
+      "job_confirmed": "أكّد العميل الطلب #{{publicId}}. أُضيف إليك {{amount}} π.",
+      "auto_released": "أُغلق الطلب #{{publicId}} تلقائيًا ودُفع للحرفي.",
+      "payout_sent": "أُرسلت دفعة بقيمة {{amount}} π إلى محفظة Pi الخاصة بك.",
+      "order_cancelled": "ألغى العميل الطلب #{{publicId}} الذي رددت عليه."
     }
   }
 }
