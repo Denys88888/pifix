@@ -1,5 +1,12 @@
 .wrap {
   position: relative;
+  /* A stacking context of its own. Leaflet gives its panes and controls
+     z-indexes of 400–1000, and without this they competed with the whole page:
+     the map was drawn on top of the response sheet (z-index 100), covering the
+     text the pioneer was typing. Inside an isolated context those numbers only
+     order the map's own layers. */
+  isolation: isolate;
+  z-index: 0;
   width: 100%;
   border-radius: var(--radius);
   overflow: hidden;

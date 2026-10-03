@@ -13,6 +13,7 @@ import { authApi, paymentsApi } from '../api/endpoints';
 import type { SelfUser } from '../api/types';
 import {
   authenticate,
+  ensureSdkAuthenticated,
   initPi,
   isPiBrowser,
   PiBridgeTimeoutError,
@@ -176,6 +177,10 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       void refreshUser().then(() => {
         setStatus((current) => (current === 'booting' ? 'signed_out' : current));
       });
+      // The app's session survived the reload; the Pi SDK's did not. Re-running
+      // authenticate in the background is what lets the next payment go through
+      // and is the only way a dangling payment from before the reload is found.
+      void ensureSdkAuthenticated().catch(() => undefined);
     } else {
       setStatus('signed_out');
     }

@@ -373,7 +373,9 @@
     "active_orders_exist": "Selesaikan atau batalkan dulu pekerjaan aktif Anda.",
     "already_reviewed": "Anda sudah mengulas pekerjaan ini.",
     "escrow_not_funded": "Tidak ada dana yang perlu dilepas untuk pekerjaan ini.",
-    "maintenance": "PiFix sedang dalam pemeliharaan. Coba lagi nanti."
+    "maintenance": "PiFix sedang dalam pemeliharaan. Coba lagi nanti.",
+    "pi_sdk_error": "Pi tidak menerima pembayaran: {{detail}}",
+    "pi_no_response": "Pi tidak merespons. Tutup lalu buka lagi PiFix, kemudian coba bayar lagi."
   },
   "privacy": {
     "title": "Kebijakan privasi",

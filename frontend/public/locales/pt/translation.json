@@ -374,7 +374,9 @@
     "active_orders_exist": "Conclua ou cancele primeiro seus serviços ativos.",
     "already_reviewed": "Você já avaliou este serviço.",
     "escrow_not_funded": "Não há nada a liberar neste serviço.",
-    "maintenance": "O PiFix está em manutenção. Tente mais tarde."
+    "maintenance": "O PiFix está em manutenção. Tente mais tarde.",
+    "pi_sdk_error": "O Pi não aceitou o pagamento: {{detail}}",
+    "pi_no_response": "O Pi não respondeu. Feche e abra o PiFix novamente e tente pagar outra vez."
   },
   "privacy": {
     "title": "Política de privacidade",

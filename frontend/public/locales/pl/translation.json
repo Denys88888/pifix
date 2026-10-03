@@ -376,7 +376,9 @@
     "active_orders_exist": "Najpierw zakończ lub anuluj aktywne zlecenia.",
     "already_reviewed": "Już wystawiłeś opinię do tego zlecenia.",
     "escrow_not_funded": "Nie ma czego wypłacić dla tego zlecenia.",
-    "maintenance": "PiFix jest w trakcie prac serwisowych. Spróbuj później."
+    "maintenance": "PiFix jest w trakcie prac serwisowych. Spróbuj później.",
+    "pi_sdk_error": "Pi nie przyjął płatności: {{detail}}",
+    "pi_no_response": "Pi nie odpowiada. Zamknij i ponownie otwórz PiFix, a potem spróbuj zapłacić jeszcze raz."
   },
   "privacy": {
     "title": "Polityka prywatności",

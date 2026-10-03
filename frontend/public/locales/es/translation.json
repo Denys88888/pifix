@@ -374,7 +374,9 @@
     "active_orders_exist": "Termina o cancela primero tus trabajos activos.",
     "already_reviewed": "Ya has valorado este trabajo.",
     "escrow_not_funded": "No hay nada que liberar en este trabajo.",
-    "maintenance": "PiFix está en mantenimiento. Inténtalo más tarde."
+    "maintenance": "PiFix está en mantenimiento. Inténtalo más tarde.",
+    "pi_sdk_error": "Pi no aceptó el pago: {{detail}}",
+    "pi_no_response": "Pi no respondió. Cierra y vuelve a abrir PiFix e intenta pagar de nuevo."
   },
   "privacy": {
     "title": "Política de privacidad",

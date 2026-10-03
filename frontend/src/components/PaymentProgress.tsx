@@ -24,7 +24,7 @@ export function PaymentProgress({
 
   if (stage === 'error' || stage === 'cancelled') {
     const key = errorCode ? `errors.${errorCode}` : 'errors.payment_failed';
-    const translated = t(key, { defaultValue: '' });
+    const translated = t(key, { defaultValue: '', detail: error ?? '' });
     return (
       <div className="alert alert--error">
         {translated || error || t('errors.payment_failed')}

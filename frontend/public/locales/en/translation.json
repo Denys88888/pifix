@@ -374,7 +374,9 @@
     "active_orders_exist": "Finish or cancel your active jobs first.",
     "already_reviewed": "You have already reviewed this job.",
     "escrow_not_funded": "There is nothing to release for this job.",
-    "maintenance": "PiFix is under maintenance. Please try again shortly."
+    "maintenance": "PiFix is under maintenance. Please try again shortly.",
+    "pi_sdk_error": "Pi did not accept the payment: {{detail}}",
+    "pi_no_response": "Pi did not respond. Close and reopen PiFix, then try the payment again."
   },
   "privacy": {
     "title": "Privacy policy",

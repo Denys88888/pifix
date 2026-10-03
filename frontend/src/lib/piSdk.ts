@@ -53,6 +53,8 @@ declare global {
 
 let initialised = false;
 let incompleteHandler: ((payment: IncompletePayment) => void) | null = null;
+/** Set once Pi.authenticate with the payments scope succeeded in this page load. */
+let sdkAuthenticated: Promise<PiAuthResult> | null = null;
 
 /**
  * How long to wait for the Pi native bridge to answer authenticate() before
@@ -126,7 +128,7 @@ export async function authenticate(
   // it must NOT do is claim to know why: the same hang happens inside the real
   // Pi Browser when the pioneer has no Pi session, so it reports "Pi did not
   // respond" rather than "you are not in Pi Browser".
-  return Promise.race([
+  const result = await Promise.race([
     window.Pi!.authenticate(scopes, (payment) => {
       incompleteHandler?.(payment);
     }),
@@ -134,6 +136,30 @@ export async function authenticate(
       setTimeout(() => reject(new PiBridgeTimeoutError()), AUTH_BRIDGE_TIMEOUT_MS),
     ),
   ]);
+  if (scopes.includes('payments')) sdkAuthenticated = Promise.resolve(result);
+  return result;
+}
+
+/**
+ * Makes sure Pi.authenticate has run with the payments scope in THIS page load.
+ *
+ * The app keeps its own session across a reload (sessionStorage), but the Pi
+ * SDK does not: after a reload it has never been authenticated, and
+ * Pi.createPayment then fails through onError with no useful message — the
+ * pioneer saw "payment not completed" right after refreshing the page. It is
+ * also the only way dangling payments get reported, because the SDK surfaces
+ * them through authenticate() and nowhere else. Memoised, so the native sheet
+ * appears at most once per page load; a failure is forgotten so a retry asks
+ * again.
+ */
+export function ensureSdkAuthenticated(): Promise<PiAuthResult> {
+  if (!sdkAuthenticated) {
+    sdkAuthenticated = authenticate(['username', 'payments', 'wallet_address']).catch((error) => {
+      sdkAuthenticated = null;
+      throw error;
+    });
+  }
+  return sdkAuthenticated;
 }
 
 /**

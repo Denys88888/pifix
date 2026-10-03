@@ -378,7 +378,9 @@
     "active_orders_exist": "أنهِ أو ألغِ طلباتك النشطة أولًا.",
     "already_reviewed": "لقد قيّمت هذا الطلب من قبل.",
     "escrow_not_funded": "لا يوجد مبلغ لتحويله في هذا الطلب.",
-    "maintenance": "PiFix قيد الصيانة. حاول لاحقًا."
+    "maintenance": "PiFix قيد الصيانة. حاول لاحقًا.",
+    "pi_sdk_error": "لم يقبل Pi الدفع: {{detail}}",
+    "pi_no_response": "لم يستجب Pi. أغلق PiFix وافتحه من جديد، ثم أعد محاولة الدفع."
   },
   "privacy": {
     "title": "سياسة الخصوصية",

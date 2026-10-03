@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { paymentsApi } from '../api/endpoints';
-import { createPayment, isPiBrowser } from '../lib/piSdk';
+import { createPayment, ensureSdkAuthenticated, isPiBrowser } from '../lib/piSdk';
 import { pollPaymentStatus, type PollResult } from '../lib/paymentPolling';
 import { ApiError } from '../api/client';
 
@@ -65,6 +65,10 @@ export function usePayment() {
       let paymentId = '';
 
       try {
+        // After a page reload the app still has its session but the Pi SDK
+        // does not, and createPayment would fail with nothing to show for it.
+        await ensureSdkAuthenticated();
+
         const result = await createPayment(
           {
             // Pi's SDK takes a number here; the server re-derives the exact
@@ -137,9 +141,14 @@ export function usePayment() {
         if (caught instanceof ApiError) {
           setErrorCode(caught.code);
           setError(caught.message);
+        } else if (caught instanceof Error && caught.name === 'PiBridgeTimeoutError') {
+          setErrorCode('pi_no_response');
+          setError(caught.message);
         } else {
-          setErrorCode('payment_failed');
-          setError(caught instanceof Error ? caught.message : 'Payment failed');
+          // Pi's own refusal. Its message is the only clue to what went wrong,
+          // so it is shown rather than replaced by a generic sentence.
+          setErrorCode('pi_sdk_error');
+          setError(caught instanceof Error ? caught.message : String(caught));
         }
         return null;
       } finally {
