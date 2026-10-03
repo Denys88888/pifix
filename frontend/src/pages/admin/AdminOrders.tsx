@@ -121,6 +121,13 @@ export default function AdminOrders(): JSX.Element {
                   </td>
                   <td>
                     <span className={styles.pill}>{t(`orderStatus.${order.status}`)}</span>
+                    {/* The reason was stored but never shown here, so a
+                        dispute had to be decided without reading it. */}
+                    {order.status === 'DISPUTED' && order.disputeReason ? (
+                      <div className="hint" style={{ maxWidth: 260, whiteSpace: 'pre-wrap', marginTop: 4 }}>
+                        <strong>{t('admin.disputeReason')}:</strong> {order.disputeReason}
+                      </div>
+                    ) : null}
                   </td>
                   <td>
                     <span

@@ -651,7 +651,8 @@
     "paymentStep": {
       "approve": "одобрение",
       "complete": "завершение"
-    }
+    },
+    "disputeReason": "Причина спора"
   },
   "support": {
     "title": "Связаться с нами",

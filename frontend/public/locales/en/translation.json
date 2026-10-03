@@ -647,7 +647,8 @@
     "paymentStep": {
       "approve": "approval",
       "complete": "completion"
-    }
+    },
+    "disputeReason": "Dispute reason"
   },
   "support": {
     "title": "Contact us",
