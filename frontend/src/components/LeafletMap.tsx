@@ -44,10 +44,17 @@ interface Props {
 
 const DEFAULT_CENTER = { lat: 20, lng: 0 };
 
-// CartoDB Positron — светлая карта с русскими подписями, без API ключа.
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-const ATTRIBUTION = '&copy; OpenStreetMap &copy; CARTO';
-const MAX_ZOOM = 20;
+/*
+ * OpenStreetMap's own tiles: light, labelled in the local language, no key.
+ *
+ * Not CARTO any more. Its basemaps started answering every tile with an "API
+ * KEY REQUIRED" watermark (seen in Pi Browser, October 2026), so the map showed
+ * nothing but that text. OSM's tile policy asks for this exact attribution and
+ * a single host without {s} subdomains; maxZoom 19 is the highest it serves.
+ */
+const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const MAX_ZOOM = 19;
 
 /**
  * Leaflet + OpenStreetMap: no API key, no billing, works from any country.
