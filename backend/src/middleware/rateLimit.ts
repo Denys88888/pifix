@@ -73,6 +73,17 @@ export const piAdminLimiter = rateLimit({
   keyGenerator: userKey,
 });
 
+/**
+ * Chat messages: 60 / 10 min / user. A conversation outruns writeLimiter's
+ * 30 per hour; this still stops a script flooding someone's order.
+ */
+export const chatLimiter = rateLimit({
+  ...base,
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  keyGenerator: userKey,
+});
+
 /** Uploads: 40 / hour / user. */
 export const uploadLimiter = rateLimit({
   ...base,

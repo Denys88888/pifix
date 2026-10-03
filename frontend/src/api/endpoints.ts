@@ -1,5 +1,7 @@
 import { adminApi, api } from './client';
 import type {
+  ChatMessage,
+  ChatPage,
   AdminDashboard,
   AdminSettings,
   Category,
@@ -138,6 +140,14 @@ export const ordersApi = {
   async dispute(id: string, reason: string) {
     const { data } = await api.post<{ order: Order }>(`/orders/${id}/dispute`, { reason });
     return data.order;
+  },
+  async messages(id: string, after?: string) {
+    const { data } = await api.get<ChatPage>(`/orders/${id}/messages`, { params: after ? { after } : {} });
+    return data;
+  },
+  async sendMessage(id: string, text: string) {
+    const { data } = await api.post<{ message: ChatMessage }>(`/orders/${id}/messages`, { text });
+    return data.message;
   },
   async responses(id: string, params: { page?: number; limit?: number; sort?: 'date' | 'price' | 'rating' } = {}) {
     const { data } = await api.get<Paginated<OrderResponse>>(`/orders/${id}/responses`, { params });
@@ -363,6 +373,16 @@ export const adminApiClient = {
   async resolveOrder(id: string, action: 'release' | 'refund' | 'refund_with_fees' | 'cancel', note?: string) {
     const { data } = await adminApi.post<{ order: Order }>(`/admin/orders/${id}/resolve`, { action, note });
     return data.order;
+  },
+  async orderMessages(id: string, after?: string) {
+    const { data } = await adminApi.get<ChatPage>(`/admin/orders/${id}/messages`, {
+      params: after ? { after } : {},
+    });
+    return data;
+  },
+  async sendOrderMessage(id: string, text: string) {
+    const { data } = await adminApi.post<{ message: ChatMessage }>(`/admin/orders/${id}/messages`, { text });
+    return data.message;
   },
   async masters(params: Record<string, string | number | undefined>) {
     const { data } = await adminApi.get<Paginated<MasterProfile>>('/admin/masters', { params });

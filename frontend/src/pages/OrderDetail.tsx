@@ -14,6 +14,7 @@ import { usePayment } from '../hooks/usePayment';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import { usePolling } from '../hooks/usePolling';
 import { formatDateTime, timeLeft } from '../lib/format';
+import { OrderChat } from '../components/OrderChat';
 import styles from '../styles/Pages.module.css';
 import detail from '../styles/OrderDetail.module.css';
 
@@ -331,7 +332,18 @@ export default function OrderDetail(): JSX.Element {
         ) : null}
         {order.status === 'DISPUTED' ? (
           <div className="alert alert--error">
-            {t('order.disputed')} — {order.disputeReason}
+            <strong>{t('order.disputed')}</strong>
+            {order.disputedBy ? ` · ${t(`dispute.openedBy.${order.disputedBy}`)}` : ''}
+            {order.disputeReason ? <div style={{ whiteSpace: 'pre-wrap' }}>{order.disputeReason}</div> : null}
+            <div className="hint" style={{ marginTop: 6 }}>
+              {t('dispute.whatNext')}
+            </div>
+          </div>
+        ) : null}
+        {order.resolution ? (
+          <div className="alert alert--info">
+            <strong>{t('dispute.decision')}:</strong> {t(`dispute.resolution.${order.resolution.action}`)}
+            {order.resolution.note ? <div style={{ whiteSpace: 'pre-wrap' }}>{order.resolution.note}</div> : null}
           </div>
         ) : null}
       </div>
@@ -397,6 +409,21 @@ export default function OrderDetail(): JSX.Element {
         <button className="btn" onClick={() => setReviewOpen(true)}>
           {t('review.leave')}
         </button>
+      ) : null}
+
+      {/* ── Chat (client and hired master) ──────────────────────────────── */}
+
+      {order.master && (isOwner || isAssignedMaster) ? (
+        <div className="card stack">
+          <h2 style={{ margin: 0 }}>{t('chat.title')}</h2>
+          <p className="hint" style={{ margin: 0 }}>
+            {t(isOwner ? 'chat.hintClient' : 'chat.hintMaster')}
+          </p>
+          <OrderChat
+            load={(after) => ordersApi.messages(order.id, after)}
+            send={(text) => ordersApi.sendMessage(order.id, text)}
+          />
+        </div>
       ) : null}
 
       {/* ── Responses (client only) ─────────────────────────────────────── */}

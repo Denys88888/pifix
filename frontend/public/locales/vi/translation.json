@@ -382,7 +382,9 @@
     "pi_sdk_error": "Pi không chấp nhận thanh toán: {{detail}}",
     "pi_no_response": "Pi không phản hồi. Hãy đóng và mở lại PiFix, rồi thử thanh toán lại.",
     "pi_api_key_invalid": "Máy chủ PiFix không kết nối được với Pi: khóa API không đúng.",
-    "payment_not_verified": "Pi chưa xác nhận giao dịch này trên blockchain."
+    "payment_not_verified": "Pi chưa xác nhận giao dịch này trên blockchain.",
+    "chat_not_open": "Trò chuyện mở khi khách thuê thợ.",
+    "chat_closed": "Việc đã đóng — không thể gửi tin nhắn nữa."
   },
   "privacy": {
     "title": "Chính sách bảo mật",
@@ -415,5 +417,35 @@
     "setLocation": "Đặt vị trí",
     "goOnline": "Bắt đầu nhận việc",
     "goOffline": "Tạm dừng"
+  },
+  "chat": {
+    "title": "Trò chuyện về việc",
+    "hintClient": "Thống nhất với thợ về thời gian và chi tiết. Bạn không cần đưa số điện thoại.",
+    "hintMaster": "Thống nhất với khách về thời gian và chi tiết. Bạn không cần đưa số điện thoại.",
+    "empty": "Chưa có tin nhắn. Hãy viết trước.",
+    "emptyAdmin": "Chưa ai viết trong việc này.",
+    "placeholder": "Tin nhắn…",
+    "placeholderAdmin": "Tin nhắn gửi cả hai bên từ ban quản trị…",
+    "send": "Gửi",
+    "sending": "Đang gửi…",
+    "closed": "Việc đã bị hủy — trò chuyện đã đóng.",
+    "admin": "Ban quản trị",
+    "you": "Bạn",
+    "client": "Khách hàng",
+    "master": "Thợ"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Khách hàng đã mở tranh chấp",
+      "master": "Thợ đã mở tranh chấp"
+    },
+    "whatNext": "Ban quản trị sẽ đọc cuộc trò chuyện bên dưới và viết cho cả hai bên. Tiền bị giữ lại cho đến khi có quyết định.",
+    "decision": "Quyết định của ban quản trị",
+    "resolution": {
+      "release": "đã trả cho thợ",
+      "refund": "đã hoàn ngân sách cho khách",
+      "refund_with_fees": "đã hoàn toàn bộ số tiền kèm phí cho khách",
+      "cancel": "việc đã bị hủy"
+    }
   }
 }

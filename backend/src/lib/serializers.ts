@@ -102,8 +102,11 @@ export function masterProfileDTO(
 
 export function orderDTO(
   order: WithCategory & WithClient & WithMaster & WithCounts,
-  extra: { distanceKm?: number; viewerIsOwner?: boolean } = {},
+  extra: { distanceKm?: number; viewerIsOwner?: boolean; viewerIsParty?: boolean } = {},
 ) {
+  // A dispute is between the two sides and the admin. The reason used to be
+  // in every copy of the order, readable by anyone who could list it.
+  const party = Boolean(extra.viewerIsParty);
   return {
     id: order.id,
     publicId: order.publicId,
@@ -128,7 +131,23 @@ export function orderDTO(
     completedAt: order.completedAt?.toISOString() ?? null,
     confirmedAt: order.confirmedAt?.toISOString() ?? null,
     cancelledAt: order.cancelledAt?.toISOString() ?? null,
-    disputeReason: order.disputeReason,
+    disputeReason: party ? order.disputeReason : null,
+    disputedBy: party
+      ? order.disputedById
+        ? order.disputedById === order.clientId
+          ? ('client' as const)
+          : ('master' as const)
+        : null
+      : null,
+    disputeOpenedAt: party ? (order.disputeOpenedAt?.toISOString() ?? null) : null,
+    resolution:
+      party && order.resolutionAction
+        ? {
+            action: order.resolutionAction,
+            note: order.resolutionNote,
+            at: order.resolvedAt?.toISOString() ?? null,
+          }
+        : null,
     createdAt: order.createdAt.toISOString(),
     client: publicUser(order.client),
     master: publicUser(order.master),

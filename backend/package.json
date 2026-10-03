@@ -2,7 +2,7 @@
   "name": "pifix-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "PiFix — marketplace of handymen inside Pi Network. Express + Prisma + PostgreSQL.",
+  "description": "PiFix \u2014 marketplace of handymen inside Pi Network. Express + Prisma + PostgreSQL.",
   "main": "dist/server.js",
   "engines": {
     "node": ">=20"
@@ -23,7 +23,8 @@
     "test:security": "tsx scripts/e2eSecurity.ts",
     "test:kyc": "tsx scripts/e2eKyc.ts",
     "fake-pi": "tsx scripts/fakePiApi.ts",
-    "hash-admin-password": "tsx scripts/hashPassword.ts"
+    "hash-admin-password": "tsx scripts/hashPassword.ts",
+    "test:chat": "tsx scripts/e2eChat.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

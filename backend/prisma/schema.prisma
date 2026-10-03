@@ -135,6 +135,7 @@ model User {
   withdrawals     WithdrawalRequest[]
   reviewsAuthored Review[]            @relation("ReviewAuthor")
   reviewsReceived Review[]            @relation("ReviewTarget")
+  orderMessages   OrderMessage[]
 
   @@index([referrerId])
   @@index([isMaster, isBlocked])
@@ -149,7 +150,7 @@ model Category {
   sortOrder Int     @default(0)
   isActive  Boolean @default(true)
 
-  orders          Order[]
+  orders           Order[]
   masterCategories MasterCategory[]
 
   @@map("categories")
@@ -222,8 +223,8 @@ model Order {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  title       String @db.VarChar(120)
-  description String @db.VarChar(1000)
+  title       String  @db.VarChar(120)
+  description String  @db.VarChar(1000)
   budgetPi    Decimal @db.Decimal(15, 7)
 
   address String @db.VarChar(300)
@@ -236,8 +237,8 @@ model Order {
   status OrderStatus @default(OPEN)
 
   masterId           String?
-  master             User?     @relation("MasterOrders", fields: [masterId], references: [id], onDelete: SetNull)
-  selectedResponseId String?   @unique
+  master             User?   @relation("MasterOrders", fields: [masterId], references: [id], onDelete: SetNull)
+  selectedResponseId String? @unique
 
   // ── escrow bookkeeping (all Pi amounts) ──
   escrowStatus    EscrowStatus @default(NONE)
@@ -255,7 +256,16 @@ model Order {
   confirmedAt DateTime? // client confirmed / auto-released
   cancelledAt DateTime?
 
-  disputeReason String? @db.VarChar(500)
+  disputeReason   String?   @db.VarChar(500)
+  /// Who escalated: the client or the assigned master.
+  disputedById    String?
+  disputeOpenedAt DateTime?
+
+  /// The admin's decision, shown to both sides: release | refund |
+  /// refund_with_fees | cancel, plus the note the admin wrote.
+  resolutionAction String?   @db.VarChar(32)
+  resolutionNote   String?   @db.VarChar(500)
+  resolvedAt       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -264,6 +274,7 @@ model Order {
   reviews      Review[]
   payments     Payment[]
   transactions Transaction[]
+  messages     OrderMessage[]
 
   @@index([status, categoryId])
   @@index([status, createdAt])
@@ -272,6 +283,31 @@ model Order {
   @@index([masterId, status])
   @@index([escrowStatus, autoReleaseAt])
   @@map("orders")
+}
+
+enum MessageRole {
+  CLIENT
+  MASTER
+  ADMIN
+}
+
+/// Chat between the client and the hired master. During a dispute the admin
+/// reads it and writes into it, so both sides hear the same thing.
+model OrderMessage {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  /// Null for the admin, who is not a pioneer account.
+  authorId   String?
+  author     User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorRole MessageRole
+
+  text      String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+  @@map("order_messages")
 }
 
 model Response {
@@ -344,11 +380,11 @@ model Transaction {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  type TransactionType
+  type         TransactionType
   /// Positive = credited to the user's balance, negative = debited.
-  amountPi    Decimal @db.Decimal(15, 7)
-  balanceAfter Decimal @default(0) @db.Decimal(15, 7)
-  description String  @db.VarChar(300)
+  amountPi     Decimal         @db.Decimal(15, 7)
+  balanceAfter Decimal         @default(0) @db.Decimal(15, 7)
+  description  String          @db.VarChar(300)
 
   /// True  — this row moved `users.balancePi` (earnings, bonuses, withdrawals).
   /// False — the user paid from their Pi wallet, so the row is history only
@@ -416,38 +452,38 @@ model Review {
 model PlatformSettings {
   id Int @id @default(1)
 
-  connectPricePi          Decimal @default(0.5) @map("connect_price_pi") @db.Decimal(15, 7)
-  clientFeePercent        Decimal @default(10.0) @map("client_fee_percent") @db.Decimal(5, 2)
+  connectPricePi              Decimal @default(0.5) @map("connect_price_pi") @db.Decimal(15, 7)
+  clientFeePercent            Decimal @default(10.0) @map("client_fee_percent") @db.Decimal(5, 2)
   /// Optional cut taken from the master's payout (0 = master receives the full budget).
-  masterFeePercent        Decimal @default(0.0) @map("master_fee_percent") @db.Decimal(5, 2)
-  proSubscriptionPricePi  Decimal @default(10.0) @map("pro_subscription_price_pi") @db.Decimal(15, 7)
-  expressFeePi            Decimal @default(3.0) @map("express_fee_pi") @db.Decimal(15, 7)
-  profileBoostPricePi     Decimal @default(5.0) @map("profile_boost_price_pi") @db.Decimal(15, 7)
-  escrowTimeoutDays       Int     @default(7) @map("escrow_timeout_days")
-  referralBonusDirectPi   Decimal @default(1.0) @map("referral_bonus_direct_pi") @db.Decimal(15, 7)
-  referralBonusIndirectPi Decimal @default(0.5) @map("referral_bonus_indirect_pi") @db.Decimal(15, 7)
-  minBudgetPi             Decimal @default(1.0) @map("min_budget_pi") @db.Decimal(15, 7)
-  maxOpenOrdersPerClient  Int     @default(5) @map("max_open_orders_per_client")
-  maxActiveResponsesPerMaster Int @default(10) @map("max_active_responses_per_master")
-  connectRefundWindowMinutes  Int @default(60) @map("connect_refund_window_minutes")
+  masterFeePercent            Decimal @default(0.0) @map("master_fee_percent") @db.Decimal(5, 2)
+  proSubscriptionPricePi      Decimal @default(10.0) @map("pro_subscription_price_pi") @db.Decimal(15, 7)
+  expressFeePi                Decimal @default(3.0) @map("express_fee_pi") @db.Decimal(15, 7)
+  profileBoostPricePi         Decimal @default(5.0) @map("profile_boost_price_pi") @db.Decimal(15, 7)
+  escrowTimeoutDays           Int     @default(7) @map("escrow_timeout_days")
+  referralBonusDirectPi       Decimal @default(1.0) @map("referral_bonus_direct_pi") @db.Decimal(15, 7)
+  referralBonusIndirectPi     Decimal @default(0.5) @map("referral_bonus_indirect_pi") @db.Decimal(15, 7)
+  minBudgetPi                 Decimal @default(1.0) @map("min_budget_pi") @db.Decimal(15, 7)
+  maxOpenOrdersPerClient      Int     @default(5) @map("max_open_orders_per_client")
+  maxActiveResponsesPerMaster Int     @default(10) @map("max_active_responses_per_master")
+  connectRefundWindowMinutes  Int     @default(60) @map("connect_refund_window_minutes")
 
   /// Withdrawals below this are rejected.
-  minWithdrawalPi     Decimal @default(5.0) @map("min_withdrawal_pi") @db.Decimal(15, 7)
+  minWithdrawalPi  Decimal @default(5.0) @map("min_withdrawal_pi") @db.Decimal(15, 7)
   /// Balance at which a withdrawal is paid out without admin approval (0 = always manual).
-  autoWithdrawalPi    Decimal @default(0) @map("auto_withdrawal_pi") @db.Decimal(15, 7)
+  autoWithdrawalPi Decimal @default(0) @map("auto_withdrawal_pi") @db.Decimal(15, 7)
   /// Pi→USD rate used by the admin dashboard only. Never used for on-chain math.
-  piUsdRate           Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
-  maintenanceMode     Boolean @default(false) @map("maintenance_mode")
+  piUsdRate        Decimal @default(0) @map("pi_usd_rate") @db.Decimal(15, 7)
+  maintenanceMode  Boolean @default(false) @map("maintenance_mode")
 
   /// Days an unanswered OPEN order stays on the board before it is closed
   /// automatically. 0 disables it. Orders holding escrow are never touched —
   /// that is someone's money, not a stale listing.
-  orderExpiryDays     Int     @default(30) @map("order_expiry_days")
+  orderExpiryDays Int @default(30) @map("order_expiry_days")
 
   /// Where a pioneer can reach a human — an email, a Telegram handle, anything.
   /// Empty hides the contact block rather than showing somewhere to write to
   /// that nobody reads. Also cited by the privacy policy for data requests.
-  supportContact      String  @default("") @map("support_contact") @db.VarChar(200)
+  supportContact String @default("") @map("support_contact") @db.VarChar(200)
 
   updatedAt DateTime @updatedAt
 

@@ -383,7 +383,9 @@
     "pi_sdk_error": "O Pi não aceitou o pagamento: {{detail}}",
     "pi_no_response": "O Pi não respondeu. Feche e abra o PiFix novamente e tente pagar outra vez.",
     "pi_api_key_invalid": "O servidor do PiFix não consegue falar com o Pi: a chave de API está errada.",
-    "payment_not_verified": "O Pi ainda não confirmou esta transação na blockchain."
+    "payment_not_verified": "O Pi ainda não confirmou esta transação na blockchain.",
+    "chat_not_open": "O chat abre quando o cliente contrata um profissional.",
+    "chat_closed": "O serviço está encerrado — o chat não aceita mais mensagens."
   },
   "privacy": {
     "title": "Política de privacidade",
@@ -416,5 +418,35 @@
     "setLocation": "Definir local",
     "goOnline": "Começar a aceitar",
     "goOffline": "Parar por agora"
+  },
+  "chat": {
+    "title": "Chat do serviço",
+    "hintClient": "Combine com o profissional o horário e os detalhes. Não é preciso passar o seu telefone.",
+    "hintMaster": "Combine com o cliente o horário e os detalhes. Não é preciso passar o seu telefone.",
+    "empty": "Ainda não há mensagens. Escreva primeiro.",
+    "emptyAdmin": "Ninguém escreveu ainda neste serviço.",
+    "placeholder": "Mensagem…",
+    "placeholderAdmin": "Mensagem para ambas as partes da administração…",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "closed": "O serviço foi cancelado — o chat está fechado.",
+    "admin": "Administração",
+    "you": "Você",
+    "client": "Cliente",
+    "master": "Profissional"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Disputa aberta pelo cliente",
+      "master": "Disputa aberta pelo profissional"
+    },
+    "whatNext": "A administração vai ler o chat abaixo e escrever para os dois. O dinheiro fica congelado até a decisão.",
+    "decision": "Decisão da administração",
+    "resolution": {
+      "release": "pago ao profissional",
+      "refund": "orçamento devolvido ao cliente",
+      "refund_with_fees": "valor total com taxas devolvido ao cliente",
+      "cancel": "serviço cancelado"
+    }
   }
 }

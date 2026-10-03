@@ -5,6 +5,8 @@ import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { Order } from '../../api/types';
 import { formatDateTime } from '../../lib/format';
+import { Modal } from '../../components/Modal';
+import { OrderChat } from '../../components/OrderChat';
 import styles from '../../styles/Admin.module.css';
 
 const STATUSES = ['', 'OPEN', 'IN_PROGRESS', 'AWAITING_CONFIRMATION', 'COMPLETED', 'CANCELLED', 'DISPUTED'];
@@ -21,6 +23,8 @@ export default function AdminOrders(): JSX.Element {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** The order whose chat is open in the side sheet. */
+  const [chatOrder, setChatOrder] = useState<Order | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -125,8 +129,22 @@ export default function AdminOrders(): JSX.Element {
                         dispute had to be decided without reading it. */}
                     {order.status === 'DISPUTED' && order.disputeReason ? (
                       <div className="hint" style={{ maxWidth: 260, whiteSpace: 'pre-wrap', marginTop: 4 }}>
+                        {order.disputedBy ? (
+                          <div>
+                            <strong>{t(`dispute.openedBy.${order.disputedBy}`)}</strong>
+                          </div>
+                        ) : null}
                         <strong>{t('admin.disputeReason')}:</strong> {order.disputeReason}
                       </div>
+                    ) : null}
+                    {order.master ? (
+                      <button
+                        className={`${styles.smallBtn} ${styles.smallBtnGhost}`}
+                        style={{ marginTop: 6 }}
+                        onClick={() => setChatOrder(order)}
+                      >
+                        {t('admin.openChat')}
+                      </button>
                     ) : null}
                   </td>
                   <td>
@@ -208,6 +226,26 @@ export default function AdminOrders(): JSX.Element {
           >{t('admin.next')}</button>
         </div>
       </div>
+
+      <Modal
+        open={chatOrder !== null}
+        title={chatOrder ? t('admin.chatTitle', { id: chatOrder.publicId }) : ''}
+        onClose={() => setChatOrder(null)}
+      >
+        {chatOrder ? (
+          <div className="stack">
+            <p className="hint" style={{ margin: 0 }}>
+              @{chatOrder.client?.username ?? '—'} → @{chatOrder.master?.username ?? '—'}
+            </p>
+            <OrderChat
+              key={chatOrder.id}
+              asAdmin
+              load={(after) => adminApiClient.orderMessages(chatOrder.id, after)}
+              send={(text) => adminApiClient.sendOrderMessage(chatOrder.id, text)}
+            />
+          </div>
+        ) : null}
+      </Modal>
     </>
   );
 }

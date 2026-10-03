@@ -382,7 +382,9 @@
     "pi_sdk_error": "Pi tidak menerima pembayaran: {{detail}}",
     "pi_no_response": "Pi tidak merespons. Tutup lalu buka lagi PiFix, kemudian coba bayar lagi.",
     "pi_api_key_invalid": "Server PiFix tidak dapat terhubung ke Pi: kunci API salah.",
-    "payment_not_verified": "Pi belum mengonfirmasi transaksi ini di blockchain."
+    "payment_not_verified": "Pi belum mengonfirmasi transaksi ini di blockchain.",
+    "chat_not_open": "Obrolan terbuka setelah klien menyewa tukang.",
+    "chat_closed": "Pekerjaan ditutup — obrolan tidak menerima pesan lagi."
   },
   "privacy": {
     "title": "Kebijakan privasi",
@@ -415,5 +417,35 @@
     "setLocation": "Tentukan lokasi",
     "goOnline": "Mulai menerima",
     "goOffline": "Berhenti dulu"
+  },
+  "chat": {
+    "title": "Obrolan pekerjaan",
+    "hintClient": "Sepakati waktu dan detail dengan tukang. Anda tidak perlu memberikan nomor telepon.",
+    "hintMaster": "Sepakati waktu dan detail dengan klien. Anda tidak perlu memberikan nomor telepon.",
+    "empty": "Belum ada pesan. Tulis lebih dulu.",
+    "emptyAdmin": "Belum ada yang menulis di pekerjaan ini.",
+    "placeholder": "Pesan…",
+    "placeholderAdmin": "Pesan untuk kedua pihak dari administrasi…",
+    "send": "Kirim",
+    "sending": "Mengirim…",
+    "closed": "Pekerjaan dibatalkan — obrolan ditutup.",
+    "admin": "Administrasi",
+    "you": "Anda",
+    "client": "Klien",
+    "master": "Tukang"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Sengketa dibuka oleh klien",
+      "master": "Sengketa dibuka oleh tukang"
+    },
+    "whatNext": "Administrasi akan membaca obrolan di bawah dan menulis kepada kalian berdua. Uang dibekukan sampai ada keputusan.",
+    "decision": "Keputusan administrasi",
+    "resolution": {
+      "release": "dibayarkan ke tukang",
+      "refund": "anggaran dikembalikan ke klien",
+      "refund_with_fees": "seluruh jumlah dengan biaya dikembalikan ke klien",
+      "cancel": "pekerjaan dibatalkan"
+    }
   }
 }

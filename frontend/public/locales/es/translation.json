@@ -383,7 +383,9 @@
     "pi_sdk_error": "Pi no aceptó el pago: {{detail}}",
     "pi_no_response": "Pi no respondió. Cierra y vuelve a abrir PiFix e intenta pagar de nuevo.",
     "pi_api_key_invalid": "El servidor de PiFix no puede conectar con Pi: la clave de API es incorrecta.",
-    "payment_not_verified": "Pi aún no ha confirmado esta transacción en la blockchain."
+    "payment_not_verified": "Pi aún no ha confirmado esta transacción en la blockchain.",
+    "chat_not_open": "El chat se abre cuando el cliente contrata a un profesional.",
+    "chat_closed": "El trabajo está cerrado: el chat ya no acepta mensajes."
   },
   "privacy": {
     "title": "Política de privacidad",
@@ -416,5 +418,35 @@
     "setLocation": "Indicar zona",
     "goOnline": "Empezar a aceptar",
     "goOffline": "Parar por ahora"
+  },
+  "chat": {
+    "title": "Chat del trabajo",
+    "hintClient": "Acuerda con el profesional la hora y los detalles. No es necesario compartir tu teléfono.",
+    "hintMaster": "Acuerda con el cliente la hora y los detalles. No es necesario compartir tu teléfono.",
+    "empty": "Aún no hay mensajes. Escribe primero.",
+    "emptyAdmin": "Nadie ha escrito todavía en este trabajo.",
+    "placeholder": "Mensaje…",
+    "placeholderAdmin": "Mensaje a ambas partes de la administración…",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "closed": "El trabajo fue cancelado: el chat está cerrado.",
+    "admin": "Administración",
+    "you": "Tú",
+    "client": "Cliente",
+    "master": "Profesional"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Disputa abierta por el cliente",
+      "master": "Disputa abierta por el profesional"
+    },
+    "whatNext": "La administración leerá el chat de abajo y os escribirá a ambos. El dinero queda congelado hasta la decisión.",
+    "decision": "Decisión de la administración",
+    "resolution": {
+      "release": "pagado al profesional",
+      "refund": "presupuesto devuelto al cliente",
+      "refund_with_fees": "importe total con comisiones devuelto al cliente",
+      "cancel": "trabajo cancelado"
+    }
   }
 }

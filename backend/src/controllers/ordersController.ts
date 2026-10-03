@@ -48,6 +48,11 @@ export const listOrdersSchema = z.object({
 
 export const idParamSchema = z.object({ id: z.string().uuid() });
 
+/** The client or the hired master — who may see the dispute and its outcome. */
+function isParty(order: { clientId: string; masterId: string | null }, viewerId?: string): boolean {
+  return Boolean(viewerId && (order.clientId === viewerId || order.masterId === viewerId));
+}
+
 export async function createOrder(req: Request, res: Response): Promise<void> {
   const input = createOrderSchema.parse(req.body);
   const settings = await getSettings();
@@ -96,7 +101,7 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
   });
 
   logger.info('Order published', { orderId: order.id, publicId: order.publicId, budget: money(budget) });
-  res.status(201).json({ order: orderDTO(order, { viewerIsOwner: true }) });
+  res.status(201).json({ order: orderDTO(order, { viewerIsOwner: true, viewerIsParty: true }) });
 }
 
 export async function listOrders(req: Request, res: Response): Promise<void> {
@@ -157,6 +162,7 @@ export async function listOrders(req: Request, res: Response): Promise<void> {
         orderDTO(entry.order, {
           distanceKm: entry.distanceKm,
           viewerIsOwner: entry.order.clientId === viewerId,
+          viewerIsParty: isParty(entry.order, viewerId),
         }),
       );
 
@@ -177,7 +183,9 @@ export async function listOrders(req: Request, res: Response): Promise<void> {
 
   res.json(
     paginate(
-      rows.map((order) => orderDTO(order, { viewerIsOwner: order.clientId === viewerId })),
+      rows.map((order) =>
+        orderDTO(order, { viewerIsOwner: order.clientId === viewerId, viewerIsParty: isParty(order, viewerId) }),
+      ),
       q.page,
       q.limit,
       total,
@@ -210,7 +218,9 @@ export async function myOrders(req: Request, res: Response): Promise<void> {
 
   res.json(
     paginate(
-      rows.map((order) => orderDTO(order, { viewerIsOwner: order.clientId === req.user!.id })),
+      rows.map((order) =>
+        orderDTO(order, { viewerIsOwner: order.clientId === req.user!.id, viewerIsParty: true }),
+      ),
       q.page,
       q.limit,
       total,
@@ -230,7 +240,10 @@ export async function getOrder(req: Request, res: Response): Promise<void> {
   const charges = computeOrderCharges(settings, order.budgetPi, order.isUrgent);
 
   res.json({
-    order: orderDTO(order, { viewerIsOwner: order.clientId === req.user?.id }),
+    order: orderDTO(order, {
+      viewerIsOwner: order.clientId === req.user?.id,
+      viewerIsParty: isParty(order, req.user?.id),
+    }),
     quote: {
       escrowAmountPi: money(charges.escrowAmountPi),
       clientFeePi: money(charges.clientFeePi),
@@ -331,7 +344,7 @@ export async function markCompleted(req: Request, res: Response): Promise<void> 
     include: { category: true, client: true, master: true },
   });
 
-  res.json({ order: orderDTO(updated) });
+  res.json({ order: orderDTO(updated, { viewerIsParty: true }) });
 }
 
 /** Client confirms → escrow is released to the master's balance. */
@@ -355,7 +368,7 @@ export async function confirmOrder(req: Request, res: Response): Promise<void> {
     include: { category: true, client: true, master: true },
   });
 
-  res.json({ order: orderDTO(fresh), released: Boolean(released) });
+  res.json({ order: orderDTO(fresh, { viewerIsParty: true }), released: Boolean(released) });
 }
 
 export const disputeSchema = z.object({ reason: z.string().trim().min(10).max(500) });
@@ -379,6 +392,12 @@ export async function openDispute(req: Request, res: Response): Promise<void> {
     data: {
       status: OrderStatus.DISPUTED,
       disputeReason: input.reason,
+      disputedById: req.user!.id,
+      disputeOpenedAt: new Date(),
+      // A new dispute starts with no decision on it.
+      resolutionAction: null,
+      resolutionNote: null,
+      resolvedAt: null,
       // Freeze the auto-release so an admin, not the timer, resolves it.
       autoReleaseAt: null,
     },
@@ -386,5 +405,5 @@ export async function openDispute(req: Request, res: Response): Promise<void> {
   });
 
   logger.warn('Dispute opened', { orderId: order.id, by: req.user!.username });
-  res.json({ order: orderDTO(updated) });
+  res.json({ order: orderDTO(updated, { viewerIsParty: true }) });
 }

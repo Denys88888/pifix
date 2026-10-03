@@ -385,7 +385,9 @@
     "pi_sdk_error": "Pi nie przyjął płatności: {{detail}}",
     "pi_no_response": "Pi nie odpowiada. Zamknij i ponownie otwórz PiFix, a potem spróbuj zapłacić jeszcze raz.",
     "pi_api_key_invalid": "Serwer PiFix nie może połączyć się z Pi: nieprawidłowy klucz API.",
-    "payment_not_verified": "Pi jeszcze nie potwierdził tej transakcji w blockchainie."
+    "payment_not_verified": "Pi jeszcze nie potwierdził tej transakcji w blockchainie.",
+    "chat_not_open": "Czat otworzy się, gdy klient zatrudni fachowca.",
+    "chat_closed": "Zlecenie zamknięte — czat nie przyjmuje wiadomości."
   },
   "privacy": {
     "title": "Polityka prywatności",
@@ -418,5 +420,35 @@
     "setLocation": "Ustaw miejsce",
     "goOnline": "Zacznij przyjmować",
     "goOffline": "Na razie przerwij"
+  },
+  "chat": {
+    "title": "Czat zlecenia",
+    "hintClient": "Ustal z fachowcem termin i szczegóły. Nie musisz podawać numeru telefonu.",
+    "hintMaster": "Ustal z klientem termin i szczegóły pracy. Nie musisz podawać numeru telefonu.",
+    "empty": "Brak wiadomości. Napisz pierwszy.",
+    "emptyAdmin": "Nikt jeszcze nie pisał w tym zleceniu.",
+    "placeholder": "Wiadomość…",
+    "placeholderAdmin": "Wiadomość do obu stron od administracji…",
+    "send": "Wyślij",
+    "sending": "Wysyłanie…",
+    "closed": "Zlecenie anulowane — czat zamknięty.",
+    "admin": "Administracja",
+    "you": "Ty",
+    "client": "Klient",
+    "master": "Fachowiec"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Spór otworzył klient",
+      "master": "Spór otworzył fachowiec"
+    },
+    "whatNext": "Administracja przeczyta czat poniżej i napisze do was obu. Pieniądze są zamrożone do decyzji.",
+    "decision": "Decyzja administracji",
+    "resolution": {
+      "release": "wypłacono fachowcowi",
+      "refund": "budżet zwrócony klientowi",
+      "refund_with_fees": "cała kwota z prowizją zwrócona klientowi",
+      "cancel": "zlecenie anulowane"
+    }
   }
 }

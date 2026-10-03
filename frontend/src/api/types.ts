@@ -95,7 +95,11 @@ export interface Order {
   completedAt: string | null;
   confirmedAt: string | null;
   cancelledAt: string | null;
+  /** Dispute details reach only the two sides and the admin; null for anyone else. */
   disputeReason: string | null;
+  disputedBy: 'client' | 'master' | null;
+  disputeOpenedAt: string | null;
+  resolution: { action: ResolutionAction; note: string | null; at: string | null } | null;
   createdAt: string;
   client: PublicUser | null;
   master: PublicUser | null;
@@ -103,6 +107,24 @@ export interface Order {
   responseCount?: number;
   distanceKm?: number;
   isOwner?: boolean;
+}
+
+export type ResolutionAction = 'release' | 'refund' | 'refund_with_fees' | 'cancel';
+
+export interface ChatMessage {
+  id: string;
+  role: 'CLIENT' | 'MASTER' | 'ADMIN';
+  username: string | null;
+  text: string;
+  /** Written by the person viewing — always false for the admin's view. */
+  mine: boolean;
+  createdAt: string;
+}
+
+export interface ChatPage {
+  items: ChatMessage[];
+  /** Whether the two sides can still write. */
+  open: boolean;
 }
 
 export interface OrderResponse {

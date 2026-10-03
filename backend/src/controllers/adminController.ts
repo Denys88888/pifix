@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import {
   EscrowStatus,
+  MessageRole,
   OrderStatus,
   PaymentStatus,
   Prisma,
@@ -233,7 +234,7 @@ export async function listOrders(req: Request, res: Response): Promise<void> {
     prisma.order.count({ where }),
   ]);
 
-  res.json(paginate(rows.map((order) => orderDTO(order)), q.page, q.limit, total));
+  res.json(paginate(rows.map((order) => orderDTO(order, { viewerIsParty: true })), q.page, q.limit, total));
 }
 
 export async function getOrder(req: Request, res: Response): Promise<void> {
@@ -258,7 +259,7 @@ export async function getOrder(req: Request, res: Response): Promise<void> {
   if (!order) throw notFound('order_not_found', 'Order not found');
 
   res.json({
-    order: orderDTO(order),
+    order: orderDTO(order, { viewerIsParty: true }),
     responses: order.responses.map((response) => ({
       id: response.id,
       masterId: response.masterId,
@@ -325,11 +326,31 @@ export async function resolveOrder(req: Request, res: Response): Promise<void> {
 
   await audit(req.admin!.username, `order:${input.action}`, order.id, { note: input.note });
 
+  // Both sides see what was decided and why, on the order and in the chat.
+  // Before this the status simply changed and nobody was told anything.
+  const note = input.note?.trim() ? input.note.trim().slice(0, 500) : null;
+  await prisma.order.update({
+    where: { id: order.id },
+    data: { resolutionAction: input.action, resolutionNote: note, resolvedAt: new Date() },
+  });
+  if (order.masterId) {
+    await prisma.orderMessage
+      .create({
+        data: {
+          orderId: order.id,
+          authorId: null,
+          authorRole: MessageRole.ADMIN,
+          text: `@resolution:${input.action}${note ? `\n${note}` : ''}`,
+        },
+      })
+      .catch((error) => logger.warn('Could not post the resolution to the chat', { error: (error as Error).message }));
+  }
+
   const fresh = await prisma.order.findUniqueOrThrow({
     where: { id: order.id },
     include: { category: true, client: true, master: true },
   });
-  res.json({ order: orderDTO(fresh) });
+  res.json({ order: orderDTO(fresh, { viewerIsParty: true }) });
 }
 
 // ── Masters & verification ───────────────────────────────────────────────────

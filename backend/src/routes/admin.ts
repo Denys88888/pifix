@@ -4,6 +4,7 @@ import { requireAdmin } from '../middleware/adminAuth';
 import { requireAuth } from '../middleware/auth';
 import { adminLoginLimiter, piAdminLimiter } from '../middleware/rateLimit';
 import * as admin from '../controllers/adminController';
+import * as messages from '../controllers/messagesController';
 
 export const adminRouter = Router();
 
@@ -29,6 +30,8 @@ adminRouter.get('/dashboard', asyncHandler(admin.dashboard));
 adminRouter.get('/orders', asyncHandler(admin.listOrders));
 adminRouter.get('/orders/:id', asyncHandler(admin.getOrder));
 adminRouter.post('/orders/:id/resolve', asyncHandler(admin.resolveOrder));
+adminRouter.get('/orders/:id/messages', asyncHandler(messages.adminListMessages));
+adminRouter.post('/orders/:id/messages', asyncHandler(messages.adminPostMessage));
 
 adminRouter.get('/masters', asyncHandler(admin.listMasters));
 adminRouter.post('/masters/:id/verify', asyncHandler(admin.verifyMaster));

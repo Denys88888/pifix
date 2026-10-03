@@ -383,7 +383,9 @@
     "pi_sdk_error": "Pi did not accept the payment: {{detail}}",
     "pi_no_response": "Pi did not respond. Close and reopen PiFix, then try the payment again.",
     "pi_api_key_invalid": "The PiFix server cannot reach Pi: its API key is wrong. The admin can see this in the panel.",
-    "payment_not_verified": "Pi has not confirmed this transaction on the blockchain yet."
+    "payment_not_verified": "Pi has not confirmed this transaction on the blockchain yet.",
+    "chat_not_open": "The chat opens once the client hires a master.",
+    "chat_closed": "This order is closed — the chat no longer accepts messages."
   },
   "privacy": {
     "title": "Privacy policy",
@@ -583,7 +585,7 @@
     "lastUpdated": "Last updated",
     "maintenanceLabel": "Maintenance mode — blocks new orders and shows a banner in the app.",
     "payoutConfirm": "This creates a real App→User payment on the Pi network.",
-    "notePrompt": "Note (optional)",
+    "notePrompt": "A note on the decision — the client and the master will see it (optional)",
     "supportContact": {
       "label": "Support contact",
       "placeholder": "email, Telegram, anything a person can reach you at",
@@ -648,10 +650,42 @@
       "approve": "approval",
       "complete": "completion"
     },
-    "disputeReason": "Dispute reason"
+    "disputeReason": "Dispute reason",
+    "openChat": "Chat",
+    "chatTitle": "Chat for job #{{id}}"
   },
   "support": {
     "title": "Contact us",
     "body": "Something went wrong, or a payment is stuck? Write to us — a person reads this."
+  },
+  "chat": {
+    "title": "Order chat",
+    "hintClient": "Agree on the time and the details with the master. You do not have to share your phone number.",
+    "hintMaster": "Agree on the time and the details with the client. You do not have to share your phone number.",
+    "empty": "No messages yet. Write first.",
+    "emptyAdmin": "Nobody has written on this order yet.",
+    "placeholder": "Message…",
+    "placeholderAdmin": "Message to both sides from the administration…",
+    "send": "Send",
+    "sending": "Sending…",
+    "closed": "The order was cancelled — the chat is closed.",
+    "admin": "Administration",
+    "you": "You",
+    "client": "Client",
+    "master": "Master"
+  },
+  "dispute": {
+    "openedBy": {
+      "client": "Dispute opened by the client",
+      "master": "Dispute opened by the master"
+    },
+    "whatNext": "The administration will read the chat below and write to you both. The money stays frozen until there is a decision.",
+    "decision": "Administration decision",
+    "resolution": {
+      "release": "paid to the master",
+      "refund": "budget refunded to the client",
+      "refund_with_fees": "full amount with fees refunded to the client",
+      "cancel": "order cancelled"
+    }
   }
 }
