@@ -370,10 +370,14 @@ export async function lazySweep(intervalSeconds: number): Promise<void> {
   if (claimed === 0) {
     // Either another instance just claimed the slot, or this is the first sweep
     // and the row does not exist yet. Only the insert winner carries on.
-    const created = await prisma.systemState
-      .create({ data: { key: SWEEP_KEY, value: String(now) } })
-      .catch(() => null);
-    if (!created) return;
+    // skipDuplicates (ON CONFLICT DO NOTHING) rather than create + catch: the
+    // row exists on every call but the first, and a failed create is logged by
+    // Prisma as `prisma:error` — once per API request, burying real errors.
+    const created = await prisma.systemState.createMany({
+      data: [{ key: SWEEP_KEY, value: String(now) }],
+      skipDuplicates: true,
+    });
+    if (created.count === 0) return;
   }
 
   await expireStaleOrders().catch((error) =>

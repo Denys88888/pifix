@@ -55,10 +55,13 @@ async function acquireA2uLock(): Promise<string | null> {
        AND value::bigint < ${now}::bigint
   `;
   if (claimed > 0) return lease;
-  const created = await prisma.systemState
-    .create({ data: { key: A2U_LOCK_KEY, value: lease } })
-    .catch(() => null);
-  return created ? lease : null;
+  // Same reasoning as the escrow sweep: a conflicting create would be logged
+  // as an error on every contended attempt.
+  const created = await prisma.systemState.createMany({
+    data: [{ key: A2U_LOCK_KEY, value: lease }],
+    skipDuplicates: true,
+  });
+  return created.count > 0 ? lease : null;
 }
 
 async function releaseA2uLock(lease: string): Promise<void> {
