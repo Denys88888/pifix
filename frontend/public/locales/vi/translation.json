@@ -190,7 +190,12 @@
     "certificates": "Chứng chỉ",
     "workArea": "Khu vực làm việc",
     "reviews": "Đánh giá ({{count}})",
-    "noReviews": "Chưa có đánh giá."
+    "noReviews": "Chưa có đánh giá.",
+    "howToHire": {
+      "title": "Cách thuê {{name}}",
+      "body": "Trên PiFix, bạn đăng việc và thợ sẽ phản hồi. Hãy đăng việc thuộc lĩnh vực của thợ này — {{name}} sẽ thấy nếu làm việc gần bạn và có thể báo giá.",
+      "cta": "Đăng việc"
+    }
   },
   "masterProfile": {
     "title": "Hồ sơ thợ",

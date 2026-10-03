@@ -190,7 +190,12 @@
     "certificates": "Sertifikat",
     "workArea": "Area kerja",
     "reviews": "Ulasan ({{count}})",
-    "noReviews": "Belum ada ulasan."
+    "noReviews": "Belum ada ulasan.",
+    "howToHire": {
+      "title": "Cara menyewa {{name}}",
+      "body": "Di PiFix Anda memasang pekerjaan dan para tukang menanggapinya. Pasang pekerjaan di kategori tukang ini — {{name}} akan melihatnya jika bekerja di dekat Anda dan dapat menawarkan harga.",
+      "cta": "Pasang pekerjaan"
+    }
   },
   "masterProfile": {
     "title": "Profil tukang",

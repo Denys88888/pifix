@@ -8,12 +8,15 @@ import { SkeletonList } from '../components/SkeletonCard';
 import { LeafletMap } from '../components/LeafletMap';
 import { formatDate } from '../lib/format';
 import { ApiError } from '../api/client';
+import { useAuth } from '../hooks/useAuth';
 import styles from '../styles/Pages.module.css';
 import profileStyles from '../styles/MasterProfile.module.css';
 
 export default function MasterProfile(): JSX.Element {
   const { username = '' } = useParams();
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const isOwnProfile = Boolean(user && user.username.toLowerCase() === username.toLowerCase());
 
   const [profile, setProfile] = useState<MasterProfileType | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -116,6 +119,24 @@ export default function MasterProfile(): JSX.Element {
 
       {profile.verificationStatus !== 'VERIFIED' ? (
         <div className="alert alert--warn">{t('master.notVerifiedPublic')}</div>
+      ) : null}
+
+      {/* PiFix has no direct hire: a client publishes a job and masters
+          respond to it. Without this card the profile was a dead end — a
+          pioneer found a master and had no idea what to do next. */}
+      {!isOwnProfile ? (
+        <div className="card stack">
+          <h2>{t('master.howToHire.title', { name: profile.displayName })}</h2>
+          <p className="muted" style={{ margin: 0 }}>
+            {t('master.howToHire.body', { name: profile.displayName })}
+          </p>
+          <Link
+            to={profile.categories[0] ? `/orders/new?category=${encodeURIComponent(profile.categories[0])}` : '/orders/new'}
+            className="btn"
+          >
+            {t('master.howToHire.cta')}
+          </Link>
+        </div>
       ) : null}
 
       <div className="card stack">

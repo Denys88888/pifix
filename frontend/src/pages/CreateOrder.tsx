@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ordersApi } from '../api/endpoints';
 import { ApiError } from '../api/client';
@@ -20,7 +20,9 @@ export default function CreateOrder(): JSX.Element {
   const { user } = useAuth();
   const geo = useGeolocation();
 
-  const [categorySlug, setCategorySlug] = useState('');
+  // Arriving from a master's profile preselects that master's trade.
+  const [searchParams] = useSearchParams();
+  const [categorySlug, setCategorySlug] = useState(() => searchParams.get('category') ?? '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [budget, setBudget] = useState('');

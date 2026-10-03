@@ -191,7 +191,12 @@
     "certificates": "Certificates",
     "workArea": "Work area",
     "reviews": "Reviews ({{count}})",
-    "noReviews": "No reviews yet."
+    "noReviews": "No reviews yet.",
+    "howToHire": {
+      "title": "How to hire {{name}}",
+      "body": "On PiFix you publish a job and masters respond to it. Post a job in this master's trade — {{name}} will see it if they work near you and can offer a price. You choose who does the job from the responses.",
+      "cta": "Post a job"
+    }
   },
   "masterProfile": {
     "title": "Master profile",

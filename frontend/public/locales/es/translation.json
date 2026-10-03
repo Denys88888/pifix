@@ -191,7 +191,12 @@
     "certificates": "Certificados",
     "workArea": "Zona de trabajo",
     "reviews": "Reseñas ({{count}})",
-    "noReviews": "Todavía no hay reseñas."
+    "noReviews": "Todavía no hay reseñas.",
+    "howToHire": {
+      "title": "Cómo contratar a {{name}}",
+      "body": "En PiFix publicas un trabajo y los profesionales responden. Publica un trabajo en la categoría de este profesional: {{name}} lo verá si trabaja cerca de ti y podrá ofrecer un precio.",
+      "cta": "Publicar trabajo"
+    }
   },
   "masterProfile": {
     "title": "Perfil profesional",

@@ -193,7 +193,12 @@
     "certificates": "Certyfikaty",
     "workArea": "Obszar pracy",
     "reviews": "Opinie ({{count}})",
-    "noReviews": "Brak opinii."
+    "noReviews": "Brak opinii.",
+    "howToHire": {
+      "title": "Jak zatrudnić: {{name}}",
+      "body": "W PiFix publikujesz zlecenie, a fachowcy sami na nie odpowiadają. Dodaj zlecenie w kategorii tego fachowca — {{name}} zobaczy je, jeśli pracuje w pobliżu, i zaproponuje cenę.",
+      "cta": "Dodaj zlecenie"
+    }
   },
   "masterProfile": {
     "title": "Profil fachowca",
