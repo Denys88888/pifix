@@ -140,6 +140,22 @@ export default function AdminDashboard(): JSX.Element {
         {data.system.piApiKey === 'invalid' ? (
           <div className="alert alert--error">{t('admin.piApiKeyFix')}</div>
         ) : null}
+        {data.system.payoutWallet ? (
+          <div className="hint" style={{ fontSize: 13, overflowWrap: 'anywhere' }}>
+            <strong>{t('admin.payoutWallet')}:</strong>{' '}
+            {data.system.payoutWallet.address === 'invalid-seed'
+              ? t('admin.payoutWalletInvalid')
+              : `${data.system.payoutWallet.address.slice(0, 6)}…${data.system.payoutWallet.address.slice(-6)}`}
+            {data.system.payoutWallet.address !== 'invalid-seed' ? (
+              <>
+                {' · '}
+                {data.system.payoutWallet.balancePi !== null
+                  ? t('admin.payoutWalletBalance', { amount: data.system.payoutWallet.balancePi })
+                  : t('admin.payoutWalletUnfunded')}
+              </>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className={styles.panel}>

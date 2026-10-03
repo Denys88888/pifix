@@ -102,6 +102,37 @@ function appKeypair(): StellarSdk.Keypair {
  * already credited the user — the admin can retry from the withdrawal screen.
  */
 /**
+ * Which wallet the payouts come from, and what is on it — for the admin.
+ *
+ * The seed itself never leaves the server; only the public address derived
+ * from it does. It answers the question nobody could answer before: is the
+ * key pasted into Render really the wallet the operator funded, or an old one?
+ * Cached for a minute so opening the dashboard does not call Horizon each time.
+ */
+let walletCache: { value: { address: string; balancePi: string | null }; at: number } | null = null;
+
+export async function payoutWalletInfo(): Promise<{ address: string; balancePi: string | null } | null> {
+  if (!env.payoutsConfigured) return null;
+  if (walletCache && Date.now() - walletCache.at < 60_000) return walletCache.value;
+  let address: string;
+  try {
+    address = appKeypair().publicKey();
+  } catch {
+    return { address: 'invalid-seed', balancePi: null };
+  }
+  let balancePi: string | null = null;
+  try {
+    const account = await horizon().loadAccount(address);
+    const native = account.balances.find((b) => b.asset_type === 'native');
+    balancePi = native ? native.balance : '0';
+  } catch {
+    // Not on the ledger (never funded) or Horizon unreachable — shown as unknown.
+  }
+  walletCache = { value: { address, balancePi }, at: Date.now() };
+  return walletCache.value;
+}
+
+/**
  * Whether a payout recipient must have passed KYC. Exported so the withdrawal
  * form can refuse early, on the same rule the money gate below applies — one
  * definition, so the two can never drift into telling the user different things.

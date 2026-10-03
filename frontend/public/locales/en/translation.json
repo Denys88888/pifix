@@ -656,7 +656,11 @@
     "openChat": "Chat",
     "chatTitle": "Chat for job #{{id}}",
     "autoPayoutLabel": "Pay the master automatically once a job is confirmed",
-    "autoPayoutHint": "As soon as the client confirms (or the auto-release time passes), the master's whole balance is sent to their Pi wallet. Works when payouts are configured and the master has a wallet on file."
+    "autoPayoutHint": "As soon as the client confirms (or the auto-release time passes), the master's whole balance is sent to their Pi wallet. Works when payouts are configured and the master has a wallet on file.",
+    "payoutWallet": "Payout wallet",
+    "payoutWalletBalance": "balance {{amount}} π",
+    "payoutWalletUnfunded": "not on the ledger or empty — fund it",
+    "payoutWalletInvalid": "the key on Render is invalid — check PI_WALLET_PRIVATE_SEED"
   },
   "support": {
     "title": "Contact us",

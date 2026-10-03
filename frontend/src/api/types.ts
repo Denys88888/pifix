@@ -286,6 +286,8 @@ export interface AdminDashboard {
   system: {
     /** Whether Pi accepts this server's API key — every payment fails when it does not. */
     piApiKey: 'ok' | 'invalid' | 'unreachable';
+    /** The wallet payouts are sent from — derived on the server, never the seed. */
+    payoutWallet: { address: string; balancePi: string | null } | null;
     recentPaymentErrors: Array<{
       at: string;
       username: string;

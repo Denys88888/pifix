@@ -19,7 +19,7 @@ import { isAdminPiUid, signAdminToken, verifyAdminCredentials } from '../middlew
 import { getSettings, updateSettings } from '../services/settings';
 import { refundEscrow, releaseEscrow } from '../services/escrow';
 import { postTransaction } from '../services/ledger';
-import { findOnChainByMemo } from '../services/piPayouts';
+import { findOnChainByMemo, payoutWalletInfo } from '../services/piPayouts';
 import { adminNote } from '../lib/adminNotes';
 import { audit } from '../lib/audit';
 import { executeWithdrawal } from '../services/withdrawals';
@@ -188,6 +188,7 @@ export async function dashboard(_req: Request, res: Response): Promise<void> {
     },
     system: {
       piApiKey: await checkServerKey(),
+      payoutWallet: await payoutWalletInfo(),
       recentPaymentErrors: await recentPaymentErrors(),
       sandbox: env.PI_SANDBOX,
       payoutsConfigured: env.payoutsConfigured,
