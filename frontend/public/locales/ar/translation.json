@@ -140,7 +140,21 @@
     "disputeTitle": "فتح نزاع",
     "disputeHint": "يبقى المبلغ محجوزًا حتى يراجع المشرف الحالة.",
     "disputePlaceholder": "اشرح ما حدث (10 أحرف على الأقل).",
-    "submitDispute": "إرسال النزاع"
+    "submitDispute": "إرسال النزاع",
+    "myResponse": {
+      "title": "ردّك",
+      "price": "سعرك",
+      "sent": "أُرسل {{date}}",
+      "waiting": "يرى العميل ردّك. عندما يختار حرفيًا سيظهر القرار هنا وتصلك إشعار.",
+      "withdraw": "سحب الرد",
+      "withdrawConfirm": "سحب ردّك؟ تُعاد الرسوم فقط خلال ساعة وما دام الطلب مفتوحًا.",
+      "status": {
+        "ACTIVE": "بانتظار العميل",
+        "SELECTED": "تم اختيارك",
+        "REJECTED": "تم اختيار حرفي آخر",
+        "WITHDRAWN": "مسحوب"
+      }
+    }
   },
   "createOrder": {
     "title": "إضافة طلب",
@@ -249,7 +263,8 @@
     "withdrawNote": "تُرسل عملات Pi إلى عنوان المحفظة المرتبط بحسابك في Pi.",
     "requestWithdrawal": "طلب سحب",
     "tab_map": "الخريطة",
-    "payoutsUnavailable": "السحب غير متاح مؤقتًا. رصيدك محفوظ وآمن."
+    "payoutsUnavailable": "السحب غير متاح مؤقتًا. رصيدك محفوظ وآمن.",
+    "piWalletDefault": "محفظة Pi الخاصة بحسابك"
   },
   "verification": {
     "UNVERIFIED": "ملفك غير موثّق. لا يمكنك إرسال عروض بعد.",
@@ -493,7 +508,8 @@
       "job_confirmed": "أكّد العميل الطلب #{{publicId}}. أُضيف إليك {{amount}} π.",
       "auto_released": "أُغلق الطلب #{{publicId}} تلقائيًا ودُفع للحرفي.",
       "payout_sent": "أُرسلت دفعة بقيمة {{amount}} π إلى محفظة Pi الخاصة بك.",
-      "order_cancelled": "ألغى العميل الطلب #{{publicId}} الذي رددت عليه."
+      "order_cancelled": "ألغى العميل الطلب #{{publicId}} الذي رددت عليه.",
+      "not_selected": "اختار العميل حرفيًا آخر للطلب #{{publicId}}."
     }
   }
 }

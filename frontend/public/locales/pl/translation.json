@@ -140,7 +140,21 @@
     "disputeTitle": "Otwórz spór",
     "disputeHint": "Środki pozostaną zablokowane, dopóki administrator nie rozpatrzy sprawy.",
     "disputePlaceholder": "Opisz, co poszło nie tak (min. 10 znaków).",
-    "submitDispute": "Zgłoś spór"
+    "submitDispute": "Zgłoś spór",
+    "myResponse": {
+      "title": "Twoja odpowiedź",
+      "price": "Twoja cena",
+      "sent": "Wysłano {{date}}",
+      "waiting": "Klient widzi twoją odpowiedź. Gdy wybierze fachowca, decyzja pojawi się tutaj i dostaniesz powiadomienie.",
+      "withdraw": "Wycofaj odpowiedź",
+      "withdrawConfirm": "Wycofać odpowiedź? Opłata wraca tylko w ciągu godziny i gdy zlecenie jest otwarte.",
+      "status": {
+        "ACTIVE": "czeka na wybór",
+        "SELECTED": "wybrano ciebie",
+        "REJECTED": "wybrano innego fachowca",
+        "WITHDRAWN": "wycofana"
+      }
+    }
   },
   "createOrder": {
     "title": "Nowe zlecenie",
@@ -247,7 +261,8 @@
     "withdrawNote": "Pi trafią na adres portfela powiązany z Twoim kontem Pi.",
     "requestWithdrawal": "Zgłoś wypłatę",
     "tab_map": "Mapa",
-    "payoutsUnavailable": "Wypłaty są chwilowo niedostępne. Twoje saldo jest bezpieczne."
+    "payoutsUnavailable": "Wypłaty są chwilowo niedostępne. Twoje saldo jest bezpieczne.",
+    "piWalletDefault": "portfel Pi twojego konta"
   },
   "verification": {
     "UNVERIFIED": "Profil niezweryfikowany. Nie możesz jeszcze zgłaszać się do zleceń.",
@@ -489,7 +504,8 @@
       "job_confirmed": "Klient potwierdził zlecenie #{{publicId}}. Naliczono ci {{amount}} π.",
       "auto_released": "Zlecenie #{{publicId}} zamknięto automatycznie, zapłata trafiła do fachowca.",
       "payout_sent": "Wypłata {{amount}} π została wysłana do twojego portfela Pi.",
-      "order_cancelled": "Klient anulował zlecenie #{{publicId}}, na które odpowiedziałeś."
+      "order_cancelled": "Klient anulował zlecenie #{{publicId}}, na które odpowiedziałeś.",
+      "not_selected": "Klient wybrał innego fachowca do zlecenia #{{publicId}}."
     }
   }
 }

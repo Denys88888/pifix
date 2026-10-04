@@ -140,7 +140,21 @@
     "disputeTitle": "Buka sengketa",
     "disputeHint": "Dana tetap dibekukan sampai administrator meninjau kasusnya.",
     "disputePlaceholder": "Jelaskan masalahnya (minimal 10 karakter).",
-    "submitDispute": "Kirim sengketa"
+    "submitDispute": "Kirim sengketa",
+    "myResponse": {
+      "title": "Tanggapan Anda",
+      "price": "Harga Anda",
+      "sent": "Dikirim {{date}}",
+      "waiting": "Klien melihat tanggapan Anda. Saat klien memilih tukang, keputusannya muncul di sini dan Anda mendapat notifikasi.",
+      "withdraw": "Tarik tanggapan",
+      "withdrawConfirm": "Tarik tanggapan Anda? Biaya hanya kembali dalam satu jam dan selama pekerjaan masih terbuka.",
+      "status": {
+        "ACTIVE": "menunggu klien",
+        "SELECTED": "Anda terpilih",
+        "REJECTED": "tukang lain terpilih",
+        "WITHDRAWN": "ditarik"
+      }
+    }
   },
   "createOrder": {
     "title": "Pasang pekerjaan",
@@ -244,7 +258,8 @@
     "withdrawNote": "Pi dikirim ke alamat dompet yang terhubung dengan akun Pi Anda.",
     "requestWithdrawal": "Ajukan penarikan",
     "tab_map": "Peta",
-    "payoutsUnavailable": "Penarikan sementara tidak tersedia. Saldo Anda tetap aman."
+    "payoutsUnavailable": "Penarikan sementara tidak tersedia. Saldo Anda tetap aman.",
+    "piWalletDefault": "dompet Pi akun Anda"
   },
   "verification": {
     "UNVERIFIED": "Profil Anda belum terverifikasi. Anda belum bisa mengirim penawaran.",
@@ -483,7 +498,8 @@
       "job_confirmed": "Klien mengonfirmasi pekerjaan #{{publicId}}. {{amount}} π dikreditkan kepada Anda.",
       "auto_released": "Pekerjaan #{{publicId}} ditutup otomatis dan dibayarkan ke tukang.",
       "payout_sent": "Pembayaran {{amount}} π dikirim ke dompet Pi Anda.",
-      "order_cancelled": "Klien membatalkan pekerjaan #{{publicId}} yang Anda tanggapi."
+      "order_cancelled": "Klien membatalkan pekerjaan #{{publicId}} yang Anda tanggapi.",
+      "not_selected": "Klien memilih tukang lain untuk pekerjaan #{{publicId}}."
     }
   }
 }

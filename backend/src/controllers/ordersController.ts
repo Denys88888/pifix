@@ -240,11 +240,30 @@ export async function getOrder(req: Request, res: Response): Promise<void> {
   const settings = await getSettings();
   const charges = computeOrderCharges(settings, order.budgetPi, order.isUrgent);
 
+  // A master who already responded sees their own response here instead of a
+  // second "Respond" button — before, the order looked untouched and only the
+  // server's refusal said otherwise.
+  const mine = req.user
+    ? await prisma.response.findUnique({
+        where: { orderId_masterId: { orderId: order.id, masterId: req.user.id } },
+      })
+    : null;
+
   res.json({
     order: orderDTO(order, {
       viewerIsOwner: order.clientId === req.user?.id,
       viewerIsParty: isParty(order, req.user?.id),
     }),
+    myResponse: mine
+      ? {
+          id: mine.id,
+          pricePi: money(mine.pricePi),
+          message: mine.message,
+          status: mine.status,
+          connectRefunded: mine.connectRefunded,
+          createdAt: mine.createdAt.toISOString(),
+        }
+      : null,
     quote: {
       escrowAmountPi: money(charges.escrowAmountPi),
       clientFeePi: money(charges.clientFeePi),

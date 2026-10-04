@@ -458,6 +458,78 @@ async function main() {
   `;
   check('ledger still balances after the automatic attempt', driftAuto.length === 0, JSON.stringify(driftAuto).slice(0, 200));
 
+  console.log('\n═══ 6. No wallet address on file is no reason to skip the payout ═══');
+
+  /**
+   * A2U payouts are addressed by the Pi uid; Pi picks the wallet. Requiring an
+   * address that Pi only sometimes reports at sign-in silently skipped every
+   * automatic payout for such a master — three confirmed jobs, nothing paid.
+   */
+  await prisma.withdrawalRequest.updateMany({
+    where: { userId: carol.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+    data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+  });
+  await prisma.user.update({ where: { id: carol.id }, data: { walletAddress: null } });
+  const noWalletOrder = await prisma.order.create({
+    data: {
+      publicId: publicId(), clientId: client.id, categoryId: category.id,
+      title: 'Carol job, no wallet on file', description: 'Confirmed with no wallet address stored.',
+      budgetPi: '3', address: 'Warsaw', lat: 52.23, lng: 21.01,
+      status: OrderStatus.AWAITING_CONFIRMATION, masterId: carol.id,
+      escrowStatus: EscrowStatus.FUNDED, escrowAmountPi: '3',
+      masterPayoutPi: '3', totalPaidPi: '3.3', clientFeePi: '0.3',
+      autoReleaseAt: new Date(Date.now() + 86400_000),
+    },
+  });
+  const confirmNoWallet = await api('POST', `/orders/${noWalletOrder.id}/confirm`, { token: client.jwt });
+  check('client confirms', confirmNoWallet.status === 200, `got ${confirmNoWallet.status}`);
+  let noWalletRequest = null as Awaited<ReturnType<typeof prisma.withdrawalRequest.findFirst>>;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((r) => setTimeout(r, 500));
+    noWalletRequest = await prisma.withdrawalRequest.findFirst({
+      where: { userId: carol.id, createdAt: { gte: noWalletOrder.createdAt } },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (noWalletRequest && noWalletRequest.status !== 'APPROVED') break;
+  }
+  check('the payout was attempted anyway', noWalletRequest !== null, 'skipped because no wallet address was stored');
+
+  // The manual path no longer refuses either.
+  await prisma.withdrawalRequest.updateMany({
+    where: { userId: carol.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+    data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+  });
+  const manualNoWallet = await api('POST', '/withdrawals', { token: carol.jwt, body: { amountPi: '5' } });
+  check('a manual withdrawal without a wallet address is accepted', manualNoWallet.status === 201,
+    `got ${manualNoWallet.status} ${JSON.stringify(manualNoWallet.body).slice(0, 120)}`);
+
+  console.log('\n═══ 7. Balances earned while payouts could not run are caught up ═══');
+
+  await prisma.withdrawalRequest.updateMany({
+    where: { userId: carol.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+    data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+  });
+  // The sweep pays a few masters per round, oldest first, and a local test
+  // database holds many with an unpaid balance — run it until carol's turn.
+  let sweepRes: { paidOut?: number } = {};
+  let caughtUp = null as Awaited<ReturnType<typeof prisma.withdrawalRequest.findFirst>>;
+  for (let round = 0; round < 30 && !caughtUp; round += 1) {
+    sweepRes = await fetch(`${API}/cron/auto-release`, {
+      method: 'POST',
+      headers: { 'X-Cron-Secret': process.env.CRON_SECRET ?? '' },
+    }).then((r) => r.json() as Promise<{ paidOut?: number }>);
+    caughtUp = await prisma.withdrawalRequest.findFirst({
+      where: { userId: carol.id, createdAt: { gt: noWalletOrder.createdAt }, adminNote: { startsWith: '@' } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+  check('the sweep picks up masters with an unpaid balance', caughtUp !== null || (sweepRes.paidOut ?? 0) >= 1,
+    JSON.stringify(sweepRes));
+  check('and starts a payout for carol', caughtUp !== null && caughtUp.createdAt > noWalletOrder.createdAt,
+    JSON.stringify(caughtUp?.adminNote));
+  const carolEnd = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
+  check('which, failing here, still leaves her the money', carolEnd.greaterThan(0), carolEnd.toString());
+
   await prisma.platformSettings.update({ where: { id: 1 }, data: { autoPayoutOnRelease: settings.autoPayoutOnRelease } });
 
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);

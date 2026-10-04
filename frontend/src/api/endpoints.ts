@@ -5,6 +5,7 @@ import type {
   NotificationSummary,
   ChatPage,
   ChatSummary,
+  MyResponse,
   AdminDashboard,
   AdminSettings,
   Category,
@@ -105,7 +106,7 @@ export const ordersApi = {
     return data;
   },
   async get(id: string) {
-    const { data } = await api.get<{ order: Order; quote: Quote }>(`/orders/${id}`);
+    const { data } = await api.get<{ order: Order; quote: Quote; myResponse: MyResponse | null }>(`/orders/${id}`);
     return data;
   },
   async create(payload: {

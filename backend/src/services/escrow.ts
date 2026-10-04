@@ -17,7 +17,7 @@ import { postTransaction } from './ledger';
 import { payReferralBonuses } from './referral';
 import { adminNote } from '../lib/adminNotes';
 import { notify } from './notifications';
-import { autoPayoutAfterRelease } from './withdrawals';
+import { autoPayoutAfterRelease, payOutstandingBalances } from './withdrawals';
 // Circular with paymentVerification, which is safe: each side only calls the
 // other inside function bodies, never while the module is loading.
 import { reconcileStuckPayments } from './paymentVerification';
@@ -410,6 +410,9 @@ export async function lazySweep(intervalSeconds: number): Promise<void> {
   await reconcileStuckPayments().catch((error) =>
     logger.error('Payment reconciliation failed', { error: (error as Error).message }),
   );
+  await payOutstandingBalances().catch((error) =>
+    logger.error('Outstanding payouts failed', { error: (error as Error).message }),
+  );
 }
 
 /** Opens a withdrawal request automatically once the balance crosses the threshold. */
@@ -421,7 +424,7 @@ async function maybeAutoWithdraw(userId: string, settings: PlatformSettings): Pr
     where: { id: userId },
     select: { balancePi: true, walletAddress: true },
   });
-  if (!user?.walletAddress) return;
+  if (!user) return;
   if (user.balancePi.lessThan(threshold)) return;
 
   const pending = await prisma.withdrawalRequest.count({

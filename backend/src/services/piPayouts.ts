@@ -23,6 +23,8 @@ export interface PayoutResult {
   ok: boolean;
   txid?: string;
   piPaymentId?: string;
+  /** The wallet Pi chose for this pioneer — the address the Pi went to. */
+  toAddress?: string;
   error?: string;
   /**
    * The transfer was submitted but its outcome is unknown (the connection
@@ -295,7 +297,7 @@ async function runPayout(params: SendPayoutParams, amount: Prisma.Decimal): Prom
     }
 
     logger.info('Payout completed', { userId: params.userId, amount: money(amount), txid });
-    return { ok: true, txid, piPaymentId: created.identifier };
+    return { ok: true, txid, piPaymentId: created.identifier, toAddress: created.to_address };
   } catch (error) {
     // Only reachable before the Stellar submit, so no Pi has moved and the
     // caller is safe to restore the balance.

@@ -245,7 +245,7 @@ export default function MasterDashboard(): JSX.Element {
             <div className="card stack">
               <div className="spread">
                 <span className="muted">{t('dashboard.wallet')}</span>
-                <span>{shortWallet(stats?.walletAddress)}</span>
+                <span>{stats?.walletAddress ? shortWallet(stats.walletAddress) : t('dashboard.piWalletDefault')}</span>
               </div>
               <div className="spread">
                 <span className="muted">{t('dashboard.available')}</span>
@@ -258,8 +258,10 @@ export default function MasterDashboard(): JSX.Element {
                   setWithdrawOpen(true);
                 }}
                 disabled={
+                  // No wallet address needed: Pi pays the pioneer's own wallet
+                  // by their Pi account. Requiring it disabled this button for
+                  // every master whose sign-in did not report an address.
                   settings?.payoutsEnabled === false ||
-                  !stats?.walletAddress ||
                   Number(stats?.balancePi ?? '0') < Number(settings?.minWithdrawalPi ?? '5')
                 }
               >

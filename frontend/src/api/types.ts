@@ -161,6 +161,16 @@ export interface ChatPage {
   open: boolean;
 }
 
+/** The viewing master's own response to an order, if they sent one. */
+export interface MyResponse {
+  id: string;
+  pricePi: string;
+  message: string;
+  status: ResponseStatus;
+  connectRefunded: boolean;
+  createdAt: string;
+}
+
 export interface OrderResponse {
   id: string;
   orderId: string;
@@ -213,7 +223,8 @@ export interface Transaction {
 export interface Withdrawal {
   id: string;
   amountPi: string;
-  walletAddress: string;
+  /** Known for sure once paid — Pi picks the pioneer's wallet. */
+  walletAddress: string | null;
   status: WithdrawalStatus;
   txid: string | null;
   adminNote: string | null;

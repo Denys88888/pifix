@@ -416,7 +416,10 @@ model WithdrawalRequest {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   amountPi      Decimal          @db.Decimal(15, 7)
-  walletAddress String
+  /// Where the Pi went. A2U payouts are addressed by the pioneer's Pi uid and
+  /// Pi picks the wallet, so this is known for sure only once the payout is
+  /// made; before that it holds the address Pi reported at sign-in, if any.
+  walletAddress String?
   status        WithdrawalStatus @default(REQUESTED)
 
   // Same reasoning as Payment.txid: one payout transaction, one request.

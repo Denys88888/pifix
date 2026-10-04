@@ -11,6 +11,7 @@ import styles from '../styles/Notifications.module.css';
 const ICONS: Record<string, string> = {
   response_new: '🙋',
   hired: '🤝',
+  not_selected: '↩️',
   message: '💬',
   dispute_opened: '⚠️',
   dispute_resolved: '⚖️',

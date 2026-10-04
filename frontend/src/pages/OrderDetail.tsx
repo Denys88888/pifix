@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ordersApi, reviewsApi } from '../api/endpoints';
+import { mastersApi, ordersApi, reviewsApi } from '../api/endpoints';
 import { ApiError } from '../api/client';
-import type { Order, OrderResponse, Quote } from '../api/types';
+import type { MyResponse, Order, OrderResponse, Quote } from '../api/types';
 import { LeafletMap } from '../components/LeafletMap';
 import { ReviewStars } from '../components/ReviewStars';
 import { Modal } from '../components/Modal';
@@ -27,6 +27,7 @@ export default function OrderDetail(): JSX.Element {
   const payment = usePayment();
 
   const [order, setOrder] = useState<Order | null>(null);
+  const [myResponse, setMyResponse] = useState<MyResponse | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [responses, setResponses] = useState<OrderResponse[]>([]);
   const [responseSort, setResponseSort] = useState<'date' | 'price' | 'rating'>('date');
@@ -75,6 +76,7 @@ export default function OrderDetail(): JSX.Element {
       const data = await ordersApi.get(id);
       setOrder(data.order);
       setQuote(data.quote);
+      setMyResponse(data.myResponse ?? null);
       setError(null);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : t('errors.generic'));
@@ -110,6 +112,7 @@ export default function OrderDetail(): JSX.Element {
     const data = await ordersApi.get(id);
     setOrder(data.order);
     setQuote(data.quote);
+    setMyResponse(data.myResponse ?? null);
   }, [id]);
 
   const refreshResponses = useCallback(async () => {
@@ -395,7 +398,37 @@ export default function OrderDetail(): JSX.Element {
 
       {/* ── Actions ─────────────────────────────────────────────────────── */}
 
-      {!isOwner && order.status === 'OPEN' && user ? (
+      {/* A master who responded sees their response, not a second button.
+          The server refused a repeat anyway — but nothing on screen said so. */}
+      {myResponse ? (
+        <div className="card stack">
+          <div className="spread">
+            <h2 style={{ margin: 0 }}>{t('order.myResponse.title')}</h2>
+            <span className="badge">{t(`order.myResponse.status.${myResponse.status}`)}</span>
+          </div>
+          <div className="spread">
+            <span className="muted">{t('order.myResponse.price')}</span>
+            <span className="pi-amount">{myResponse.pricePi} π</span>
+          </div>
+          {myResponse.message ? <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{myResponse.message}</p> : null}
+          <span className="hint">
+            {t('order.myResponse.sent', { date: formatDateTime(myResponse.createdAt, i18n.resolvedLanguage) })}
+          </span>
+          {myResponse.status === 'ACTIVE' ? <p className="hint" style={{ margin: 0 }}>{t('order.myResponse.waiting')}</p> : null}
+          {myResponse.status === 'ACTIVE' && order.status === 'OPEN' ? (
+            <button
+              className="btn btn--secondary"
+              disabled={busy}
+              onClick={() => {
+                if (!window.confirm(t('order.myResponse.withdrawConfirm'))) return;
+                void runAction(() => mastersApi.withdrawResponse(myResponse.id));
+              }}
+            >
+              {t('order.myResponse.withdraw')}
+            </button>
+          ) : null}
+        </div>
+      ) : !isOwner && order.status === 'OPEN' && user ? (
         <button className="btn" onClick={() => void openRespond()}>
           {t('order.respond')} · {settings?.connectPricePi ?? ''} π
         </button>

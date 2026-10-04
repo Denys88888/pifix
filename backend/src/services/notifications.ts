@@ -13,6 +13,7 @@ import { logger } from '../lib/logger';
 export type NotificationType =
   | 'response_new'
   | 'hired'
+  | 'not_selected'
   | 'message'
   | 'dispute_opened'
   | 'dispute_resolved'

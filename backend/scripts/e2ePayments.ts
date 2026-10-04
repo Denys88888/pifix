@@ -313,6 +313,15 @@ async function main() {
   check('the replay did not extend PRO', proAfter?.getTime() === proBefore?.getTime(),
     `${proBefore?.toISOString()} → ${proAfter?.toISOString()}`);
 
+  // The master sees their own response on the order instead of a second button.
+  const asMaster = await api('GET', `/orders/${orderId}`, { token: masterJwt });
+  check('the master sees their own response on the order',
+    asMaster.body?.myResponse?.pricePi === '38.5' && asMaster.body?.myResponse?.status === 'ACTIVE',
+    JSON.stringify(asMaster.body?.myResponse));
+  const asClientView = await api('GET', `/orders/${orderId}`, { token: clientJwt });
+  check('the client gets no "my response" of their own', asClientView.body?.myResponse === null,
+    JSON.stringify(asClientView.body?.myResponse));
+
   // Same master responding twice.
   const dupe = await craftPayment({
     uid: masterUid, amount: connectPrice,

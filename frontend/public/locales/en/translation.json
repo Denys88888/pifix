@@ -140,7 +140,21 @@
     "disputeTitle": "Open a dispute",
     "disputeHint": "The escrow stays frozen until an administrator reviews the case.",
     "disputePlaceholder": "Describe what went wrong (at least 10 characters).",
-    "submitDispute": "Submit the dispute"
+    "submitDispute": "Submit the dispute",
+    "myResponse": {
+      "title": "Your response",
+      "price": "Your price",
+      "sent": "Sent {{date}}",
+      "waiting": "The client can see your response. When they choose a master, the decision shows here and you get a notification.",
+      "withdraw": "Withdraw the response",
+      "withdrawConfirm": "Withdraw your response? The fee comes back only within an hour of responding and while the job is still open.",
+      "status": {
+        "ACTIVE": "waiting for the client",
+        "SELECTED": "you were chosen",
+        "REJECTED": "another master was chosen",
+        "WITHDRAWN": "withdrawn"
+      }
+    }
   },
   "createOrder": {
     "title": "Post a job",
@@ -245,7 +259,8 @@
     "withdrawNote": "The Pi is sent to the wallet address linked to your Pi account.",
     "requestWithdrawal": "Request a withdrawal",
     "tab_map": "Map",
-    "payoutsUnavailable": "Withdrawals are temporarily unavailable. Your balance is safe and stays yours."
+    "payoutsUnavailable": "Withdrawals are temporarily unavailable. Your balance is safe and stays yours.",
+    "piWalletDefault": "your Pi account wallet"
   },
   "verification": {
     "UNVERIFIED": "Your profile is not verified. You cannot respond to jobs yet.",
@@ -661,7 +676,8 @@
     "payoutWallet": "Payout wallet",
     "payoutWalletBalance": "balance {{amount}} π",
     "payoutWalletUnfunded": "not on the ledger or empty — fund it",
-    "payoutWalletInvalid": "the key on Render is invalid — check PI_WALLET_PRIVATE_SEED"
+    "payoutWalletInvalid": "the key on Render is invalid — check PI_WALLET_PRIVATE_SEED",
+    "walletByPi": "the user's Pi wallet (chosen by Pi)"
   },
   "support": {
     "title": "Contact us",
@@ -731,7 +747,8 @@
       "job_confirmed": "The client confirmed job #{{publicId}}. {{amount}} π was credited to you.",
       "auto_released": "Job #{{publicId}} was closed automatically and paid to the master.",
       "payout_sent": "A payout of {{amount}} π was sent to your Pi wallet.",
-      "order_cancelled": "The client cancelled job #{{publicId}} that you responded to."
+      "order_cancelled": "The client cancelled job #{{publicId}} that you responded to.",
+      "not_selected": "The client chose another master for job #{{publicId}}."
     }
   }
 }

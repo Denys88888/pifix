@@ -273,11 +273,15 @@ async function main() {
 
   console.log('\n═══ 6. Withdrawals ═══');
 
-  // The controller checks the wallet before the amount, so the no-wallet case
-  // has to be asserted first — otherwise it masks the minimum-amount check.
+  // No wallet address is needed: an A2U payout is addressed by the Pi uid and
+  // Pi picks the wallet. This used to be refused as "no_wallet", which locked
+  // out every master whose sign-in did not report an address.
   const noWallet = await call('POST', '/withdrawals', { token: masterT, body: { amountPi: '10' } });
-  check('withdrawal without a wallet refused', noWallet.status === 400 && noWallet.body?.error?.code === 'no_wallet',
+  check('withdrawal without a wallet address on file is accepted', noWallet.status === 201,
     `got ${noWallet.status} ${noWallet.body?.error?.code}`);
+  if (noWallet.body?.withdrawal?.id) {
+    await call('DELETE', `/withdrawals/${noWallet.body.withdrawal.id}`, { token: masterT });
+  }
 
   await prisma.user.update({ where: { id: master.id }, data: { walletAddress: 'GTESTWALLETADDRESSFORE2ETESTINGXXXXXXXXXXXXXXXXXX' } });
 

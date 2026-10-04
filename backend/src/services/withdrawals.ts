@@ -60,7 +60,9 @@ export async function executeWithdrawal(id: string, actor: string): Promise<With
       userId: withdrawal.userId,
       type: TransactionType.WITHDRAWAL,
       amountPi: toPi(withdrawal.amountPi).negated(),
-      description: `Withdrawal to ${withdrawal.walletAddress.slice(0, 8)}…`,
+      description: withdrawal.walletAddress
+        ? `Withdrawal to ${withdrawal.walletAddress.slice(0, 8)}…`
+        : 'Withdrawal to the Pi wallet',
       requireFunds: true,
     });
   });
@@ -103,7 +105,14 @@ export async function executeWithdrawal(id: string, actor: string): Promise<With
 
   const paid = await prisma.withdrawalRequest.update({
     where: { id },
-    data: { status: WithdrawalStatus.PAID, txid: payout.txid, piPaymentId: payout.piPaymentId, processedAt: new Date() },
+    data: {
+      status: WithdrawalStatus.PAID,
+      txid: payout.txid,
+      piPaymentId: payout.piPaymentId,
+      // Record where the Pi actually went — Pi chose the wallet, not us.
+      walletAddress: payout.toAddress ?? withdrawal.walletAddress,
+      processedAt: new Date(),
+    },
   });
   await audit(actor, 'withdrawal:paid', id, { txid: payout.txid });
   await notify(withdrawal.userId, 'payout_sent', null, { amount: money(withdrawal.amountPi) });
@@ -114,27 +123,35 @@ export async function executeWithdrawal(id: string, actor: string): Promise<With
  * After a job is confirmed (or auto-released): send the master's balance to
  * their Pi wallet straight away instead of waiting for them to ask.
  *
- * Quietly does nothing when it cannot pay — payouts switched off, no wallet on
- * file, KYC still missing where it is required, a payout already in progress.
- * The money is on the balance in every one of those cases, exactly as before,
- * and can still be withdrawn by hand.
+ * No wallet address is needed: an App-to-User payment is addressed by the
+ * pioneer's Pi uid and Pi itself picks their wallet. Requiring the address —
+ * which Pi only sometimes reports at sign-in — silently skipped every payout
+ * for a master whose sign-in did not carry it.
+ *
+ * When it does not pay, it says why in the log. Skipping quietly is how three
+ * confirmed jobs went unpaid without a single line anywhere. The money is on
+ * the balance in every one of those cases and can still be withdrawn by hand.
  */
-export async function autoPayoutAfterRelease(masterId: string, orderId: string): Promise<void> {
+export async function autoPayoutAfterRelease(masterId: string, orderId: string | null): Promise<void> {
   const settings = await getSettings();
-  if (!settings.autoPayoutOnRelease || !env.payoutsConfigured) return;
+  const skip = (reason: string) => {
+    logger.info('Automatic payout skipped', { masterId, orderId, reason });
+  };
+  if (!settings.autoPayoutOnRelease) return skip('switched off in the settings');
+  if (!env.payoutsConfigured) return skip('payouts are not configured');
 
   const user = await prisma.user.findUnique({
     where: { id: masterId },
     select: { balancePi: true, walletAddress: true, kycVerified: true },
   });
-  if (!user?.walletAddress) return;
-  if (payoutsRequireKyc() && !user.kycVerified) return;
-  if (!toPi(user.balancePi).greaterThan(0)) return;
+  if (!user) return skip('no such user');
+  if (payoutsRequireKyc() && !user.kycVerified) return skip('KYC required');
+  if (!toPi(user.balancePi).greaterThan(0)) return skip('nothing on the balance');
 
   const open = await prisma.withdrawalRequest.count({
     where: { userId: masterId, status: { in: [WithdrawalStatus.REQUESTED, WithdrawalStatus.APPROVED] } },
   });
-  if (open > 0) return;
+  if (open > 0) return skip('a withdrawal is already open');
 
   const request = await prisma.withdrawalRequest.create({
     data: {
@@ -147,9 +164,36 @@ export async function autoPayoutAfterRelease(masterId: string, orderId: string):
 
   try {
     const result = await executeWithdrawal(request.id, 'system:auto-payout');
-    logger.info('Automatic payout after confirmation', { orderId, masterId, outcome: result.outcome });
+    logger.info('Automatic payout', { orderId, masterId, outcome: result.outcome });
   } catch (error) {
     // The request stays REQUESTED with the balance intact; the admin can pay it.
     logger.error('Automatic payout could not start', { orderId, masterId, error: (error as Error).message });
   }
+}
+
+/**
+ * Catches up balances earned while automatic payout could not run — payouts
+ * not yet configured, or the wallet-address requirement that skipped them.
+ * Runs from the sweep: masters with something earned on their balance and no
+ * payout open get one, a few per round.
+ */
+export async function payOutstandingBalances(limit = 5): Promise<number> {
+  const settings = await getSettings();
+  if (!settings.autoPayoutOnRelease || !env.payoutsConfigured) return 0;
+
+  const owed = await prisma.user.findMany({
+    where: {
+      balancePi: { gt: 0 },
+      isBlocked: false,
+      transactions: { some: { type: TransactionType.JOB_EARNING } },
+      withdrawals: { none: { status: { in: [WithdrawalStatus.REQUESTED, WithdrawalStatus.APPROVED] } } },
+    },
+    select: { id: true },
+    orderBy: { updatedAt: 'asc' },
+    take: limit,
+  });
+  for (const user of owed) {
+    await autoPayoutAfterRelease(user.id, null);
+  }
+  return owed.length;
 }

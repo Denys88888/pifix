@@ -140,7 +140,21 @@
     "disputeTitle": "Mở tranh chấp",
     "disputeHint": "Tiền ký quỹ vẫn bị đóng băng cho tới khi quản trị viên xem xét.",
     "disputePlaceholder": "Mô tả vấn đề (tối thiểu 10 ký tự).",
-    "submitDispute": "Gửi tranh chấp"
+    "submitDispute": "Gửi tranh chấp",
+    "myResponse": {
+      "title": "Phản hồi của bạn",
+      "price": "Giá của bạn",
+      "sent": "Đã gửi {{date}}",
+      "waiting": "Khách thấy phản hồi của bạn. Khi khách chọn thợ, quyết định sẽ hiện ở đây và bạn nhận được thông báo.",
+      "withdraw": "Rút phản hồi",
+      "withdrawConfirm": "Rút phản hồi? Phí chỉ được hoàn trong vòng một giờ và khi việc còn mở.",
+      "status": {
+        "ACTIVE": "đang chờ khách",
+        "SELECTED": "bạn được chọn",
+        "REJECTED": "thợ khác được chọn",
+        "WITHDRAWN": "đã rút"
+      }
+    }
   },
   "createOrder": {
     "title": "Đăng công việc",
@@ -244,7 +258,8 @@
     "withdrawNote": "Pi sẽ được gửi tới địa chỉ ví liên kết với tài khoản Pi của bạn.",
     "requestWithdrawal": "Yêu cầu rút tiền",
     "tab_map": "Bản đồ",
-    "payoutsUnavailable": "Rút tiền tạm thời không khả dụng. Số dư của bạn vẫn an toàn."
+    "payoutsUnavailable": "Rút tiền tạm thời không khả dụng. Số dư của bạn vẫn an toàn.",
+    "piWalletDefault": "ví Pi của tài khoản bạn"
   },
   "verification": {
     "UNVERIFIED": "Hồ sơ chưa được xác minh. Bạn chưa thể gửi chào giá.",
@@ -483,7 +498,8 @@
       "job_confirmed": "Khách đã xác nhận việc #{{publicId}}. Bạn được cộng {{amount}} π.",
       "auto_released": "Việc #{{publicId}} đã tự động đóng và trả cho thợ.",
       "payout_sent": "Đã gửi {{amount}} π vào ví Pi của bạn.",
-      "order_cancelled": "Khách đã hủy việc #{{publicId}} mà bạn đã phản hồi."
+      "order_cancelled": "Khách đã hủy việc #{{publicId}} mà bạn đã phản hồi.",
+      "not_selected": "Khách đã chọn thợ khác cho việc #{{publicId}}."
     }
   }
 }

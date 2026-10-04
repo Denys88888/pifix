@@ -27,9 +27,9 @@ export async function requestWithdrawal(req: Request, res: Response): Promise<vo
   const settings = await getSettings();
   const user = await prisma.user.findUniqueOrThrow({ where: { id: req.user!.id } });
 
-  if (!user.walletAddress) {
-    throw badRequest('no_wallet', 'Sign in with the payments scope so PiFix knows your wallet address');
-  }
+  // No wallet address needed: the payout is addressed by the Pi uid and Pi
+  // picks the wallet. Refusing here locked out every master whose sign-in did
+  // not carry an address.
 
   // Refused here as well as at the payout itself, so the answer arrives before
   // the balance is moved rather than as a failed transfer afterwards.

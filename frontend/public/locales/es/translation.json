@@ -140,7 +140,21 @@
     "disputeTitle": "Abrir una disputa",
     "disputeHint": "El depósito seguirá bloqueado hasta que un administrador revise el caso.",
     "disputePlaceholder": "Describe qué salió mal (mínimo 10 caracteres).",
-    "submitDispute": "Enviar la disputa"
+    "submitDispute": "Enviar la disputa",
+    "myResponse": {
+      "title": "Tu respuesta",
+      "price": "Tu precio",
+      "sent": "Enviada {{date}}",
+      "waiting": "El cliente ve tu respuesta. Cuando elija a un profesional, la decisión aparecerá aquí y recibirás una notificación.",
+      "withdraw": "Retirar la respuesta",
+      "withdrawConfirm": "¿Retirar tu respuesta? La tarifa solo se devuelve dentro de la primera hora y si el trabajo sigue abierto.",
+      "status": {
+        "ACTIVE": "esperando al cliente",
+        "SELECTED": "te eligieron",
+        "REJECTED": "eligieron a otro profesional",
+        "WITHDRAWN": "retirada"
+      }
+    }
   },
   "createOrder": {
     "title": "Publicar un trabajo",
@@ -245,7 +259,8 @@
     "withdrawNote": "Los Pi se envían al monedero vinculado a tu cuenta de Pi.",
     "requestWithdrawal": "Solicitar retiro",
     "tab_map": "Mapa",
-    "payoutsUnavailable": "Los retiros no están disponibles temporalmente. Tu saldo está a salvo."
+    "payoutsUnavailable": "Los retiros no están disponibles temporalmente. Tu saldo está a salvo.",
+    "piWalletDefault": "la billetera Pi de tu cuenta"
   },
   "verification": {
     "UNVERIFIED": "Tu perfil no está verificado. Aún no puedes enviar propuestas.",
@@ -485,7 +500,8 @@
       "job_confirmed": "El cliente confirmó el trabajo #{{publicId}}. Se te acreditaron {{amount}} π.",
       "auto_released": "El trabajo #{{publicId}} se cerró automáticamente y se pagó al profesional.",
       "payout_sent": "Se envió un pago de {{amount}} π a tu billetera Pi.",
-      "order_cancelled": "El cliente canceló el trabajo #{{publicId}} al que respondiste."
+      "order_cancelled": "El cliente canceló el trabajo #{{publicId}} al que respondiste.",
+      "not_selected": "El cliente eligió a otro profesional para el trabajo #{{publicId}}."
     }
   }
 }

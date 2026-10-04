@@ -140,7 +140,21 @@
     "disputeTitle": "Abrir uma disputa",
     "disputeHint": "A custódia permanece bloqueada até um administrador analisar o caso.",
     "disputePlaceholder": "Descreva o que deu errado (mínimo de 10 caracteres).",
-    "submitDispute": "Enviar a disputa"
+    "submitDispute": "Enviar a disputa",
+    "myResponse": {
+      "title": "Sua resposta",
+      "price": "Seu preço",
+      "sent": "Enviada {{date}}",
+      "waiting": "O cliente vê sua resposta. Quando ele escolher um profissional, a decisão aparece aqui e você recebe uma notificação.",
+      "withdraw": "Retirar a resposta",
+      "withdrawConfirm": "Retirar sua resposta? A taxa só volta dentro de uma hora e se o serviço ainda estiver aberto.",
+      "status": {
+        "ACTIVE": "aguardando o cliente",
+        "SELECTED": "você foi escolhido",
+        "REJECTED": "outro profissional foi escolhido",
+        "WITHDRAWN": "retirada"
+      }
+    }
   },
   "createOrder": {
     "title": "Publicar um serviço",
@@ -245,7 +259,8 @@
     "withdrawNote": "Os Pi vão para o endereço de carteira vinculado à sua conta Pi.",
     "requestWithdrawal": "Solicitar saque",
     "tab_map": "Mapa",
-    "payoutsUnavailable": "Os saques estão temporariamente indisponíveis. Seu saldo está seguro."
+    "payoutsUnavailable": "Os saques estão temporariamente indisponíveis. Seu saldo está seguro.",
+    "piWalletDefault": "a carteira Pi da sua conta"
   },
   "verification": {
     "UNVERIFIED": "Seu perfil não está verificado. Você ainda não pode enviar propostas.",
@@ -485,7 +500,8 @@
       "job_confirmed": "O cliente confirmou o serviço #{{publicId}}. {{amount}} π foram creditados a você.",
       "auto_released": "O serviço #{{publicId}} foi fechado automaticamente e pago ao profissional.",
       "payout_sent": "Um pagamento de {{amount}} π foi enviado para sua carteira Pi.",
-      "order_cancelled": "O cliente cancelou o serviço #{{publicId}} ao qual você respondeu."
+      "order_cancelled": "O cliente cancelou o serviço #{{publicId}} ao qual você respondeu.",
+      "not_selected": "O cliente escolheu outro profissional para o serviço #{{publicId}}."
     }
   }
 }

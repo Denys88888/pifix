@@ -405,6 +405,15 @@ async function executeIntent(
         claim,
       });
       await notify(order.masterId, 'hired', order.id, { publicId: order.publicId });
+      // The others who paid to respond are told too, instead of finding out
+      // only by opening the order.
+      const passedOver = await prisma.response.findMany({
+        where: { orderId: order.id, status: ResponseStatus.REJECTED, masterId: { not: order.masterId ?? undefined } },
+        select: { masterId: true },
+      });
+      for (const response of passedOver) {
+        await notify(response.masterId, 'not_selected', order.id, { publicId: order.publicId });
+      }
       return { orderId: order.id, orderStatus: order.status };
     }
 

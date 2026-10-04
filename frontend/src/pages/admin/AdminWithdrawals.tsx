@@ -57,7 +57,7 @@ export default function AdminWithdrawals(): JSX.Element {
     const confirmed = window.confirm(
       `${t('admin.payoutAsk', {
         amount: withdrawal.amountPi,
-        wallet: withdrawal.walletAddress,
+        wallet: withdrawal.walletAddress ?? t('admin.walletByPi'),
         user: withdrawal.username ?? '—',
       })}\n\n${t('admin.payoutConfirm')}`,
     );
@@ -160,7 +160,7 @@ export default function AdminWithdrawals(): JSX.Element {
                     <strong>{withdrawal.amountPi} π</strong>
                   </td>
                   <td style={{ wordBreak: 'break-all', maxWidth: 220 }}>
-                    <span className="hint">{withdrawal.walletAddress}</span>
+                    <span className="hint">{withdrawal.walletAddress ?? t('admin.walletByPi')}</span>
                     {withdrawal.txid ? <div className="hint">tx: {withdrawal.txid}</div> : null}
                   </td>
                   <td>
