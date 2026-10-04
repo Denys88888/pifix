@@ -50,20 +50,38 @@ export async function notify(
 export async function summary(userId: string) {
   const unread = await prisma.notification.findMany({
     where: { userId, readAt: null },
-    select: { orderId: true, count: true },
+    select: { orderId: true, count: true, type: true },
   });
   const byOrder: Record<string, number> = {};
+  const messagesByOrder: Record<string, number> = {};
   let total = 0;
+  let messages = 0;
   for (const row of unread) {
     total += row.count;
     if (row.orderId) byOrder[row.orderId] = (byOrder[row.orderId] ?? 0) + row.count;
+    if (row.type === 'message') {
+      messages += row.count;
+      if (row.orderId) messagesByOrder[row.orderId] = (messagesByOrder[row.orderId] ?? 0) + row.count;
+    }
   }
-  return { unread: total, byOrder };
+  // `messages` drives the badge on the Chats tab, `messagesByOrder` the one on
+  // an order's chat button.
+  return { unread: total, messages, byOrder, messagesByOrder };
 }
 
-export async function markRead(userId: string, orderId?: string): Promise<number> {
+/**
+ * `exceptMessages`: the order page reads the order's news but not its chat —
+ * those stay unread until the chat itself is opened, or the count on the chat
+ * button would vanish the moment the order was opened.
+ */
+export async function markRead(userId: string, orderId?: string, exceptMessages = false): Promise<number> {
   const result = await prisma.notification.updateMany({
-    where: { userId, readAt: null, ...(orderId ? { orderId } : {}) },
+    where: {
+      userId,
+      readAt: null,
+      ...(orderId ? { orderId } : {}),
+      ...(exceptMessages ? { type: { not: 'message' } } : {}),
+    },
     data: { readAt: new Date() },
   });
   return result.count;

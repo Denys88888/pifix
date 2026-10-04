@@ -241,7 +241,7 @@ export default function AdminOrders(): JSX.Element {
               key={chatOrder.id}
               asAdmin
               load={(after) => adminApiClient.orderMessages(chatOrder.id, after)}
-              send={(text) => adminApiClient.sendOrderMessage(chatOrder.id, text)}
+              send={(text, photos) => adminApiClient.sendOrderMessage(chatOrder.id, text, photos)}
             />
           </div>
         ) : null}

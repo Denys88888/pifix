@@ -25,7 +25,8 @@
     "orders": "Замовлення",
     "masters": "Майстри",
     "profile": "Профіль",
-    "admin": "Адмінка"
+    "admin": "Адмінка",
+    "chats": "Чати"
   },
   "auth": {
     "signIn": "Увійти через Pi",
@@ -436,7 +437,21 @@
     "admin": "Адміністрація",
     "you": "Ви",
     "client": "Замовник",
-    "master": "Майстер"
+    "master": "Майстер",
+    "photoType": "Можна надіслати лише JPEG або PNG.",
+    "photoSize": "Фото більше 5 МБ — виберіть менше.",
+    "photo": "Фото",
+    "removePhoto": "Прибрати фото",
+    "addPhoto": "Додати фото",
+    "withMaster": "Майстер",
+    "withClient": "Замовник",
+    "listTitle": "Чати",
+    "listEmpty": "Поки немає листувань. Чат з’являється, коли замовник наймає майстра.",
+    "noMessagesYet": "Повідомлень ще немає",
+    "roleMaster": "майстер",
+    "roleClient": "замовник",
+    "openWithMaster": "Чат з майстром",
+    "openWithClient": "Чат із замовником"
   },
   "dispute": {
     "openedBy": {

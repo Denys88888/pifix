@@ -29,7 +29,9 @@ export async function notificationSummary(req: Request, res: Response): Promise<
 }
 
 export async function readNotifications(req: Request, res: Response): Promise<void> {
-  const input = z.object({ orderId: z.string().uuid().optional() }).parse(req.body ?? {});
-  const marked = await markRead(req.user!.id, input.orderId);
+  const input = z
+    .object({ orderId: z.string().uuid().optional(), exceptMessages: z.boolean().optional() })
+    .parse(req.body ?? {});
+  const marked = await markRead(req.user!.id, input.orderId, input.exceptMessages ?? false);
   res.json({ ok: true, marked });
 }

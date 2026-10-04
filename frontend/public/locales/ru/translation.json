@@ -25,7 +25,8 @@
     "orders": "Заказы",
     "masters": "Мастера",
     "profile": "Профиль",
-    "admin": "Админка"
+    "admin": "Админка",
+    "chats": "Чаты"
   },
   "auth": {
     "signIn": "Войти через Pi",
@@ -684,7 +685,21 @@
     "admin": "Администрация",
     "you": "Вы",
     "client": "Заказчик",
-    "master": "Мастер"
+    "master": "Мастер",
+    "photoType": "Можно отправить только JPEG или PNG.",
+    "photoSize": "Фото больше 5 МБ — выберите поменьше.",
+    "photo": "Фото",
+    "removePhoto": "Убрать фото",
+    "addPhoto": "Добавить фото",
+    "withMaster": "Мастер",
+    "withClient": "Заказчик",
+    "listTitle": "Чаты",
+    "listEmpty": "Пока нет переписок. Чат появляется, когда заказчик нанимает мастера.",
+    "noMessagesYet": "Сообщений пока нет",
+    "roleMaster": "мастер",
+    "roleClient": "заказчик",
+    "openWithMaster": "Чат с мастером",
+    "openWithClient": "Чат с заказчиком"
   },
   "dispute": {
     "openedBy": {

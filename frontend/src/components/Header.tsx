@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/Header.module.css';
 
-const ROOT_PATHS = ['/', '/orders', '/masters', '/profile', '/dashboard'];
+const ROOT_PATHS = ['/', '/orders', '/masters', '/chats', '/profile', '/dashboard'];
 
 export function Header(): JSX.Element {
   const { t } = useTranslation();

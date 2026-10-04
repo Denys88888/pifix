@@ -25,7 +25,8 @@
     "orders": "Jobs",
     "masters": "Masters",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chats": "Chats"
   },
   "auth": {
     "signIn": "Sign in with Pi",
@@ -680,7 +681,21 @@
     "admin": "Administration",
     "you": "You",
     "client": "Client",
-    "master": "Master"
+    "master": "Master",
+    "photoType": "Only JPEG or PNG photos can be sent.",
+    "photoSize": "The photo is over 5 MB — pick a smaller one.",
+    "photo": "Photo",
+    "removePhoto": "Remove photo",
+    "addPhoto": "Add a photo",
+    "withMaster": "Master",
+    "withClient": "Client",
+    "listTitle": "Chats",
+    "listEmpty": "No conversations yet. A chat appears once the client hires a master.",
+    "noMessagesYet": "No messages yet",
+    "roleMaster": "master",
+    "roleClient": "client",
+    "openWithMaster": "Chat with the master",
+    "openWithClient": "Chat with the client"
   },
   "dispute": {
     "openedBy": {

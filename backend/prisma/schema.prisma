@@ -306,6 +306,9 @@ model OrderMessage {
   authorRole MessageRole
 
   text      String   @db.VarChar(1000)
+  /// Photos attached to the message — only URLs this server's Cloudinary
+  /// upload produced (see postMessageSchema), never arbitrary links.
+  photos    String[] @default([])
   createdAt DateTime @default(now())
 
   @@index([orderId, createdAt])

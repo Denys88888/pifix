@@ -11,6 +11,7 @@ import {
   categoriesRouter,
   nearbyRouter,
   notificationsRouter,
+  chatsRouter,
   reviewsRouter,
   settingsRouter,
   uploadsRouter,
@@ -49,5 +50,6 @@ apiRouter.use('/reviews', reviewsRouter);
 apiRouter.use('/uploads', uploadsRouter);
 apiRouter.use('/withdrawals', withdrawalsRouter);
 apiRouter.use('/notifications', notificationsRouter);
+apiRouter.use('/chats', chatsRouter);
 apiRouter.use('/admin', adminRouter);
 apiRouter.use('/cron', cronRouter);

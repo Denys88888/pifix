@@ -25,7 +25,8 @@
     "orders": "Công việc",
     "masters": "Thợ",
     "profile": "Hồ sơ",
-    "admin": "Quản trị"
+    "admin": "Quản trị",
+    "chats": "Trò chuyện"
   },
   "auth": {
     "signIn": "Đăng nhập bằng Pi",
@@ -433,7 +434,21 @@
     "admin": "Ban quản trị",
     "you": "Bạn",
     "client": "Khách hàng",
-    "master": "Thợ"
+    "master": "Thợ",
+    "photoType": "Chỉ gửi được ảnh JPEG hoặc PNG.",
+    "photoSize": "Ảnh lớn hơn 5 MB — hãy chọn ảnh nhỏ hơn.",
+    "photo": "Ảnh",
+    "removePhoto": "Bỏ ảnh",
+    "addPhoto": "Thêm ảnh",
+    "withMaster": "Thợ",
+    "withClient": "Khách hàng",
+    "listTitle": "Trò chuyện",
+    "listEmpty": "Chưa có cuộc trò chuyện. Trò chuyện xuất hiện khi khách thuê thợ.",
+    "noMessagesYet": "Chưa có tin nhắn",
+    "roleMaster": "thợ",
+    "roleClient": "khách hàng",
+    "openWithMaster": "Trò chuyện với thợ",
+    "openWithClient": "Trò chuyện với khách"
   },
   "dispute": {
     "openedBy": {

@@ -25,7 +25,8 @@
     "orders": "الطلبات",
     "masters": "الحرفيون",
     "profile": "الملف الشخصي",
-    "admin": "الإدارة"
+    "admin": "الإدارة",
+    "chats": "المحادثات"
   },
   "auth": {
     "signIn": "تسجيل الدخول عبر Pi",
@@ -438,7 +439,21 @@
     "admin": "الإدارة",
     "you": "أنت",
     "client": "العميل",
-    "master": "الحرفي"
+    "master": "الحرفي",
+    "photoType": "يمكن إرسال صور JPEG أو PNG فقط.",
+    "photoSize": "الصورة أكبر من 5 ميغابايت — اختر صورة أصغر.",
+    "photo": "صورة",
+    "removePhoto": "إزالة الصورة",
+    "addPhoto": "إضافة صورة",
+    "withMaster": "الحرفي",
+    "withClient": "العميل",
+    "listTitle": "المحادثات",
+    "listEmpty": "لا توجد محادثات بعد. تظهر المحادثة بعد أن يوظّف العميل حرفيًا.",
+    "noMessagesYet": "لا رسائل بعد",
+    "roleMaster": "حرفي",
+    "roleClient": "عميل",
+    "openWithMaster": "محادثة الحرفي",
+    "openWithClient": "محادثة العميل"
   },
   "dispute": {
     "openedBy": {

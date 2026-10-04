@@ -111,8 +111,12 @@ export interface Order {
 
 export interface NotificationSummary {
   unread: number;
+  /** Unread chat messages — the badge on the Chats tab. */
+  messages: number;
   /** Unread count per order — drives the "new" badges on order cards. */
   byOrder: Record<string, number>;
+  /** Unread chat messages per order — the count on an order's chat button. */
+  messagesByOrder: Record<string, number>;
 }
 
 export interface AppNotification {
@@ -132,9 +136,23 @@ export interface ChatMessage {
   role: 'CLIENT' | 'MASTER' | 'ADMIN';
   username: string | null;
   text: string;
+  photos: string[];
   /** Written by the person viewing — always false for the admin's view. */
   mine: boolean;
   createdAt: string;
+}
+
+export interface ChatSummary {
+  orderId: string;
+  publicId: string;
+  title: string;
+  status: OrderStatus;
+  /** Username of the other side. */
+  with: string | null;
+  withRole: 'client' | 'master';
+  last: ChatMessage | null;
+  unread: number;
+  at: string;
 }
 
 export interface ChatPage {

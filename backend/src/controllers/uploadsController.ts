@@ -4,9 +4,11 @@ import { badRequest } from '../lib/errors';
 import { uploadImage, type UploadFolder } from '../lib/cloudinary';
 import { looksLikeImage } from '../middleware/upload';
 
-const FOLDERS: UploadFolder[] = ['avatars', 'portfolio', 'orders', 'certificates', 'verification'];
+const FOLDERS: UploadFolder[] = ['avatars', 'portfolio', 'orders', 'certificates', 'verification', 'chat'];
 
-const folderSchema = z.object({ folder: z.enum(['avatars', 'portfolio', 'orders', 'certificates', 'verification']) });
+const folderSchema = z.object({
+  folder: z.enum(['avatars', 'portfolio', 'orders', 'certificates', 'verification', 'chat']),
+});
 
 /**
  * Uploads go through the server (not a browser→Cloudinary signature) so the
@@ -26,6 +28,7 @@ export async function uploadImages(req: Request, res: Response): Promise<void> {
     orders: 3,
     certificates: 10,
     verification: 4,
+    chat: 4,
   };
   if (files.length > maxPerFolder[folder]) {
     throw badRequest('too_many_files', `At most ${maxPerFolder[folder]} file(s) for ${folder}`);

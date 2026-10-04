@@ -17,7 +17,7 @@ if (env.cloudinaryConfigured) {
 export const ALLOWED_MIME = ['image/jpeg', 'image/png'] as const;
 export const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 
-export type UploadFolder = 'avatars' | 'portfolio' | 'orders' | 'certificates' | 'verification';
+export type UploadFolder = 'avatars' | 'portfolio' | 'orders' | 'certificates' | 'verification' | 'chat';
 
 /**
  * Uploads a buffer to Cloudinary. `verification` documents go to a separate

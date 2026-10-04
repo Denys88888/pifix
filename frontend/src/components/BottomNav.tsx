@@ -7,6 +7,7 @@ import styles from '../styles/BottomNav.module.css';
 const TABS = [
   { to: '/orders', key: 'nav.orders', icon: '📋' },
   { to: '/masters', key: 'nav.masters', icon: '🛠️' },
+  { to: '/chats', key: 'nav.chats', icon: '💬', signedInOnly: true },
   { to: '/profile', key: 'nav.profile', icon: '👤' },
   // Only rendered for the accounts listed in ADMIN_UIDS, the same way taxi-pro
   // gates its admin tab. Hiding it is presentation, not protection: every
@@ -17,13 +18,17 @@ const TABS = [
 export function BottomNav(): JSX.Element {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { unread, byOrder } = useNotifications();
+  const { unread, byOrder, messages } = useNotifications();
   // Orders with something new; whatever is left (a payout) belongs to the profile.
   const orderBadge = Object.keys(byOrder).length;
   const orderUnread = Object.values(byOrder).reduce((sum, n) => sum + n, 0);
-  const badgeFor = (to: string): number => (to === '/orders' ? orderBadge : to === '/profile' ? unread - orderUnread : 0);
+  const badgeFor = (to: string): number =>
+    to === '/chats' ? messages : to === '/orders' ? orderBadge : to === '/profile' ? unread - orderUnread : 0;
 
-  const tabs = TABS.filter((tab) => !('adminOnly' in tab && tab.adminOnly) || user?.isAdmin);
+  const tabs = TABS.filter(
+    (tab) =>
+      (!('adminOnly' in tab && tab.adminOnly) || user?.isAdmin) && (!('signedInOnly' in tab && tab.signedInOnly) || user),
+  );
 
   return (
     <nav className={styles.nav} aria-label={t('nav.label')}>

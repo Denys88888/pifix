@@ -6,20 +6,26 @@ import { usePolling } from '../hooks/usePolling';
 
 interface NotificationsValue {
   unread: number;
+  /** Unread chat messages, for the Chats tab. */
+  messages: number;
   byOrder: Record<string, number>;
+  messagesByOrder: Record<string, number>;
   /** Shown for a few seconds when something new arrives while the app is open. */
   toast: string | null;
   dismissToast: () => void;
   refresh: () => Promise<void>;
-  markOrderRead: (orderId: string) => Promise<void>;
+  /** exceptMessages: read the order's news but leave its chat unread. */
+  markOrderRead: (orderId: string, exceptMessages?: boolean) => Promise<void>;
   markAllRead: () => Promise<void>;
 }
 
-const EMPTY: NotificationSummary = { unread: 0, byOrder: {} };
+const EMPTY: NotificationSummary = { unread: 0, messages: 0, byOrder: {}, messagesByOrder: {} };
 
 export const NotificationsContext = createContext<NotificationsValue>({
   unread: 0,
+  messages: 0,
   byOrder: {},
+  messagesByOrder: {},
   toast: null,
   dismissToast: () => undefined,
   refresh: async () => undefined,
@@ -75,9 +81,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }): JS
   }, [apply, signedIn]);
 
   const markOrderRead = useCallback(
-    async (orderId: string) => {
+    async (orderId: string, exceptMessages = false) => {
       if (!signedIn || !summary.byOrder[orderId]) return;
-      await notificationsApi.read(orderId).catch(() => undefined);
+      await notificationsApi.read(orderId, exceptMessages).catch(() => undefined);
       const next = await notificationsApi.summary().catch(() => null);
       // Reading is not "something new": move the baseline down with it.
       if (next) {
@@ -98,7 +104,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }): JS
   const value = useMemo<NotificationsValue>(
     () => ({
       unread: summary.unread,
+      messages: summary.messages ?? 0,
       byOrder: summary.byOrder,
+      messagesByOrder: summary.messagesByOrder ?? {},
       toast,
       dismissToast: () => setToast(null),
       refresh,

@@ -14,10 +14,38 @@
   overscroll-behavior: contain;
 }
 
+/* Its own page: the thread takes whatever height the page leaves it and the
+   composer sits under it like in any messenger. The page (chatPage below)
+   is the one that knows where the header and the bottom menu are. */
+.full {
+  flex: 1;
+  min-height: 0;
+}
+
+.full .list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+
+/* The whole screen between the header and the bottom menu — measured from
+   the layout, not guessed, so the composer is never hidden under the menu. */
+.chatPage {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  height: calc(100dvh - var(--header-h));
+  padding: 12px 16px calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);
+  overflow: hidden;
+}
+
 .message {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   max-width: 85%;
   padding: 8px 12px;
   border-radius: var(--radius);
@@ -56,13 +84,113 @@
   overflow-wrap: anywhere;
 }
 
+.photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.photoBtn {
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.photoBtn img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
 .composer {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.composer textarea {
-  resize: vertical;
-  min-height: 56px;
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.row textarea {
+  flex: 1;
+  resize: none;
+  min-height: 48px;
+  max-height: 140px;
+}
+
+.attach,
+.send {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0;
+  font-size: 20px;
+  border-radius: var(--radius);
+}
+
+.attach {
+  border: 1px solid var(--border);
+  background: var(--card-hover);
+  color: var(--text);
+}
+
+.pending {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pendingItem {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.pendingItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.pendingItem button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--error);
+  color: #fff;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* Tap a photo to see it large; tap again to close. */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border: none;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+.viewer img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }

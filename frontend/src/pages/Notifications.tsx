@@ -86,7 +86,7 @@ export default function Notifications(): JSX.Element {
           </div>
         );
         return item.order ? (
-          <Link key={item.id} to={`/orders/${item.order.id}`}>
+          <Link key={item.id} to={item.type === 'message' ? `/orders/${item.order.id}/chat` : `/orders/${item.order.id}`}>
             {body}
           </Link>
         ) : (

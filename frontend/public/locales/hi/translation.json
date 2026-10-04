@@ -25,7 +25,8 @@
     "orders": "काम",
     "masters": "कारीगर",
     "profile": "प्रोफ़ाइल",
-    "admin": "एडमिन"
+    "admin": "एडमिन",
+    "chats": "चैट"
   },
   "auth": {
     "signIn": "Pi से साइन इन करें",
@@ -434,7 +435,21 @@
     "admin": "प्रशासन",
     "you": "आप",
     "client": "ग्राहक",
-    "master": "कारीगर"
+    "master": "कारीगर",
+    "photoType": "केवल JPEG या PNG भेजे जा सकते हैं।",
+    "photoSize": "फ़ोटो 5 MB से बड़ी है — छोटी चुनें।",
+    "photo": "फ़ोटो",
+    "removePhoto": "फ़ोटो हटाएँ",
+    "addPhoto": "फ़ोटो जोड़ें",
+    "withMaster": "कारीगर",
+    "withClient": "ग्राहक",
+    "listTitle": "चैट",
+    "listEmpty": "अभी कोई बातचीत नहीं। ग्राहक के कारीगर चुनने पर चैट दिखेगी।",
+    "noMessagesYet": "अभी कोई संदेश नहीं",
+    "roleMaster": "कारीगर",
+    "roleClient": "ग्राहक",
+    "openWithMaster": "कारीगर से चैट",
+    "openWithClient": "ग्राहक से चैट"
   },
   "dispute": {
     "openedBy": {

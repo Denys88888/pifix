@@ -162,6 +162,55 @@ async function main() {
   check('markup is stored as plain text, not stripped or rejected',
     html.status === 201 && html.body?.message?.text === '<img src=x onerror=alert(1)>', `got ${html.status}`);
 
+  // Photos: only ones uploaded through PiFix, never an arbitrary link.
+  const cloud = process.env.CLOUDINARY_CLOUD_NAME;
+  const folder = process.env.CLOUDINARY_FOLDER ?? 'pifix';
+  const foreign = await call('POST', `/orders/${hired.id}/messages`, {
+    token: clientT,
+    body: { text: 'look', photos: ['https://evil.example.com/pixel.png'] },
+  });
+  check('a photo from somewhere else is refused', foreign.status === 400, `got ${foreign.status}`);
+  if (cloud) {
+    const own = `https://res.cloudinary.com/${cloud}/image/upload/v1/${folder}/chat/test-photo.jpg`;
+    const photoOnly = await call('POST', `/orders/${hired.id}/messages`, { token: clientT, body: { photos: [own] } });
+    check('a photo uploaded through PiFix can be sent, even with no text',
+      photoOnly.status === 201 && photoOnly.body?.message?.photos?.[0] === own,
+      `got ${photoOnly.status} ${JSON.stringify(photoOnly.body).slice(0, 140)}`);
+    const otherFolder = await call('POST', `/orders/${hired.id}/messages`, {
+      token: clientT,
+      body: { photos: [`https://res.cloudinary.com/${cloud}/image/upload/v1/${folder}/verification/id.jpg`] },
+    });
+    check('a PiFix photo from another folder (ID documents) is refused', otherFolder.status === 400,
+      `got ${otherFolder.status}`);
+    const five = await call('POST', `/orders/${hired.id}/messages`, { token: clientT, body: { photos: Array(5).fill(own) } });
+    check('at most four photos per message', five.status === 400, `got ${five.status}`);
+  } else {
+    console.log('  ⚠️  CLOUDINARY_CLOUD_NAME not set — skipping the accepted-photo checks');
+  }
+
+  console.log('\n═══ 2b. The Chats tab ═══');
+
+  const chats = await call('GET', '/chats', { token: masterT });
+  const mine = (chats.body?.items ?? []).find((c: any) => c.orderId === hired.id);
+  check('the conversation is listed for the master', Boolean(mine), JSON.stringify(chats.body).slice(0, 160));
+  check('it names the other side and shows the last message',
+    mine?.with === client.username && mine?.withRole === 'client' && Boolean(mine?.last),
+    JSON.stringify(mine).slice(0, 200));
+  check('it carries the unread count', (mine?.unread ?? 0) > 0, String(mine?.unread));
+  const strangerChats = await call('GET', '/chats', { token: strangerT });
+  check('a stranger does not see it', !(strangerChats.body?.items ?? []).some((c: any) => c.orderId === hired.id));
+  const openChats = await call('GET', '/chats', { token: clientT });
+  check('an order with no hired master has no chat', !(openChats.body?.items ?? []).some((c: any) => c.orderId === open.id));
+
+  const masterSum0 = (await call('GET', '/notifications/summary', { token: masterT })).body;
+  check('the summary counts chat messages per order', (masterSum0?.messagesByOrder?.[hired.id] ?? 0) > 0,
+    JSON.stringify(masterSum0));
+  await call('POST', '/notifications/read', { token: masterT, body: { orderId: hired.id, exceptMessages: true } });
+  const masterSum1 = (await call('GET', '/notifications/summary', { token: masterT })).body;
+  check('opening the order leaves its chat unread until the chat is opened',
+    (masterSum1?.messagesByOrder?.[hired.id] ?? 0) === (masterSum0?.messagesByOrder?.[hired.id] ?? 0),
+    `${masterSum0?.messagesByOrder?.[hired.id]} → ${masterSum1?.messagesByOrder?.[hired.id]}`);
+
   console.log('\n═══ 3. A dispute: who opened it, the admin joins, the decision reaches both ═══');
 
   const dispute = await call('POST', `/orders/${hired.id}/dispute`, {
@@ -186,7 +235,7 @@ async function main() {
     JSON.stringify(leaked?.disputeReason));
 
   const adminRead = await call('GET', `/admin/orders/${hired.id}/messages`, { basic: ADMIN_BASIC });
-  check('the admin reads the whole chat', adminRead.status === 200 && adminRead.body?.items?.length === 3,
+  check('the admin reads the whole chat', adminRead.status === 200 && (adminRead.body?.items?.length ?? 0) >= 3,
     `got ${adminRead.status} ${adminRead.body?.items?.length}`);
   const adminSays = await call('POST', `/admin/orders/${hired.id}/messages`, {
     basic: ADMIN_BASIC,

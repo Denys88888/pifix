@@ -25,7 +25,8 @@
     "orders": "Trabajos",
     "masters": "Profesionales",
     "profile": "Perfil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chats": "Chats"
   },
   "auth": {
     "signIn": "Entrar con Pi",
@@ -434,7 +435,21 @@
     "admin": "Administración",
     "you": "Tú",
     "client": "Cliente",
-    "master": "Profesional"
+    "master": "Profesional",
+    "photoType": "Solo se pueden enviar JPEG o PNG.",
+    "photoSize": "La foto supera 5 MB: elige una más pequeña.",
+    "photo": "Foto",
+    "removePhoto": "Quitar foto",
+    "addPhoto": "Añadir foto",
+    "withMaster": "Profesional",
+    "withClient": "Cliente",
+    "listTitle": "Chats",
+    "listEmpty": "Aún no hay conversaciones. El chat aparece cuando el cliente contrata a un profesional.",
+    "noMessagesYet": "Aún no hay mensajes",
+    "roleMaster": "profesional",
+    "roleClient": "cliente",
+    "openWithMaster": "Chat con el profesional",
+    "openWithClient": "Chat con el cliente"
   },
   "dispute": {
     "openedBy": {

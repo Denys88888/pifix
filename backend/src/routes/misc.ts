@@ -11,6 +11,7 @@ import * as reviews from '../controllers/reviewsController';
 import * as uploads from '../controllers/uploadsController';
 import * as withdrawals from '../controllers/withdrawalsController';
 import * as notifications from '../controllers/notificationsController';
+import * as messages from '../controllers/messagesController';
 
 // ── Public settings & categories ─────────────────────────────────────────────
 export const settingsRouter = Router();
@@ -74,3 +75,8 @@ notificationsRouter.use(requireAuth);
 notificationsRouter.get('/summary', pollLimiter, asyncHandler(notifications.notificationSummary));
 notificationsRouter.get('/', asyncHandler(notifications.listNotifications));
 notificationsRouter.post('/read', asyncHandler(notifications.readNotifications));
+
+// ── Chats: every conversation in one list ────────────────────────────────────
+export const chatsRouter = Router();
+
+chatsRouter.get('/', requireAuth, asyncHandler(messages.listChats));

@@ -26,6 +26,8 @@ const MasterProfileEdit = lazy(() => import('./pages/MasterProfileEdit'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Notifications = lazy(() => import('./pages/Notifications'));
+const Chats = lazy(() => import('./pages/Chats'));
+const OrderChatPage = lazy(() => import('./pages/OrderChatPage'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -120,6 +122,8 @@ export default function App(): JSX.Element {
           <Route path="/orders" element={<OrdersList />} />
           <Route path="/orders/new" element={<RequireAuth><CreateOrder /></RequireAuth>} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/orders/:id/chat" element={<RequireAuth><OrderChatPage /></RequireAuth>} />
+          <Route path="/chats" element={<RequireAuth><Chats /></RequireAuth>} />
           <Route path="/masters" element={<MastersList />} />
           <Route path="/masters/:username" element={<MasterProfile />} />
           <Route path="/dashboard" element={<RequireAuth><MasterDashboard /></RequireAuth>} />

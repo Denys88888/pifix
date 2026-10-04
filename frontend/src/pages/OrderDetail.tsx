@@ -14,7 +14,6 @@ import { usePayment } from '../hooks/usePayment';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
 import { usePolling } from '../hooks/usePolling';
 import { formatDateTime, timeLeft } from '../lib/format';
-import { OrderChat } from '../components/OrderChat';
 import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/Pages.module.css';
 import detail from '../styles/OrderDetail.module.css';
@@ -64,11 +63,12 @@ export default function OrderDetail(): JSX.Element {
   // Opening the order is reading what happened on it. Re-runs when the counter
   // for this order goes up while the page is open — a message arriving in the
   // chat the pioneer is looking at is not "new" to them.
-  const { byOrder, markOrderRead } = useNotifications();
-  const freshHere = order ? (byOrder[order.id] ?? 0) : 0;
+  const { byOrder, messagesByOrder, markOrderRead } = useNotifications();
+  const chatUnread = order ? (messagesByOrder[order.id] ?? 0) : 0;
+  const otherNews = order ? (byOrder[order.id] ?? 0) - chatUnread : 0;
   useEffect(() => {
-    if (order && freshHere > 0) void markOrderRead(order.id);
-  }, [order, freshHere, markOrderRead]);
+    if (order && otherNews > 0) void markOrderRead(order.id, true);
+  }, [order, otherNews, markOrderRead]);
 
   const loadOrder = useCallback(async () => {
     try {
@@ -297,6 +297,16 @@ export default function OrderDetail(): JSX.Element {
         <span className="pi-amount">{order.budgetPi} π</span>
       </div>
 
+      {/* The chat used to sit at the very bottom of this page, under the map,
+          the price and the actions — people could not find it. It now opens
+          on its own page from here, the Chats tab and the notifications. */}
+      {order.master && (isOwner || isAssignedMaster) ? (
+        <Link to={`/orders/${order.id}/chat`} className={`btn ${detail.chatButton}`}>
+          💬 {t(isOwner ? 'chat.openWithMaster' : 'chat.openWithClient')}
+          {chatUnread > 0 ? <span className={detail.chatCount}>{chatUnread}</span> : null}
+        </Link>
+      ) : null}
+
       <p className={detail.description}>{order.description}</p>
 
       {order.photos.length > 0 ? (
@@ -419,21 +429,6 @@ export default function OrderDetail(): JSX.Element {
         <button className="btn" onClick={() => setReviewOpen(true)}>
           {t('review.leave')}
         </button>
-      ) : null}
-
-      {/* ── Chat (client and hired master) ──────────────────────────────── */}
-
-      {order.master && (isOwner || isAssignedMaster) ? (
-        <div className="card stack">
-          <h2 style={{ margin: 0 }}>{t('chat.title')}</h2>
-          <p className="hint" style={{ margin: 0 }}>
-            {t(isOwner ? 'chat.hintClient' : 'chat.hintMaster')}
-          </p>
-          <OrderChat
-            load={(after) => ordersApi.messages(order.id, after)}
-            send={(text) => ordersApi.sendMessage(order.id, text)}
-          />
-        </div>
       ) : null}
 
       {/* ── Responses (client only) ─────────────────────────────────────── */}

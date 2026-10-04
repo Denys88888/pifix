@@ -4,6 +4,7 @@ import type {
   ChatMessage,
   NotificationSummary,
   ChatPage,
+  ChatSummary,
   AdminDashboard,
   AdminSettings,
   Category,
@@ -147,8 +148,8 @@ export const ordersApi = {
     const { data } = await api.get<ChatPage>(`/orders/${id}/messages`, { params: after ? { after } : {} });
     return data;
   },
-  async sendMessage(id: string, text: string) {
-    const { data } = await api.post<{ message: ChatMessage }>(`/orders/${id}/messages`, { text });
+  async sendMessage(id: string, text: string, photos: string[] = []) {
+    const { data } = await api.post<{ message: ChatMessage }>(`/orders/${id}/messages`, { text, photos });
     return data.message;
   },
   async responses(id: string, params: { page?: number; limit?: number; sort?: 'date' | 'price' | 'rating' } = {}) {
@@ -302,7 +303,7 @@ export const reviewsApi = {
 
 // ── Uploads ──────────────────────────────────────────────────────────────────
 
-export type UploadFolder = 'avatars' | 'portfolio' | 'orders' | 'certificates' | 'verification';
+export type UploadFolder = 'avatars' | 'portfolio' | 'orders' | 'certificates' | 'verification' | 'chat';
 
 export const uploadsApi = {
   async images(folder: UploadFolder, files: File[], onProgress?: (percent: number) => void) {
@@ -345,6 +346,13 @@ export const withdrawalsApi = {
 
 // ── Notifications (in-app: Pi Browser has no push) ───────────────────────────
 
+export const chatsApi = {
+  async list() {
+    const { data } = await api.get<{ items: ChatSummary[] }>('/chats');
+    return data.items;
+  },
+};
+
 export const notificationsApi = {
   async summary() {
     const { data } = await api.get<NotificationSummary>('/notifications/summary');
@@ -355,8 +363,8 @@ export const notificationsApi = {
     return data.items;
   },
   /** Marks everything read, or only what belongs to one order. */
-  async read(orderId?: string) {
-    await api.post('/notifications/read', orderId ? { orderId } : {});
+  async read(orderId?: string, exceptMessages = false) {
+    await api.post('/notifications/read', orderId ? { orderId, exceptMessages } : {});
   },
 };
 
@@ -406,8 +414,8 @@ export const adminApiClient = {
     });
     return data;
   },
-  async sendOrderMessage(id: string, text: string) {
-    const { data } = await adminApi.post<{ message: ChatMessage }>(`/admin/orders/${id}/messages`, { text });
+  async sendOrderMessage(id: string, text: string, photos: string[] = []) {
+    const { data } = await adminApi.post<{ message: ChatMessage }>(`/admin/orders/${id}/messages`, { text, photos });
     return data.message;
   },
   async masters(params: Record<string, string | number | undefined>) {

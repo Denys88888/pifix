@@ -25,7 +25,8 @@
     "orders": "Zlecenia",
     "masters": "Fachowcy",
     "profile": "Profil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chats": "Czaty"
   },
   "auth": {
     "signIn": "Zaloguj przez Pi",
@@ -436,7 +437,21 @@
     "admin": "Administracja",
     "you": "Ty",
     "client": "Klient",
-    "master": "Fachowiec"
+    "master": "Fachowiec",
+    "photoType": "Można wysłać tylko JPEG lub PNG.",
+    "photoSize": "Zdjęcie ma ponad 5 MB — wybierz mniejsze.",
+    "photo": "Zdjęcie",
+    "removePhoto": "Usuń zdjęcie",
+    "addPhoto": "Dodaj zdjęcie",
+    "withMaster": "Fachowiec",
+    "withClient": "Klient",
+    "listTitle": "Czaty",
+    "listEmpty": "Brak rozmów. Czat pojawia się, gdy klient zatrudni fachowca.",
+    "noMessagesYet": "Brak wiadomości",
+    "roleMaster": "fachowiec",
+    "roleClient": "klient",
+    "openWithMaster": "Czat z fachowcem",
+    "openWithClient": "Czat z klientem"
   },
   "dispute": {
     "openedBy": {

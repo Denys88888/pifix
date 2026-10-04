@@ -25,7 +25,8 @@
     "orders": "Pekerjaan",
     "masters": "Tukang",
     "profile": "Profil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "chats": "Obrolan"
   },
   "auth": {
     "signIn": "Masuk dengan Pi",
@@ -433,7 +434,21 @@
     "admin": "Administrasi",
     "you": "Anda",
     "client": "Klien",
-    "master": "Tukang"
+    "master": "Tukang",
+    "photoType": "Hanya JPEG atau PNG yang bisa dikirim.",
+    "photoSize": "Foto lebih dari 5 MB — pilih yang lebih kecil.",
+    "photo": "Foto",
+    "removePhoto": "Hapus foto",
+    "addPhoto": "Tambah foto",
+    "withMaster": "Tukang",
+    "withClient": "Klien",
+    "listTitle": "Obrolan",
+    "listEmpty": "Belum ada percakapan. Obrolan muncul setelah klien menyewa tukang.",
+    "noMessagesYet": "Belum ada pesan",
+    "roleMaster": "tukang",
+    "roleClient": "klien",
+    "openWithMaster": "Obrolan dengan tukang",
+    "openWithClient": "Obrolan dengan klien"
   },
   "dispute": {
     "openedBy": {

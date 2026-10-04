@@ -2,7 +2,7 @@
 
 ## Automated first
 
-Seven suites, 260 assertions. All refuse to run with `NODE_ENV=production`.
+Seven suites, 271 assertions. All refuse to run with `NODE_ENV=production`.
 `test:unit` needs nothing running; the rest need a database, and three of them
 need the fake Pi API as well.
 
@@ -123,7 +123,7 @@ and reopen the request.
 Like the payout suite, it first asserts the gate is switched on: with
 `REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
 
-Last full run: **48 + 46 + 59 + 38 + 17 + 11 + 41 = 260 passed, 0 failed** (2026-10-04, local).
+Last full run: **48 + 46 + 59 + 38 + 17 + 11 + 52 = 271 passed, 0 failed** (2026-10-04, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.
