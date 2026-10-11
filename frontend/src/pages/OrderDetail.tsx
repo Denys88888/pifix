@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AppLink as Link } from '../components/AppLink';
 import { useTranslation } from 'react-i18next';
 import { mastersApi, ordersApi, reviewsApi } from '../api/endpoints';
 import { ApiError } from '../api/client';

@@ -19,6 +19,7 @@ import { getSettings } from './settings';
 import { computeOrderCharges, fundEscrow } from './escrow';
 import { postTransaction } from './ledger';
 import { notify } from './notifications';
+import { autoPayoutAfterRelease } from './withdrawals';
 
 /**
  * Payment metadata is written by the client, so it is treated as UNTRUSTED
@@ -605,6 +606,8 @@ async function markCancelled(piPaymentId: string, userId?: string, piPayment?: P
  * before any master was selected (policy 4.5).
  */
 export async function refundConnect(responseId: string, reason: string): Promise<void> {
+  let refundedTo: string | null = null;
+  let refundedOrder: string | null = null;
   await prisma.$transaction(async (tx) => {
     const response = await tx.response.findUnique({ where: { id: responseId } });
     if (!response) return;
@@ -629,5 +632,15 @@ export async function refundConnect(responseId: string, reason: string): Promise
       description: reason.slice(0, 300),
       orderId: response.orderId,
     });
+    refundedTo = response.masterId;
+    refundedOrder = response.orderId;
   });
+
+  // Back to the master's Pi wallet, not a balance: a 0.5 π fee could never be
+  // withdrawn on its own under the minimum withdrawal.
+  if (refundedTo) {
+    void autoPayoutAfterRelease(refundedTo, refundedOrder).catch((error) =>
+      logger.error('Automatic connect refund payout failed', { responseId, error: (error as Error).message }),
+    );
+  }
 }

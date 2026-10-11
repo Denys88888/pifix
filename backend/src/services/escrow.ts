@@ -254,7 +254,7 @@ export async function releaseEscrow(orderId: string, reason: ReleaseReason): Pro
 
 /** Refunds a funded escrow back to the client's balance (dispute resolution). */
 export async function refundEscrow(orderId: string, refundFees: boolean): Promise<Order | null> {
-  return prisma.$transaction(async (tx) => {
+  const refunded = await prisma.$transaction(async (tx) => {
     // Same reasoning as releaseEscrow: two admins resolving one dispute at the
     // same moment would otherwise both read FUNDED and refund the client twice.
     // The lock also stops a refund and a release from settling the same escrow.
@@ -286,6 +286,16 @@ export async function refundEscrow(orderId: string, refundFees: boolean): Promis
     logger.info('Escrow refunded', { orderId, amount: money(amount), refundFees });
     return updated;
   });
+
+  // The client paid from their Pi wallet, so the refund goes back there rather
+  // than sitting on a PiFix balance they would have to withdraw — and could
+  // not, below the minimum withdrawal. Not awaited, as for the master's payout.
+  if (refunded) {
+    void autoPayoutAfterRelease(refunded.clientId, refunded.id).catch((error) =>
+      logger.error('Automatic refund payout failed', { orderId, error: (error as Error).message }),
+    );
+  }
+  return refunded;
 }
 
 /**

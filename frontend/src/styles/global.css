@@ -85,6 +85,26 @@ p {
   margin: 0 0 12px;
 }
 
+/* No long-press menu on links, buttons and pictures. On iOS that menu offers
+   "Open Link", which opens the page in Safari — outside Pi Browser, where the
+   app has no Pi session and nothing works. Seen on a real iPhone when a
+   bottom-menu tab was held a moment too long. Text in messages, descriptions
+   and form fields stays selectable and copyable. */
+a,
+button,
+img,
+[role='button'] {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+a,
+button,
+[role='button'] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 a {
   color: var(--accent);
   text-decoration: none;
@@ -376,4 +396,9 @@ button:disabled {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* In-app links carry no href (see AppLink) — keep the pointer and focus ring. */
+a[role='link'] {
+  cursor: pointer;
 }

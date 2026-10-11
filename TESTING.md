@@ -2,7 +2,7 @@
 
 ## Automated first
 
-Seven suites, 279 assertions. All refuse to run with `NODE_ENV=production`.
+Seven suites, 283 assertions. All refuse to run with `NODE_ENV=production`.
 `test:unit` needs nothing running; the rest need a database, and three of them
 need the fake Pi API as well.
 
@@ -60,7 +60,7 @@ fires and is **per user, not per IP** (carrier NAT would otherwise punish a whol
 city), reads keep working while writes are limited, admin login is brute-force
 braked, and hostile input is rejected rather than truncated.
 
-### Referrals, boost, and the failed-payout path — 44 assertions
+### Referrals, boost, and the failed-payout path — 48 assertions
 
 ```bash
 # same three terminals, but the backend needs a wallet that cannot sign:
@@ -123,7 +123,7 @@ and reopen the request.
 Like the payout suite, it first asserts the gate is switched on: with
 `REQUIRE_KYC` unset on Testnet every assertion would pass vacuously.
 
-Last full run: **48 + 46 + 61 + 44 + 17 + 11 + 52 = 279 passed, 0 failed** (2026-10-04, local).
+Last full run: **48 + 46 + 61 + 48 + 17 + 11 + 52 = 283 passed, 0 failed** (2026-10-11, local).
 
 No suite replaces items 8, 9, 12 and 17 below: only a real device proves the Pi
 SDK callbacks behave in Pi Browser.

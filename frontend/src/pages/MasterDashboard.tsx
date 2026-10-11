@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from '../components/AppLink';
 import { useTranslation } from 'react-i18next';
 import { mastersApi, ordersApi, withdrawalsApi } from '../api/endpoints';
 import type { MasterStats, Order, OrderResponse, Transaction, Withdrawal } from '../api/types';

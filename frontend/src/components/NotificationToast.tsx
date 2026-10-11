@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from './AppLink';
 import { useNotifications } from '../hooks/useNotifications';
 import styles from '../styles/NotificationToast.module.css';
 

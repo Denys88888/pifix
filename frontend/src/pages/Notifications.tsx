@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from '../components/AppLink';
 import { useTranslation } from 'react-i18next';
 import { notificationsApi } from '../api/endpoints';
 import type { AppNotification } from '../api/types';

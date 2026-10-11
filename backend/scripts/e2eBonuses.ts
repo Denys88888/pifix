@@ -530,6 +530,48 @@ async function main() {
   const carolEnd = (await prisma.user.findUniqueOrThrow({ where: { id: carol.id } })).balancePi;
   check('which, failing here, still leaves her the money', carolEnd.greaterThan(0), carolEnd.toString());
 
+  console.log('\n═══ 8. A refund goes back to the Pi wallet, not a balance ═══');
+
+  // The client of a disputed job, refunded by the admin: the refund is sent
+  // to their wallet like a master's payout, instead of sitting on a balance
+  // they could not withdraw below the minimum.
+  await prisma.withdrawalRequest.updateMany({
+    where: { userId: client.id, status: { in: ['REQUESTED', 'APPROVED'] } },
+    data: { status: 'REJECTED', adminNote: 'Closed by the test', processedAt: new Date() },
+  });
+  const refundOrder = await prisma.order.create({
+    data: {
+      publicId: publicId(), clientId: client.id, categoryId: category.id,
+      title: 'Disputed job refunded to the client', description: 'The admin refunds it.',
+      budgetPi: '4', address: 'Warsaw', lat: 52.23, lng: 21.01,
+      status: OrderStatus.DISPUTED, masterId: carol.id, disputeReason: 'Nobody came.',
+      escrowStatus: EscrowStatus.FUNDED, escrowAmountPi: '4',
+      masterPayoutPi: '4', totalPaidPi: '4.4', clientFeePi: '0.4',
+    },
+  });
+  const clientBefore = (await prisma.user.findUniqueOrThrow({ where: { id: client.id } })).balancePi;
+  const refundRes = await api('POST', `/admin/orders/${refundOrder.id}/resolve`, {
+    basic: ADMIN_BASIC,
+    body: { action: 'refund_with_fees', note: 'Refunded by the test' },
+  });
+  check('admin refunds the client', refundRes.status === 200, `got ${refundRes.status}`);
+  let refundRequest = null as Awaited<ReturnType<typeof prisma.withdrawalRequest.findFirst>>;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((r) => setTimeout(r, 500));
+    refundRequest = await prisma.withdrawalRequest.findFirst({
+      where: { userId: client.id, createdAt: { gte: refundOrder.createdAt } },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (refundRequest && refundRequest.status !== 'APPROVED') break;
+  }
+  check('a payout of the refund to the client was started', refundRequest !== null, 'the refund stayed on the balance');
+  check('for the refund plus whatever else they were owed',
+    !!refundRequest && refundRequest.amountPi.equals(clientBefore.add('4.4')),
+    `${refundRequest?.amountPi?.toString()} vs ${clientBefore.add('4.4').toString()}`);
+  const clientAfterRefund = (await prisma.user.findUniqueOrThrow({ where: { id: client.id } })).balancePi;
+  check('failing here, the client still keeps the money', clientAfterRefund.equals(clientBefore.add('4.4')),
+    `${clientBefore.toString()} → ${clientAfterRefund.toString()}`);
+
   await prisma.platformSettings.update({ where: { id: 1 }, data: { autoPayoutOnRelease: settings.autoPayoutOnRelease } });
 
   console.log(`\n═══ RESULT: ${pass} passed, ${fail} failed ═══`);

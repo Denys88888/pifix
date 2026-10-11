@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from './AppLink';
 import { mastersApi } from '../api/endpoints';
 import { ApiError } from '../api/client';
 import type { MasterProfile } from '../api/types';

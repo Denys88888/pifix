@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from '../../components/AppLink';
 import { adminApiClient } from '../../api/endpoints';
 import { ApiError } from '../../api/client';
 import type { AdminDashboard as Dashboard } from '../../api/types';

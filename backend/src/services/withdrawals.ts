@@ -181,11 +181,13 @@ export async function payOutstandingBalances(limit = 5): Promise<number> {
   const settings = await getSettings();
   if (!settings.autoPayoutOnRelease || !env.payoutsConfigured) return 0;
 
+  // Anyone PiFix owes Pi to: earnings, refunds, bonuses. The open-request
+  // filter below keeps a failed payout from being retried every round — that
+  // one waits for the admin.
   const owed = await prisma.user.findMany({
     where: {
       balancePi: { gt: 0 },
       isBlocked: false,
-      transactions: { some: { type: TransactionType.JOB_EARNING } },
       withdrawals: { none: { status: { in: [WithdrawalStatus.REQUESTED, WithdrawalStatus.APPROVED] } } },
     },
     select: { id: true },

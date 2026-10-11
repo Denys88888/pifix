@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from './AppLink';
 import { useTranslation } from 'react-i18next';
 import type { MasterProfile } from '../api/types';
 import { ReviewStars } from './ReviewStars';

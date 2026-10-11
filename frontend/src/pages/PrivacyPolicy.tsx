@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { usePlatformSettings } from '../hooks/usePlatformSettings';
-import { Link } from 'react-router-dom';
+import { AppLink as Link } from '../components/AppLink';
 
 export default function PrivacyPolicy(): JSX.Element {
   const { settings } = usePlatformSettings();

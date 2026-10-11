@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { AppLink as Link } from '../components/AppLink';
 import { useTranslation } from 'react-i18next';
 import { ordersApi } from '../api/endpoints';
 import type { Order } from '../api/types';
