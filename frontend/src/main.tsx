@@ -1,3 +1,5 @@
+// First: may move the page to its public PiNet address before anything renders.
+import { movingToPublicAddress } from './lib/publicAddress';
 import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -19,7 +21,7 @@ if (import.meta.env.DEV && import.meta.env.VITE_PI_MOCK === 'true') {
 const container = document.getElementById('root');
 if (!container) throw new Error('#root is missing from index.html');
 
-createRoot(container).render(
+if (!movingToPublicAddress) createRoot(container).render(
   <StrictMode>
     <Suspense fallback={<BootScreen />}>
       <BrowserRouter>

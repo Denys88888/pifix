@@ -31,7 +31,8 @@ export default function Profile(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const referralUrl = user ? `${APP_URL}/?ref=${user.username}` : APP_URL;
+  // A path, not ?ref=: the PiNet wrapper drops query strings (see captureReferrer).
+  const referralUrl = user ? `${APP_URL}/r/${encodeURIComponent(user.username)}` : APP_URL;
 
   const load = useCallback(async () => {
     try {

@@ -50,7 +50,8 @@ export function selfUser(user: User & { masterProfile?: MasterProfile | null }) 
     ratingCount: user.ratingCount,
     balancePi: money(user.balancePi),
     totalEarnedPi: money(user.totalEarnedPi),
-    referralLink: `?ref=${user.username}`,
+    // A path: the PiNet wrapper keeps paths and drops query strings.
+    referralLink: `/r/${encodeURIComponent(user.username)}`,
     createdAt: user.createdAt.toISOString(),
     masterProfile: user.masterProfile ? masterProfileDTO(user.masterProfile) : null,
     // Only so the app knows whether to offer the admin entrance. Every admin

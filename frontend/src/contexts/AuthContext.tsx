@@ -38,10 +38,18 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 
 const REFERRER_KEY = 'pifix_ref';
 
-/** Captures ?ref=username on first load, before React Router rewrites the URL. */
+/**
+ * Captures who invited this pioneer on first load, before React Router
+ * rewrites the URL. Two shapes: `/r/<username>` and the older `?ref=<username>`.
+ *
+ * The path form is the one that works: the PiNet wrapper (handyfix1515.pinet.com)
+ * passes the path into the app but drops the query string, so every `?ref=`
+ * link shared through it arrived with no referrer and no bonus was ever paid.
+ */
 function captureReferrer(): string | undefined {
   try {
-    const fromUrl = new URLSearchParams(window.location.search).get('ref');
+    const fromPath = /^\/r\/([^/?#]+)/.exec(window.location.pathname)?.[1];
+    const fromUrl = fromPath ? decodeURIComponent(fromPath) : new URLSearchParams(window.location.search).get('ref');
     if (fromUrl) {
       sessionStorage.setItem(REFERRER_KEY, fromUrl);
       return fromUrl;
@@ -51,6 +59,12 @@ function captureReferrer(): string | undefined {
     return undefined;
   }
 }
+
+// Read once while the module loads — before any route renders. `/r/<name>`
+// falls through to the catch-all route, which navigates to "/" in an effect
+// that runs before this provider's own effects, so waiting for mount would
+// read "/" and lose the referrer.
+captureReferrer();
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
   const [status, setStatus] = useState<AuthStatus>('booting');
