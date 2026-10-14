@@ -4,24 +4,26 @@
  * support, no Web Push and no background sync, and a stale cached API response
  * about money would be worse than a slow one. So:
  *   • hashed build assets  → cache-first (they are immutable)
- *   • locale JSON          → stale-while-revalidate
+ *   • locale JSON          → network-first (short timeout), cached fallback
  *   • the app shell        → network-first with a cached fallback
  *   • EVERYTHING under /api → never touched by the worker
  */
 
-/* Bump this on every locale change, and on any change to a PRECACHE entry.
- * `activate` deletes every cache whose name does not start with VERSION, so
- * bumping is what evicts stale translation bundles. Locales are
- * stale-while-revalidate, which means a newly added key renders as its raw id
- * ("auth.piNoResponse") on the first load after a deploy and only comes good on
- * the next one — seen for real in Pi Browser. The manifest is precached, so a
- * new icon set is invisible to "Add to Home Screen" until this changes too. */
-const VERSION = 'pifix-v26';
+/* Bump this on any change to a PRECACHE entry: `activate` deletes every cache
+ * whose name does not start with VERSION. The manifest is precached, so a new
+ * icon set is invisible to "Add to Home Screen" until this changes.
+ *
+ * Locales used to be stale-while-revalidate, so a newly added key rendered as
+ * its raw id ("terms.title") on the first load after every deploy — seen in Pi
+ * Browser and again on the PiNet page. They are network-first now; the cached
+ * copy is only for when the network is down or too slow. */
+const VERSION = 'pifix-v27';
 const STATIC_CACHE = `${VERSION}-static`;
 const SHELL_CACHE = `${VERSION}-shell`;
 const SHELL_URL = '/index.html';
 
 const PRECACHE = ['/', SHELL_URL, '/manifest.webmanifest', '/favicon.svg'];
+const LOCALE_TIMEOUT_MS = 4000;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -85,14 +87,18 @@ self.addEventListener('fetch', (event) => {
   if (isLocale(url)) {
     event.respondWith(
       caches.open(STATIC_CACHE).then(async (cache) => {
+        const network = fetch(request, { cache: 'no-cache' }).then((response) => {
+          if (response.ok) void cache.put(request, response.clone());
+          return response;
+        });
+        // A slow network falls back to the cached bundle after a few seconds
+        // rather than leaving the app on its boot screen.
+        const slow = new Promise((resolve) => setTimeout(resolve, LOCALE_TIMEOUT_MS));
+        const first = await Promise.race([network.catch(() => undefined), slow]);
+        if (first && first.ok) return first;
         const cached = await cache.match(request);
-        const network = fetch(request)
-          .then((response) => {
-            if (response.ok) void cache.put(request, response.clone());
-            return response;
-          })
-          .catch(() => cached);
-        return cached ?? network;
+        if (cached) return cached;
+        return network;
       }),
     );
     return;
