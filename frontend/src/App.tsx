@@ -25,6 +25,7 @@ const MasterDashboard = lazy(() => import('./pages/MasterDashboard'));
 const MasterProfileEdit = lazy(() => import('./pages/MasterProfileEdit'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const Chats = lazy(() => import('./pages/Chats'));
 const OrderChatPage = lazy(() => import('./pages/OrderChatPage'));
@@ -130,6 +131,7 @@ export default function App(): JSX.Element {
           <Route path="/dashboard/profile" element={<RequireAuth><MasterProfileEdit /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
 
           <Route path="/admin/login" element={<AdminLogin />} />

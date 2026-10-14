@@ -153,6 +153,9 @@ export default function Profile(): JSX.Element {
           <Link to="/privacy" className="btn btn--secondary">
             {t('common.privacy')}
           </Link>
+          <Link to="/terms" className="btn btn--secondary">
+            {t('common.terms')}
+          </Link>
         </div>
 
         {/* Hidden until an operator fills it in: pointing people at an address

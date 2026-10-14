@@ -113,6 +113,9 @@ export default function Home(): JSX.Element {
           <Link to="/privacy" className={styles.link}>
             {t('common.privacy')}
           </Link>
+          <Link to="/terms" className={styles.link}>
+            {t('common.terms')}
+          </Link>
         </div>
       ) : null}
     </main>

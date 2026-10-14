@@ -16,6 +16,7 @@
     "pullToRefresh": "Kéo để làm mới",
     "releaseToRefresh": "Thả để làm mới",
     "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản dịch vụ",
     "maintenance": "PiFix đang bảo trì. Một số thao tác tạm thời không dùng được.",
     "truncated": "Đang hiển thị {{shown}} kết quả gần nhất. Thu nhỏ bán kính để tìm chính xác hơn.",
     "close": "Đóng"
@@ -405,7 +406,7 @@
   },
   "privacy": {
     "title": "Chính sách bảo mật",
-    "updated": "Cập nhật lần cuối: 05/08/2026",
+    "updated": "Cập nhật lần cuối: 14/10/2026",
     "collectTitle": "Dữ liệu chúng tôi thu thập",
     "collectBody": "Tên người dùng và mã Pi của bạn, địa chỉ ví Pi, ngôn ngữ bạn chọn, các công việc và chào giá bạn tạo, ảnh bạn tải lên, địa chỉ và điểm trên bản đồ bạn nhập, cùng các đánh giá của bạn.\nChúng tôi không bao giờ hỏi cụm từ khôi phục Pi của bạn và PiFix không thể nhìn thấy nó.",
     "useTitle": "Chúng tôi dùng để làm gì",
@@ -414,6 +415,8 @@
     "paymentsBody": "Thanh toán chạy trên mạng Pi Network. PiFix lưu mã thanh toán, số tiền, memo và mã giao dịch. Ký quỹ được ghi trong cơ sở dữ liệu của chúng tôi; Pi thực tế di chuyển trên blockchain Pi.",
     "photosTitle": "Ảnh và giấy tờ",
     "photosBody": "Ảnh được lưu trên Cloudinary. Siêu dữ liệu vị trí bị loại bỏ khi tải lên. Giấy tờ xác minh được lưu riêng tư, chỉ quản trị viên xem được và sẽ bị xoá nếu xác minh bị từ chối.",
+    "chatTitle": "Trò chuyện đơn hàng",
+    "chatBody": "Tin nhắn và ảnh bạn gửi trong trò chuyện của đơn hàng được bên kia của đơn hàng nhìn thấy, và quản trị viên khi xử lý tranh chấp. Chúng được lưu cùng đơn hàng.",
     "locationTitle": "Vị trí",
     "locationBody": "Vị trí chỉ được yêu cầu khi bạn chạm nút định vị và chỉ để tính khoảng cách. Bạn luôn có thể nhập địa chỉ thủ công. Chúng tôi lưu toạ độ của công việc hoặc cơ sở làm việc, không lưu lịch sử di chuyển.",
     "retentionTitle": "Thời gian lưu trữ",
@@ -501,5 +504,33 @@
       "order_cancelled": "Khách đã hủy việc #{{publicId}} mà bạn đã phản hồi.",
       "not_selected": "Khách đã chọn thợ khác cho việc #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Điều khoản dịch vụ",
+    "updated": "Cập nhật lần cuối: 14/10/2026",
+    "intro": "Khi sử dụng PiFix, bạn chấp nhận các điều khoản này. Nếu không đồng ý, vui lòng không sử dụng ứng dụng.",
+    "aboutTitle": "PiFix là gì",
+    "aboutBody": "PiFix là sàn kết nối người cần làm việc (khách hàng) với thợ làm việc độc lập. PiFix không thuê thợ và không phải là một bên trong thỏa thuận giữa khách hàng và thợ. Thợ chịu trách nhiệm về công việc; khách hàng chịu trách nhiệm mô tả công việc trung thực.",
+    "accountTitle": "Tài khoản của bạn",
+    "accountBody": "Bạn chỉ đăng nhập bằng tài khoản Pi Network, và ngoài các điều khoản này còn áp dụng điều khoản của Pi Network. Mỗi người — một tài khoản. Bạn chịu trách nhiệm về mọi việc được thực hiện từ tài khoản của mình.",
+    "paymentsTitle": "Thanh toán và ký quỹ",
+    "paymentsBody": "Mọi thanh toán trong PiFix đều bằng Pi qua Pi Network. Khi khách hàng chọn thợ, ngân sách cộng phí nền tảng được giữ trong ký quỹ. Thợ nhận tiền khi khách hàng xác nhận công việc, hoặc tự động nếu khách hàng không xác nhận và không mở tranh chấp trong số ngày ghi trên đơn hàng. Tiền được gửi vào ví Pi của thợ.",
+    "feesTitle": "Phí và tính năng trả phí",
+    "feesBody": "Phí của khách hàng, giá phản hồi công việc, PRO, đẩy hồ sơ và đăng tin khẩn được hiển thị trong ứng dụng trước khi bạn thanh toán. Tính năng trả phí đã được cung cấp sẽ không được hoàn tiền.",
+    "refundsTitle": "Hủy và hoàn tiền",
+    "refundsBody": "Trước khi chọn thợ, công việc có thể được hủy miễn phí. Khi tiền trong ký quỹ cần được trả lại — công việc đã thanh toán bị hủy hoặc tranh chấp được phân xử cho khách hàng — tiền được gửi vào ví Pi của khách hàng.",
+    "disputesTitle": "Tranh chấp",
+    "disputesBody": "Nếu có sự cố, khách hàng hoặc thợ có thể mở tranh chấp trong đơn hàng, và tiền vẫn bị đóng băng. Quản trị viên đọc trò chuyện của đơn hàng, có thể hỏi cả hai bên và quyết định: trả tiền cho thợ, hoàn tiền cho khách hàng hoặc hủy đơn hàng. Cả hai bên đều thấy quyết định trong đơn hàng. Hãy trao đổi trong trò chuyện của đơn hàng — đó là bằng chứng.",
+    "conductTitle": "Những điều bị cấm",
+    "conductBody": "Bị cấm: dịch vụ bất hợp pháp hoặc nguy hiểm; gian lận, đơn hàng hoặc đánh giá giả; xúc phạm, đe dọa hoặc quấy rối; công khai dữ liệu cá nhân của người khác; yêu cầu thanh toán ngoài PiFix hoặc bằng thứ khác ngoài Pi; nhiều tài khoản để nhận thưởng. Vi phạm sẽ dẫn đến xóa nội dung và khóa tài khoản.",
+    "verificationTitle": "Xác minh và đánh giá",
+    "verificationBody": "Huy hiệu “đã xác minh” nghĩa là quản trị viên đã kiểm tra giấy tờ của thợ. Đây không phải là bảo đảm chất lượng công việc. Đánh giá phải trung thực và về công việc thật được thực hiện qua PiFix.",
+    "liabilityTitle": "Trách nhiệm",
+    "liabilityBody": "PiFix được cung cấp “nguyên trạng”. Chúng tôi cố gắng để ứng dụng hoạt động và thanh toán chính xác, nhưng không thể bảo đảm ứng dụng, Pi Network hay blockchain Pi hoạt động liên tục. PiFix không chịu trách nhiệm về chất lượng, an toàn hay kết quả công việc của thợ, cũng như thiệt hại mà khách hàng và thợ gây ra cho nhau.",
+    "changesTitle": "Thay đổi",
+    "changesBody": "Các điều khoản này có thể được cập nhật; ngày ở trên cùng cho biết phiên bản hiện tại. Tiếp tục sử dụng PiFix sau khi thay đổi nghĩa là bạn chấp nhận phiên bản mới.",
+    "contactTitle": "Liên hệ",
+    "contactBody": "Nếu có câu hỏi về các điều khoản này, hãy liên hệ chủ sở hữu ứng dụng qua trang PiFix trên Pi Developer Portal.",
+    "contactWithChannel": "Câu hỏi về các điều khoản này — hãy viết tới:"
   }
 }

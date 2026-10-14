@@ -16,6 +16,7 @@
     "pullToRefresh": "Pull to refresh",
     "releaseToRefresh": "Release to refresh",
     "privacy": "Privacy policy",
+    "terms": "Terms of service",
     "maintenance": "PiFix is under maintenance. Some actions are temporarily unavailable.",
     "truncated": "Showing the {{shown}} nearest matches. Reduce the radius to narrow the search.",
     "close": "Close"
@@ -406,7 +407,7 @@
   },
   "privacy": {
     "title": "Privacy policy",
-    "updated": "Last updated: 2026-08-05",
+    "updated": "Last updated: 2026-10-14",
     "collectTitle": "What we collect",
     "collectBody": "Your Pi username and Pi user id, your Pi wallet address, the language you choose, the jobs and responses you create, the photos you upload, the address and map point you enter, and your reviews.\nWe never ask for your Pi passphrase, and PiFix cannot see it.",
     "useTitle": "How we use it",
@@ -415,6 +416,8 @@
     "paymentsBody": "Payments run on the Pi Network. PiFix stores the payment identifier, the amount, the memo and the transaction id. Escrow is recorded in our database; the Pi itself moves on the Pi blockchain.",
     "photosTitle": "Photos and documents",
     "photosBody": "Photos are stored on Cloudinary. Location metadata is stripped on upload. Verification documents (ID and selfie) are stored privately, are visible only to administrators, and are deleted if verification is rejected.",
+    "chatTitle": "Order chat",
+    "chatBody": "Messages and photos you send in an order chat are seen by the other side of the order, and by administrators when they handle a dispute. They are stored together with the order.",
     "locationTitle": "Location",
     "locationBody": "Location is requested only when you tap the location button, and only to compute distances. You can always type the address manually instead. We store the coordinates of your job or your working base, not a movement history.",
     "retentionTitle": "Retention",
@@ -750,5 +753,33 @@
       "order_cancelled": "The client cancelled job #{{publicId}} that you responded to.",
       "not_selected": "The client chose another master for job #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Terms of service",
+    "updated": "Last updated: 2026-10-14",
+    "intro": "By using PiFix you accept these terms. If you do not agree with them, please do not use the app.",
+    "aboutTitle": "What PiFix is",
+    "aboutBody": "PiFix is a marketplace that connects people who need work done (clients) with independent workers (masters). PiFix does not employ masters and is not a party to the agreement between a client and a master. The master is responsible for the work; the client is responsible for describing it honestly.",
+    "accountTitle": "Your account",
+    "accountBody": "You sign in only with your Pi Network account, and the Pi Network terms apply as well as these. One person — one account. You are responsible for everything done from your account.",
+    "paymentsTitle": "Payments and escrow",
+    "paymentsBody": "All payments in PiFix are made in Pi through the Pi Network. When a client hires a master, the budget plus the platform fee is held in escrow. The master is paid when the client confirms the work, or automatically if the client neither confirms nor opens a dispute within the number of days shown on the order. Payouts are sent to the master's Pi wallet.",
+    "feesTitle": "Fees and paid features",
+    "feesBody": "The client fee, the price of responding to a job, PRO, profile boost and urgent placement are shown in the app before you pay. Paid features that have already been delivered are not refunded.",
+    "refundsTitle": "Cancellation and refunds",
+    "refundsBody": "Before a master is hired, a job can be cancelled at no cost. When money held in escrow has to be returned — a cancelled paid job or a dispute decided for the client — it is sent to the client's Pi wallet.",
+    "disputesTitle": "Disputes",
+    "disputesBody": "If something goes wrong, the client or the master can open a dispute on the order, and the money stays frozen. The administration reads the order chat, may ask both sides questions, and decides: pay the master, refund the client, or cancel the order. Both sides see the decision in the order. Keep your communication in the order chat — it is the evidence.",
+    "conductTitle": "What is not allowed",
+    "conductBody": "Not allowed: illegal or dangerous services; fraud, fake orders or fake reviews; insults, threats or harassment; publishing other people's personal data; asking to be paid outside PiFix or in anything other than Pi; several accounts to collect bonuses. Violations lead to removal of content and blocking of the account.",
+    "verificationTitle": "Verification and reviews",
+    "verificationBody": "The “verified” badge means an administrator has checked a master's documents. It is not a guarantee of the quality of work. Reviews must be honest and about a real job done through PiFix.",
+    "liabilityTitle": "Liability",
+    "liabilityBody": "PiFix is provided “as is”. We work to keep it running and the payments correct, but cannot guarantee uninterrupted operation of the app, the Pi Network or the Pi blockchain. PiFix is not responsible for the quality, safety or result of the masters' work, or for damage clients and masters cause each other.",
+    "changesTitle": "Changes",
+    "changesBody": "These terms may be updated; the date at the top shows the current version. Using PiFix after a change means you accept the new version.",
+    "contactTitle": "Contact",
+    "contactBody": "For questions about these terms, contact the app owner through the Pi Developer Portal listing for PiFix.",
+    "contactWithChannel": "Questions about these terms — write to:"
   }
 }

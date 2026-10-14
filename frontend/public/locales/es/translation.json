@@ -16,6 +16,7 @@
     "pullToRefresh": "Desliza para actualizar",
     "releaseToRefresh": "Suelta para actualizar",
     "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
     "maintenance": "PiFix está en mantenimiento. Algunas acciones no están disponibles temporalmente.",
     "truncated": "Mostrando los {{shown}} más cercanos. Reduce el radio para acotar la búsqueda.",
     "close": "Cerrar"
@@ -406,7 +407,7 @@
   },
   "privacy": {
     "title": "Política de privacidad",
-    "updated": "Última actualización: 05/08/2026",
+    "updated": "Última actualización: 14/10/2026",
     "collectTitle": "Qué datos recogemos",
     "collectBody": "Tu nombre de usuario y tu identificador de Pi, tu dirección de monedero Pi, el idioma que eliges, los trabajos y propuestas que creas, las fotos que subes, la dirección y el punto del mapa que indicas, y tus reseñas.\nNunca pedimos tu frase de recuperación de Pi y PiFix no puede verla.",
     "useTitle": "Cómo los usamos",
@@ -415,6 +416,8 @@
     "paymentsBody": "Los pagos se realizan en la red Pi Network. PiFix guarda el identificador del pago, el importe, el memo y el identificador de la transacción. El depósito se registra en nuestra base de datos; los Pi se mueven en la blockchain de Pi.",
     "photosTitle": "Fotos y documentos",
     "photosBody": "Las fotos se almacenan en Cloudinary. Los metadatos de ubicación se eliminan al subirlas. Los documentos de verificación se guardan de forma privada, solo los ven los administradores y se eliminan si la verificación es rechazada.",
+    "chatTitle": "Chat del pedido",
+    "chatBody": "Los mensajes y fotos que envías en el chat de un pedido los ve la otra parte del pedido y, si hay una disputa, la administración. Se guardan junto con el pedido.",
     "locationTitle": "Ubicación",
     "locationBody": "La ubicación se solicita solo cuando pulsas el botón y únicamente para calcular distancias. Siempre puedes escribir la dirección manualmente. Guardamos las coordenadas del trabajo o de tu base, no un historial de movimientos.",
     "retentionTitle": "Conservación",
@@ -503,5 +506,33 @@
       "order_cancelled": "El cliente canceló el trabajo #{{publicId}} al que respondiste.",
       "not_selected": "El cliente eligió a otro profesional para el trabajo #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Términos de servicio",
+    "updated": "Última actualización: 14/10/2026",
+    "intro": "Al usar PiFix aceptas estos términos. Si no estás de acuerdo, no uses la aplicación.",
+    "aboutTitle": "Qué es PiFix",
+    "aboutBody": "PiFix es un mercado que conecta a quienes necesitan un trabajo (clientes) con trabajadores independientes (profesionales). PiFix no emplea a los profesionales y no es parte del acuerdo entre cliente y profesional. El profesional responde por el trabajo; el cliente, por describirlo con honestidad.",
+    "accountTitle": "Tu cuenta",
+    "accountBody": "Solo se inicia sesión con tu cuenta de Pi Network, y además de estos términos se aplican los de Pi Network. Una persona, una cuenta. Eres responsable de todo lo que se hace desde tu cuenta.",
+    "paymentsTitle": "Pagos y depósito",
+    "paymentsBody": "Todos los pagos en PiFix se hacen en Pi a través de Pi Network. Cuando un cliente contrata a un profesional, el presupuesto más la comisión de la plataforma quedan en depósito. El profesional cobra cuando el cliente confirma el trabajo, o automáticamente si el cliente no confirma ni abre una disputa en el número de días indicado en el pedido. Los pagos llegan a la billetera Pi del profesional.",
+    "feesTitle": "Comisiones y funciones de pago",
+    "feesBody": "La comisión del cliente, el precio de responder a un trabajo, PRO, el impulso del perfil y la publicación urgente se muestran en la aplicación antes de pagar. Las funciones de pago ya prestadas no se reembolsan.",
+    "refundsTitle": "Cancelación y reembolsos",
+    "refundsBody": "Antes de contratar a un profesional, el trabajo se puede cancelar sin coste. Cuando hay que devolver el dinero en depósito —un trabajo pagado cancelado o una disputa resuelta a favor del cliente— se envía a la billetera Pi del cliente.",
+    "disputesTitle": "Disputas",
+    "disputesBody": "Si algo sale mal, el cliente o el profesional pueden abrir una disputa en el pedido y el dinero queda congelado. La administración lee el chat del pedido, puede hacer preguntas a ambas partes y decide: pagar al profesional, reembolsar al cliente o cancelar el pedido. Ambas partes ven la decisión en el pedido. Comunícate en el chat del pedido: es la prueba.",
+    "conductTitle": "Qué no está permitido",
+    "conductBody": "No se permite: servicios ilegales o peligrosos; fraude, pedidos o reseñas falsos; insultos, amenazas o acoso; publicar datos personales de otros; pedir pagos fuera de PiFix o en algo que no sea Pi; varias cuentas para obtener bonos. Las infracciones conllevan la eliminación del contenido y el bloqueo de la cuenta.",
+    "verificationTitle": "Verificación y reseñas",
+    "verificationBody": "La insignia «verificado» significa que un administrador revisó los documentos del profesional. No garantiza la calidad del trabajo. Las reseñas deben ser honestas y sobre un trabajo real hecho a través de PiFix.",
+    "liabilityTitle": "Responsabilidad",
+    "liabilityBody": "PiFix se ofrece «tal cual». Trabajamos para que funcione y los pagos sean correctos, pero no podemos garantizar el funcionamiento ininterrumpido de la aplicación, de Pi Network ni de la cadena de bloques de Pi. PiFix no responde de la calidad, la seguridad ni el resultado del trabajo de los profesionales, ni de los daños que clientes y profesionales se causen entre sí.",
+    "changesTitle": "Cambios",
+    "changesBody": "Estos términos pueden actualizarse; la fecha de arriba indica la versión vigente. Seguir usando PiFix tras un cambio significa aceptar la nueva versión.",
+    "contactTitle": "Contacto",
+    "contactBody": "Para preguntas sobre estos términos, contacta con el propietario de la aplicación a través de la ficha de PiFix en el Pi Developer Portal.",
+    "contactWithChannel": "Preguntas sobre estos términos: escribe a:"
   }
 }

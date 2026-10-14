@@ -16,6 +16,7 @@
     "pullToRefresh": "Pociągnij, aby odświeżyć",
     "releaseToRefresh": "Puść, aby odświeżyć",
     "privacy": "Polityka prywatności",
+    "terms": "Regulamin",
     "maintenance": "PiFix jest w trakcie prac serwisowych. Część funkcji jest chwilowo niedostępna.",
     "truncated": "Pokazano {{shown}} najbliższych. Zmniejsz promień, aby zawęzić wyszukiwanie.",
     "close": "Zamknij"
@@ -408,7 +409,7 @@
   },
   "privacy": {
     "title": "Polityka prywatności",
-    "updated": "Ostatnia aktualizacja: 05.08.2026",
+    "updated": "Ostatnia aktualizacja: 14.10.2026",
     "collectTitle": "Jakie dane zbieramy",
     "collectBody": "Twoją nazwę użytkownika i identyfikator Pi, adres portfela Pi, wybrany język, tworzone zlecenia i oferty, przesyłane zdjęcia, adres i punkt na mapie oraz opinie.\nNigdy nie prosimy o Twoją passphrase Pi i nie mamy do niej dostępu.",
     "useTitle": "Jak je wykorzystujemy",
@@ -417,6 +418,8 @@
     "paymentsBody": "Płatności realizowane są w sieci Pi Network. PiFix przechowuje identyfikator płatności, kwotę, memo i identyfikator transakcji. Escrow jest zapisywany w naszej bazie; same Pi poruszają się w blockchainie Pi.",
     "photosTitle": "Zdjęcia i dokumenty",
     "photosBody": "Zdjęcia są przechowywane w Cloudinary. Metadane lokalizacji są usuwane podczas przesyłania. Dokumenty weryfikacyjne są prywatne, widoczne wyłącznie dla administratorów i usuwane po odrzuceniu weryfikacji.",
+    "chatTitle": "Czat zlecenia",
+    "chatBody": "Wiadomości i zdjęcia wysłane na czacie zlecenia widzi druga strona zlecenia, a w razie sporu — administracja. Są przechowywane razem ze zleceniem.",
     "locationTitle": "Lokalizacja",
     "locationBody": "O lokalizację prosimy dopiero po naciśnięciu przycisku i wyłącznie w celu obliczenia odległości. Adres zawsze możesz wpisać ręcznie. Zapisujemy współrzędne zlecenia lub bazy pracy, a nie historię przemieszczania się.",
     "retentionTitle": "Okres przechowywania",
@@ -507,5 +510,33 @@
       "order_cancelled": "Klient anulował zlecenie #{{publicId}}, na które odpowiedziałeś.",
       "not_selected": "Klient wybrał innego fachowca do zlecenia #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Regulamin",
+    "updated": "Ostatnia aktualizacja: 14.10.2026",
+    "intro": "Korzystając z PiFix, akceptujesz ten regulamin. Jeśli się z nim nie zgadzasz, nie korzystaj z aplikacji.",
+    "aboutTitle": "Czym jest PiFix",
+    "aboutBody": "PiFix to platforma, która łączy osoby potrzebujące wykonania pracy (klientów) z niezależnymi wykonawcami (fachowcami). PiFix nie zatrudnia fachowców i nie jest stroną umowy między klientem a fachowcem. Za pracę odpowiada fachowiec, za uczciwy opis zadania — klient.",
+    "accountTitle": "Twoje konto",
+    "accountBody": "Logowanie odbywa się wyłącznie przez konto Pi Network, a oprócz tego regulaminu obowiązują zasady Pi Network. Jedna osoba — jedno konto. Odpowiadasz za wszystko, co dzieje się na Twoim koncie.",
+    "paymentsTitle": "Płatności i escrow",
+    "paymentsBody": "Wszystkie płatności w PiFix odbywają się w Pi przez Pi Network. Gdy klient wybiera fachowca, budżet wraz z prowizją platformy trafia do escrow. Fachowiec otrzymuje zapłatę, gdy klient potwierdzi pracę, albo automatycznie, jeśli klient w liczbie dni podanej w zleceniu ani nie potwierdzi pracy, ani nie otworzy sporu. Wypłaty trafiają do portfela Pi fachowca.",
+    "feesTitle": "Prowizje i płatne funkcje",
+    "feesBody": "Prowizja klienta, cena odpowiedzi na zlecenie, PRO, wyróżnienie profilu i pilna publikacja są pokazywane w aplikacji przed zapłatą. Za już zrealizowane płatne funkcje nie ma zwrotu.",
+    "refundsTitle": "Anulowanie i zwroty",
+    "refundsBody": "Dopóki fachowiec nie został wybrany, zlecenie można anulować bez kosztów. Gdy pieniądze z escrow trzeba zwrócić — anulowane opłacone zlecenie lub spór rozstrzygnięty na korzyść klienta — trafiają do portfela Pi klienta.",
+    "disputesTitle": "Spory",
+    "disputesBody": "Jeśli coś pójdzie nie tak, klient lub fachowiec może otworzyć spór w zleceniu, a pieniądze pozostają zamrożone. Administracja czyta czat zlecenia, może zadać pytania obu stronom i decyduje: zapłacić fachowcowi, zwrócić pieniądze klientowi lub anulować zlecenie. Obie strony widzą decyzję w zleceniu. Rozmawiajcie na czacie zlecenia — to on jest dowodem.",
+    "conductTitle": "Czego nie wolno",
+    "conductBody": "Zabronione są: nielegalne lub niebezpieczne usługi; oszustwa, fałszywe zlecenia i opinie; obelgi, groźby i nękanie; publikowanie cudzych danych osobowych; proszenie o zapłatę poza PiFix lub w czymś innym niż Pi; kilka kont dla bonusów. Naruszenia kończą się usunięciem treści i zablokowaniem konta.",
+    "verificationTitle": "Weryfikacja i opinie",
+    "verificationBody": "Znaczek „zweryfikowany” oznacza, że administrator sprawdził dokumenty fachowca. Nie jest to gwarancja jakości pracy. Opinie muszą być uczciwe i dotyczyć prawdziwej pracy wykonanej przez PiFix.",
+    "liabilityTitle": "Odpowiedzialność",
+    "liabilityBody": "PiFix jest udostępniany „tak jak jest”. Dbamy o to, by działał, a płatności były poprawne, ale nie możemy zagwarantować nieprzerwanego działania aplikacji, Pi Network ani blockchainu Pi. PiFix nie odpowiada za jakość, bezpieczeństwo ani rezultat pracy fachowców, ani za szkody, które klienci i fachowcy wyrządzą sobie nawzajem.",
+    "changesTitle": "Zmiany",
+    "changesBody": "Regulamin może być aktualizowany; data na górze pokazuje obecną wersję. Dalsze korzystanie z PiFix po zmianie oznacza akceptację nowej wersji.",
+    "contactTitle": "Kontakt",
+    "contactBody": "W sprawie tego regulaminu skontaktuj się z właścicielem aplikacji przez wizytówkę PiFix w Pi Developer Portal.",
+    "contactWithChannel": "Pytania o regulamin — pisz tutaj:"
   }
 }

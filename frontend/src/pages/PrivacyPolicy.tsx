@@ -11,6 +11,7 @@ export default function PrivacyPolicy(): JSX.Element {
     'use',
     'payments',
     'photos',
+    'chat',
     'location',
     'retention',
     'rights',

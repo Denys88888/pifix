@@ -16,6 +16,7 @@
     "pullToRefresh": "Puxe para atualizar",
     "releaseToRefresh": "Solte para atualizar",
     "privacy": "Política de privacidade",
+    "terms": "Termos de serviço",
     "maintenance": "O PiFix está em manutenção. Algumas ações estão temporariamente indisponíveis.",
     "truncated": "Mostrando os {{shown}} mais próximos. Reduza o raio para refinar a busca.",
     "close": "Fechar"
@@ -406,7 +407,7 @@
   },
   "privacy": {
     "title": "Política de privacidade",
-    "updated": "Última atualização: 05/08/2026",
+    "updated": "Última atualização: 14/10/2026",
     "collectTitle": "Quais dados coletamos",
     "collectBody": "Seu nome de usuário e identificador Pi, o endereço da sua carteira Pi, o idioma escolhido, os serviços e propostas que você cria, as fotos enviadas, o endereço e o ponto no mapa, e suas avaliações.\nNunca pedimos sua passphrase do Pi e o PiFix não consegue vê-la.",
     "useTitle": "Como usamos",
@@ -415,6 +416,8 @@
     "paymentsBody": "Os pagamentos ocorrem na rede Pi Network. O PiFix guarda o identificador do pagamento, o valor, o memo e o identificador da transação. A custódia é registrada em nosso banco de dados; os Pi se movem na blockchain do Pi.",
     "photosTitle": "Fotos e documentos",
     "photosBody": "As fotos ficam na Cloudinary. Os metadados de localização são removidos no envio. Documentos de verificação são armazenados de forma privada, visíveis apenas para administradores, e apagados se a verificação for recusada.",
+    "chatTitle": "Chat do pedido",
+    "chatBody": "As mensagens e fotos que você envia no chat de um pedido são vistas pela outra parte do pedido e, em caso de disputa, pela administração. Elas ficam guardadas junto com o pedido.",
     "locationTitle": "Localização",
     "locationBody": "A localização só é solicitada quando você toca no botão e apenas para calcular distâncias. Você sempre pode digitar o endereço manualmente. Guardamos as coordenadas do serviço ou da sua base, não um histórico de deslocamento.",
     "retentionTitle": "Retenção",
@@ -503,5 +506,33 @@
       "order_cancelled": "O cliente cancelou o serviço #{{publicId}} ao qual você respondeu.",
       "not_selected": "O cliente escolheu outro profissional para o serviço #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Termos de serviço",
+    "updated": "Última atualização: 14/10/2026",
+    "intro": "Ao usar o PiFix, você aceita estes termos. Se não concordar, não use o aplicativo.",
+    "aboutTitle": "O que é o PiFix",
+    "aboutBody": "O PiFix é um marketplace que conecta quem precisa de um serviço (clientes) a profissionais independentes. O PiFix não emprega os profissionais e não é parte do acordo entre cliente e profissional. O profissional responde pelo trabalho; o cliente, por descrevê-lo com honestidade.",
+    "accountTitle": "Sua conta",
+    "accountBody": "O login é feito apenas com sua conta Pi Network, e além destes termos valem os da Pi Network. Uma pessoa, uma conta. Você é responsável por tudo o que é feito na sua conta.",
+    "paymentsTitle": "Pagamentos e custódia",
+    "paymentsBody": "Todos os pagamentos no PiFix são feitos em Pi pela Pi Network. Quando o cliente contrata um profissional, o orçamento mais a taxa da plataforma ficam em custódia. O profissional recebe quando o cliente confirma o trabalho, ou automaticamente se o cliente não confirmar nem abrir disputa no número de dias indicado no pedido. Os pagamentos vão para a carteira Pi do profissional.",
+    "feesTitle": "Taxas e recursos pagos",
+    "feesBody": "A taxa do cliente, o preço para responder a um serviço, PRO, destaque do perfil e publicação urgente aparecem no aplicativo antes do pagamento. Recursos pagos já entregues não são reembolsados.",
+    "refundsTitle": "Cancelamento e reembolsos",
+    "refundsBody": "Antes de contratar um profissional, o serviço pode ser cancelado sem custo. Quando o dinheiro em custódia precisa ser devolvido — serviço pago cancelado ou disputa decidida a favor do cliente — ele é enviado para a carteira Pi do cliente.",
+    "disputesTitle": "Disputas",
+    "disputesBody": "Se algo der errado, o cliente ou o profissional pode abrir uma disputa no pedido, e o dinheiro fica congelado. A administração lê o chat do pedido, pode fazer perguntas às duas partes e decide: pagar o profissional, reembolsar o cliente ou cancelar o pedido. As duas partes veem a decisão no pedido. Converse pelo chat do pedido — ele é a prova.",
+    "conductTitle": "O que não é permitido",
+    "conductBody": "Não é permitido: serviços ilegais ou perigosos; fraude, pedidos ou avaliações falsos; insultos, ameaças ou assédio; publicar dados pessoais de outras pessoas; pedir pagamento fora do PiFix ou em algo que não seja Pi; várias contas para obter bônus. Violações levam à remoção do conteúdo e ao bloqueio da conta.",
+    "verificationTitle": "Verificação e avaliações",
+    "verificationBody": "O selo «verificado» significa que um administrador conferiu os documentos do profissional. Não é garantia da qualidade do trabalho. As avaliações devem ser honestas e sobre um serviço real feito pelo PiFix.",
+    "liabilityTitle": "Responsabilidade",
+    "liabilityBody": "O PiFix é fornecido «como está». Trabalhamos para mantê-lo funcionando e os pagamentos corretos, mas não podemos garantir o funcionamento ininterrupto do aplicativo, da Pi Network ou da blockchain Pi. O PiFix não responde pela qualidade, segurança ou resultado do trabalho dos profissionais, nem por danos que clientes e profissionais causem uns aos outros.",
+    "changesTitle": "Alterações",
+    "changesBody": "Estes termos podem ser atualizados; a data no topo mostra a versão atual. Continuar usando o PiFix após uma alteração significa aceitar a nova versão.",
+    "contactTitle": "Contato",
+    "contactBody": "Para dúvidas sobre estes termos, fale com o responsável pelo aplicativo pela ficha do PiFix no Pi Developer Portal.",
+    "contactWithChannel": "Dúvidas sobre estes termos — escreva para:"
   }
 }

@@ -16,6 +16,7 @@
     "pullToRefresh": "Tarik untuk menyegarkan",
     "releaseToRefresh": "Lepas untuk menyegarkan",
     "privacy": "Kebijakan privasi",
+    "terms": "Ketentuan layanan",
     "maintenance": "PiFix sedang dalam pemeliharaan. Beberapa fitur sementara tidak tersedia.",
     "truncated": "Menampilkan {{shown}} terdekat. Perkecil radius untuk mempersempit pencarian.",
     "close": "Tutup"
@@ -405,7 +406,7 @@
   },
   "privacy": {
     "title": "Kebijakan privasi",
-    "updated": "Diperbarui: 05-08-2026",
+    "updated": "Diperbarui: 14-10-2026",
     "collectTitle": "Data yang kami kumpulkan",
     "collectBody": "Nama pengguna dan ID Pi Anda, alamat dompet Pi, bahasa pilihan, pekerjaan dan penawaran yang Anda buat, foto yang diunggah, alamat dan titik peta yang Anda isi, serta ulasan Anda.\nKami tidak pernah meminta passphrase Pi Anda dan PiFix tidak dapat melihatnya.",
     "useTitle": "Cara kami menggunakannya",
@@ -414,6 +415,8 @@
     "paymentsBody": "Pembayaran berjalan di jaringan Pi Network. PiFix menyimpan ID pembayaran, jumlah, memo, dan ID transaksi. Escrow dicatat di basis data kami; Pi-nya sendiri bergerak di blockchain Pi.",
     "photosTitle": "Foto dan dokumen",
     "photosBody": "Foto disimpan di Cloudinary. Metadata lokasi dihapus saat unggah. Dokumen verifikasi disimpan secara privat, hanya dapat dilihat administrator, dan dihapus jika verifikasi ditolak.",
+    "chatTitle": "Chat pesanan",
+    "chatBody": "Pesan dan foto yang kamu kirim di chat pesanan dilihat oleh pihak lain dalam pesanan, dan oleh administrator saat menangani sengketa. Semuanya disimpan bersama pesanan.",
     "locationTitle": "Lokasi",
     "locationBody": "Lokasi hanya diminta saat Anda menekan tombol lokasi dan hanya untuk menghitung jarak. Anda selalu bisa mengetik alamat secara manual. Kami menyimpan koordinat pekerjaan atau pangkalan kerja, bukan riwayat pergerakan.",
     "retentionTitle": "Penyimpanan",
@@ -501,5 +504,33 @@
       "order_cancelled": "Klien membatalkan pekerjaan #{{publicId}} yang Anda tanggapi.",
       "not_selected": "Klien memilih tukang lain untuk pekerjaan #{{publicId}}."
     }
+  },
+  "terms": {
+    "title": "Ketentuan layanan",
+    "updated": "Diperbarui: 14-10-2026",
+    "intro": "Dengan menggunakan PiFix, kamu menyetujui ketentuan ini. Jika tidak setuju, jangan gunakan aplikasi ini.",
+    "aboutTitle": "Apa itu PiFix",
+    "aboutBody": "PiFix adalah marketplace yang menghubungkan orang yang membutuhkan pekerjaan (klien) dengan pekerja mandiri (tukang). PiFix tidak mempekerjakan tukang dan bukan pihak dalam kesepakatan antara klien dan tukang. Tukang bertanggung jawab atas pekerjaannya; klien bertanggung jawab menjelaskan pekerjaan dengan jujur.",
+    "accountTitle": "Akunmu",
+    "accountBody": "Masuk hanya dengan akun Pi Network, dan selain ketentuan ini berlaku juga ketentuan Pi Network. Satu orang — satu akun. Kamu bertanggung jawab atas semua yang dilakukan dari akunmu.",
+    "paymentsTitle": "Pembayaran dan escrow",
+    "paymentsBody": "Semua pembayaran di PiFix dilakukan dalam Pi melalui Pi Network. Saat klien memilih tukang, anggaran ditambah biaya platform ditahan di escrow. Tukang dibayar saat klien mengonfirmasi pekerjaan, atau otomatis jika klien tidak mengonfirmasi dan tidak membuka sengketa dalam jumlah hari yang tertera di pesanan. Pembayaran dikirim ke dompet Pi tukang.",
+    "feesTitle": "Biaya dan fitur berbayar",
+    "feesBody": "Biaya klien, harga menanggapi pekerjaan, PRO, promosi profil, dan penayangan mendesak ditampilkan di aplikasi sebelum kamu membayar. Fitur berbayar yang sudah diberikan tidak dikembalikan.",
+    "refundsTitle": "Pembatalan dan pengembalian dana",
+    "refundsBody": "Sebelum tukang dipilih, pekerjaan bisa dibatalkan tanpa biaya. Jika uang di escrow harus dikembalikan — pekerjaan berbayar dibatalkan atau sengketa diputuskan untuk klien — uang dikirim ke dompet Pi klien.",
+    "disputesTitle": "Sengketa",
+    "disputesBody": "Jika ada masalah, klien atau tukang dapat membuka sengketa di pesanan, dan uang tetap dibekukan. Administrasi membaca chat pesanan, dapat bertanya kepada kedua pihak, lalu memutuskan: membayar tukang, mengembalikan dana klien, atau membatalkan pesanan. Kedua pihak melihat keputusan di pesanan. Berkomunikasilah di chat pesanan — itulah buktinya.",
+    "conductTitle": "Yang tidak diperbolehkan",
+    "conductBody": "Dilarang: layanan ilegal atau berbahaya; penipuan, pesanan atau ulasan palsu; hinaan, ancaman, atau pelecehan; menyebarkan data pribadi orang lain; meminta pembayaran di luar PiFix atau selain Pi; beberapa akun untuk mengumpulkan bonus. Pelanggaran berakibat penghapusan konten dan pemblokiran akun.",
+    "verificationTitle": "Verifikasi dan ulasan",
+    "verificationBody": "Lencana “terverifikasi” berarti administrator telah memeriksa dokumen tukang. Ini bukan jaminan kualitas pekerjaan. Ulasan harus jujur dan tentang pekerjaan nyata yang dilakukan melalui PiFix.",
+    "liabilityTitle": "Tanggung jawab",
+    "liabilityBody": "PiFix disediakan “apa adanya”. Kami berusaha agar aplikasi berjalan dan pembayaran benar, tetapi tidak dapat menjamin aplikasi, Pi Network, atau blockchain Pi bekerja tanpa gangguan. PiFix tidak bertanggung jawab atas kualitas, keamanan, atau hasil pekerjaan tukang, maupun kerugian yang ditimbulkan klien dan tukang satu sama lain.",
+    "changesTitle": "Perubahan",
+    "changesBody": "Ketentuan ini dapat diperbarui; tanggal di atas menunjukkan versi saat ini. Terus menggunakan PiFix setelah perubahan berarti kamu menerima versi baru.",
+    "contactTitle": "Kontak",
+    "contactBody": "Untuk pertanyaan tentang ketentuan ini, hubungi pemilik aplikasi melalui halaman PiFix di Pi Developer Portal.",
+    "contactWithChannel": "Pertanyaan tentang ketentuan ini — tulis ke:"
   }
 }
